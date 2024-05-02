@@ -35,12 +35,22 @@ app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
 
-// TODO: have a set of predetermined names that choose whether it needs to parse to int or not.
-// This will become relevant as more query parameters get added.
+// Unmapped properties will pass through directly
+const parseMapping = {
+  blockNumber: parseInt,
+  timestamp: (p) => {
+    // Convert to seconds if its provided in ms
+    if (p.length >= 13) {
+      return parseInt(p) / 1000;
+    }
+    return parseInt(p);
+  }
+}
+
 function parseQuery(query) {
   const retval = {};
   for (const property in query) {
-    retval[property] = parseInt(query[property]);
+    retval[property] = parseMapping[property]?.call(null, query[property]) ?? query[property];
   }
   return retval;
 }
