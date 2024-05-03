@@ -26,7 +26,7 @@ class BlockUtil {
       }`
     ))._meta.block.number;
 
-    const optionsBlock = await this.blockFromOptions(options);
+    const optionsBlock = await BlockUtil.blockFromOptions(options);
     const blockToUse = Math.min(subgraphBlock, optionsBlock.number);
     
     return await (await providerThenable).getBlock(blockToUse);

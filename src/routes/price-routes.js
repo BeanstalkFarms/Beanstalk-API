@@ -1,5 +1,5 @@
 const { getBeanPrice } = require('../service/price-service');
-const { parseQuery } = require('../utils/rest-parsing');
+const RestParsingUtil = require('../utils/rest-parsing');
 
 const Router = require('koa-router');
 const router = new Router({
@@ -12,7 +12,7 @@ const router = new Router({
  * ?timestamp: gets the price at the specified timestamp
  */
 router.get('/', async ctx => {
-  const options = parseQuery(ctx.query);
+  const options = RestParsingUtil.parseQuery(ctx.query);
   const price = await getBeanPrice(options);
   ctx.body = price;
 });

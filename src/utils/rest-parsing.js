@@ -10,14 +10,15 @@ const standardMapping = {
   }
 }
 
-function parseQuery(query, parseMapping = standardMapping) {
-  const retval = {};
-  for (const property in query) {
-    retval[property] = parseMapping[property]?.call(null, query[property]) ?? query[property];
+class RestParsingUtil {
+
+  static parseQuery(query, parseMapping = standardMapping) {
+    const retval = {};
+    for (const property in query) {
+      retval[property] = parseMapping[property]?.call(null, query[property]) ?? query[property];
+    }
+    return retval;
   }
-  return retval;
 }
 
-module.exports = {
-  parseQuery
-}
+module.exports = RestParsingUtil;
