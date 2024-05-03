@@ -1,10 +1,10 @@
-const { getTickers } = require("../src/service/coingecko-service");
-
 jest.mock("../src/datasources/subgraph-client", () => ({
   ...jest.requireActual("../src/datasources/subgraph-client"),
   basinSG: jest.fn()
 }));
 const { basinSG } = require("../src/datasources/subgraph-client");
+
+const { getTickers } = require("../src/service/coingecko-service");
 
 describe('CoingeckoService', () => {
 
@@ -19,6 +19,6 @@ describe('CoingeckoService', () => {
     expect(tickers[0].target_currency).toEqual('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
     expect(tickers[0].pool_id).toEqual('0xbea0e11282e2bb5893bece110cf199501e872bad');
 
-    console.log(tickers);
+    // console.log(tickers);
   });
 });

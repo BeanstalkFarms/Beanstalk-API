@@ -1,10 +1,7 @@
-
-const { getBeanPrice } = require("../src/service/price-service");
-const { BigNumber } = require("alchemy-sdk");
-
 jest.mock("../src/datasources/contracts", () => ({
   ...jest.requireActual("../src/datasources/contracts"),
-  asyncPriceV1ContractGetter: jest.fn()
+  asyncPriceV1ContractGetter: jest.fn(),
+  asyncUsdOracleContractGetter: jest.fn()
 }));
 
 jest.mock("../src/utils/block", () => ({
@@ -12,18 +9,26 @@ jest.mock("../src/utils/block", () => ({
   blockFromOptions: jest.fn()
 }));
 
-const { asyncPriceV1ContractGetter } = require("../src/datasources/contracts");
+const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("../src/datasources/contracts");
 const { blockFromOptions } = require("../src/utils/block");
+
+const { getBeanPrice, getTokenPrice } = require("../src/service/price-service");
+const { BigNumber } = require("alchemy-sdk");
+const { WETH } = require("../src/constants/addresses");
+
+const defaultOptions = { blockNumber: 19000000 };
 
 describe('PriceService', () => {
 
-  it('should fetch and format price data correctly', async () => {
-
+  beforeAll(() => {
     const mockBlock = {
-      number: 19000000,
+      number: defaultOptions.blockNumber,
       timestamp: 1705173443
     };
     blockFromOptions.mockResolvedValue(mockBlock);
+  });
+
+  it('should fetch and format Bean price data correctly', async () => {
 
     const mockPrice = {
       callStatic: {
@@ -36,10 +41,23 @@ describe('PriceService', () => {
     };
     asyncPriceV1ContractGetter.mockResolvedValue(mockPrice);
     
-    const price = await getBeanPrice({ blockNumber: 19000000 });
+    const price = await getBeanPrice(defaultOptions);
     expect(price.price).toEqual(0.9977);
     expect(price.liquidityUSD).toEqual(27676822.89);
     expect(price.deltaB).toEqual(-16781);
 
+  });
+
+  it('should fetch and format WETH price correctly', async () => {
+
+    mockPrice = {
+      callStatic: {
+        getUsdPrice: jest.fn().mockResolvedValue(BigNumber.from("390100082091451"))
+      }
+    }
+    asyncUsdOracleContractGetter.mockResolvedValue(mockPrice);
+
+    const price = await getTokenPrice(WETH, defaultOptions);
+    expect (price.usdPrice).toBeCloseTo(2563.44);
   });
 });

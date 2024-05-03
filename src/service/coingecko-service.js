@@ -15,7 +15,6 @@ async function getTickers() {
       }
     }`
   );
-  console.log(JSON.stringify(result));
 
   const allTickers = [];
 

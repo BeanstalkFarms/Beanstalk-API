@@ -1,5 +1,5 @@
 const { Contract } = require('alchemy-sdk');
-const { BEANSTALK_PRICE, ABIS } = require('../constants/addresses.js');
+const { BEANSTALK, BEANSTALK_PRICE, USD_ORACLE, ABIS } = require('../constants/addresses.js');
 const { providerThenable } = require('./alchemy.js');
 
 const contracts = {};
@@ -12,5 +12,7 @@ async function getContractAsync(address, blockNumber) {
 }
 
 module.exports = {
-  asyncPriceV1ContractGetter: async () => getContractAsync(BEANSTALK_PRICE, 0),
+  asyncBeanstalkContractGetter: async (blockNumber = 0) => getContractAsync(BEANSTALK, blockNumber),
+  asyncPriceV1ContractGetter: async (blockNumber = 0) => getContractAsync(BEANSTALK_PRICE, blockNumber),
+  asyncUsdOracleContractGetter: async (blockNumber = 0) => getContractAsync(USD_ORACLE, blockNumber),
 }

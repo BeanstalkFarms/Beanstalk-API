@@ -1,5 +1,7 @@
-const { asyncPriceV1ContractGetter } = require("../datasources/contracts");
+const { BigNumber } = require("alchemy-sdk");
+const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("../datasources/contracts");
 const { blockFromOptions } = require("../utils/block");
+const { createNumberSpread } = require("../utils/number");
 
 async function getBeanPrice(options = {}) {
   const block = await blockFromOptions(options);
@@ -10,13 +12,30 @@ async function getBeanPrice(options = {}) {
   const readable = {
     block: block.number,
     timestamp: block.timestamp,
-    price: parseFloat((priceResult.price.toNumber() / Math.pow(10, 6)).toFixed(4)),
-    liquidityUSD: parseFloat((priceResult.liquidity.toNumber() / Math.pow(10, 6)).toFixed(2)),
-    deltaB: parseFloat((priceResult.deltaB.toNumber() / Math.pow(10, 6)).toFixed(0))
+    price: createNumberSpread(priceResult.price, 6, 4).float,
+    liquidityUSD: createNumberSpread(priceResult.liquidity, 6, 2).float,
+    deltaB: createNumberSpread(priceResult.deltaB, 6, 0).float,
+  };
+  return readable;
+}
+
+async function getTokenPrice(token, options = {}) {
+  const block = await blockFromOptions(options);
+  const usdOracle = await asyncUsdOracleContractGetter();
+  const result = await usdOracle.callStatic.getUsdPrice(token, { blockTag: block.number });
+  // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion
+  const instPrice = BigNumber.from(10).pow(24).div(result);
+  
+  const readable = {
+    block: block.number,
+    timestamp: block.timestamp,
+    token,
+    usdPrice: createNumberSpread(instPrice, 6, 2).float
   };
   return readable;
 }
 
 module.exports = {
-  getBeanPrice
+  getBeanPrice,
+  getTokenPrice
 }
