@@ -3,6 +3,7 @@ const { basinSG, gql } = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/constant-product");
 
 async function getTickers() {
+  // Retrieve results from Basin subgraph
   const result = await basinSG(gql`
     {
       wells {
@@ -18,6 +19,7 @@ async function getTickers() {
 
   const allTickers = [];
 
+  // For each well in the subgraph, construct a formatted response
   for (const well of result.wells) {
     const token0 = well.tokens[0].id;
     const token1 = well.tokens[1].id;
