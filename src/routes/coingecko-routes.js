@@ -6,7 +6,7 @@ const router = new Router({
 
 router.get('/tickers', async ctx => {
   const tickers = await getTickers();
-  ctx.body = `coingecko placeholder ${ctx.params.id}`;
+  ctx.body = tickers;
 });
 
 // Note that /orderbook endpoint is not required since the current Well implementation is an AMM mirroring Uniswap V2

@@ -1,5 +1,6 @@
 
 const { getBeanPrice } = require("../src/service/price-service");
+const { BigNumber } = require("alchemy-sdk");
 
 jest.mock("../src/datasources/contracts", () => ({
   ...jest.requireActual("../src/datasources/contracts"),
@@ -13,7 +14,6 @@ jest.mock("../src/utils/block", () => ({
 
 const { asyncPriceV1ContractGetter } = require("../src/datasources/contracts");
 const { blockFromOptions } = require("../src/utils/block");
-const { BigNumber } = require("alchemy-sdk");
 
 describe('PriceService', () => {
 
