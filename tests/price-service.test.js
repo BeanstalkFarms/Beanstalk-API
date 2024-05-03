@@ -3,14 +3,9 @@ jest.mock("../src/datasources/contracts", () => ({
   asyncPriceV1ContractGetter: jest.fn(),
   asyncUsdOracleContractGetter: jest.fn()
 }));
-
-jest.mock("../src/utils/block", () => ({
-  ...jest.requireActual("../src/utils/block"),
-  blockFromOptions: jest.fn()
-}));
-
 const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("../src/datasources/contracts");
-const { blockFromOptions } = require("../src/utils/block");
+
+const BlockUtil = require("../src/utils/block");
 
 const { getBeanPrice, getTokenPrice } = require("../src/service/price-service");
 const { BigNumber } = require("alchemy-sdk");
@@ -25,7 +20,7 @@ describe('PriceService', () => {
       number: defaultOptions.blockNumber,
       timestamp: 1705173443
     };
-    blockFromOptions.mockResolvedValue(mockBlock);
+    jest.spyOn(BlockUtil, 'blockFromOptions').mockResolvedValue(mockBlock);
   });
 
   it('should fetch and format Bean price data correctly', async () => {

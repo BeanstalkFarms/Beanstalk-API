@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const { getTickers } = require('../service/coingecko-service');
+const { parseQuery } = require('../utils/rest-parsing');
+
 const router = new Router({
   prefix: '/basin'
 });
@@ -9,7 +11,8 @@ const router = new Router({
  * https://docs.google.com/document/d/1v27QFoQq1SKT3Priq3aqPgB70Xd_PnDzbOCiuoCyixw/edit
  */
 router.get('/tickers', async ctx => {
-  const tickers = await getTickers();
+  const options = parseQuery(ctx.query);
+  const tickers = await getTickers(options);
   ctx.body = tickers;
 });
 

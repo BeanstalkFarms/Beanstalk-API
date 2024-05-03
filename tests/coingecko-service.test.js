@@ -4,6 +4,9 @@ jest.mock("../src/datasources/subgraph-client", () => ({
 }));
 const { basinSG } = require("../src/datasources/subgraph-client");
 
+const BlockUtil = require("../src/utils/block");
+jest.spyOn(BlockUtil, 'blockForSubgraphFromOptions').mockResolvedValue({ number: 19000000, timestamp: 1705173443 });
+
 const { getTickers } = require("../src/service/coingecko-service");
 
 describe('CoingeckoService', () => {

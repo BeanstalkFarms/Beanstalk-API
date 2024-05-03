@@ -1,10 +1,10 @@
 const { BigNumber } = require("alchemy-sdk");
 const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("../datasources/contracts");
-const { blockFromOptions } = require("../utils/block");
+const BlockUtil = require("../utils/block");
 const { createNumberSpread } = require("../utils/number");
 
 async function getBeanPrice(options = {}) {
-  const block = await blockFromOptions(options);
+  const block = await BlockUtil.blockFromOptions(options);
   const priceContract = await asyncPriceV1ContractGetter();
   const priceResult = await priceContract.callStatic.price({ blockTag: block.number });
 
@@ -20,7 +20,7 @@ async function getBeanPrice(options = {}) {
 }
 
 async function getTokenPrice(token, options = {}) {
-  const block = await blockFromOptions(options);
+  const block = await BlockUtil.blockFromOptions(options);
   const usdOracle = await asyncUsdOracleContractGetter();
   const result = await usdOracle.callStatic.getUsdPrice(token, { blockTag: block.number });
   // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion

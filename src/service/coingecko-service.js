@@ -1,12 +1,16 @@
 const { BigNumber } = require("alchemy-sdk");
 const { basinSG, gql } = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/constant-product");
+const BlockUtil = require("../utils/block");
 
-async function getTickers() {
+async function getTickers(options = {}) {
+  // Determine block
+  const block = await BlockUtil.blockForSubgraphFromOptions(basinSG, options);
+
   // Retrieve results from Basin subgraph
   const result = await basinSG(gql`
     {
-      wells {
+      wells(block: {number: ${block.number}}) {
         id
         tokens {
           id
