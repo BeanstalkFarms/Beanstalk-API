@@ -1,7 +1,8 @@
 const { BigNumber } = require("alchemy-sdk");
 const { basinSG, gql } = require("../datasources/subgraph-client");
-const { getConstantProductPrice } = require("../utils/constant-product");
+const { getConstantProductPrice } = require("../utils/pool/constant-product");
 const BlockUtil = require("../utils/block");
+const { calcPoolLiquidityUSD } = require("../utils/pool/liquidity");
 
 class CoingeckoService {
 
@@ -27,18 +28,23 @@ class CoingeckoService {
   
     // For each well in the subgraph, construct a formatted response
     for (const well of result.wells) {
+
       const token0 = well.tokens[0].id;
       const token1 = well.tokens[1].id;
-      const price = getConstantProductPrice(well.reserves.map(BigNumber.from), well.tokens.map(t => t.decimals));
+
+      const reservesBN = well.reserves.map(BigNumber.from);
+      const poolPrice = getConstantProductPrice(reservesBN, well.tokens.map(t => t.decimals));
+      const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, reservesBN);
+      
       const ticker = {
         ticker_id: `${token0}_${token1}`,
         base_currency: token0,
         target_currency: token1,
         pool_id: well.id,
-        last_price: price.string[0],
+        last_price: poolPrice.string[0],
         base_volume: null,
         target_volume: null,
-        liquidity_in_usd: null,
+        liquidity_in_usd: poolLiquidity.toFixed(0),
         high: null,
         low: null
       };

@@ -19,7 +19,7 @@ jest.mock("../src/datasources/alchemy", () => ({
 const alchemy = require("../src/datasources/alchemy");
 
 const { BigNumber } = require("alchemy-sdk");
-const { getConstantProductPrice } = require("../src/utils/constant-product");
+const { getConstantProductPrice } = require("../src/utils/pool/constant-product");
 const { parseQuery } = require("../src/utils/rest-parsing");
 
 

@@ -7,9 +7,8 @@ const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("..
 
 const BlockUtil = require("../src/utils/block");
 
-const { getBeanPrice, getTokenPrice } = require("../src/service/price-service");
+const { getBeanPrice, getEthPrice } = require("../src/service/price-service");
 const { BigNumber } = require("alchemy-sdk");
-const { WETH } = require("../src/constants/addresses");
 
 const defaultOptions = { blockNumber: 19000000 };
 
@@ -37,7 +36,7 @@ describe('PriceService', () => {
     asyncPriceV1ContractGetter.mockResolvedValue(mockPrice);
     
     const price = await getBeanPrice(defaultOptions);
-    expect(price.price).toEqual(0.9977);
+    expect(price.usdPrice).toEqual(0.9977);
     expect(price.liquidityUSD).toEqual(27676822.89);
     expect(price.deltaB).toEqual(-16781);
 
@@ -52,7 +51,7 @@ describe('PriceService', () => {
     }
     asyncUsdOracleContractGetter.mockResolvedValue(mockPrice);
 
-    const price = await getTokenPrice(WETH, defaultOptions);
+    const price = await getEthPrice(defaultOptions);
     expect (price.usdPrice).toBeCloseTo(2563.44);
   });
 });

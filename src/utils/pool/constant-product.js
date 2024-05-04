@@ -1,5 +1,5 @@
 const { BigNumber } = require("alchemy-sdk");
-const NumberUtil = require("./number");
+const NumberUtil = require("../number");
 
 class ConstantProductUtil {
   // Given the reserves, returns the current price of each token in a constant product pool
