@@ -1,5 +1,6 @@
 const { BigNumber } = require("alchemy-sdk");
-const { basinSG, gql } = require("../datasources/subgraph-client");
+const { gql } = require("../datasources/subgraph-client");
+const SubgraphClients = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/pool/constant-product");
 const BlockUtil = require("../utils/block");
 const { calcPoolLiquidityUSD } = require("../utils/pool/liquidity");
@@ -12,10 +13,10 @@ class CoingeckoService {
 
   static async getTickers(options = {}) {
     // Determine block
-    const block = await BlockUtil.blockForSubgraphFromOptions(basinSG, options);
+    const block = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, options);
   
     // Retrieve results from Basin subgraph
-    const result = await basinSG(gql`
+    const result = await SubgraphClients.basinSG(gql`
       {
         wells(block: {number: ${block.number}}) {
           id
@@ -38,7 +39,9 @@ class CoingeckoService {
 
       const reservesBN = well.reserves.map(BigNumber.from);
       const poolPrice = getConstantProductPrice(reservesBN, well.tokens.map(t => t.decimals));
+      // TODO: improve this with promise.all
       const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, reservesBN, block.number);
+      const pool24hVolume = await CoingeckoService.getWellVolume(well.id, block.timestamp);
       
       const ticker = {
         ticker_id: `${token0}_${token1}`,
@@ -46,8 +49,8 @@ class CoingeckoService {
         target_currency: token1,
         pool_id: well.id,
         last_price: poolPrice.string[0],
-        base_volume: null,
-        target_volume: null,
+        base_volume: pool24hVolume[token0].string,
+        target_volume: pool24hVolume[token1].string,
         liquidity_in_usd: poolLiquidity.toFixed(0),
         high: null,
         low: null
@@ -62,7 +65,7 @@ class CoingeckoService {
   static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
-      basinSG,
+      SubgraphClients.basinSG,
       gql`
       {
         swaps {
@@ -79,7 +82,7 @@ class CoingeckoService {
           timestamp
         }
       }`,
-      `well: "${wellAddress}"`,
+      `well: "${wellAddress}", timestamp_lte: "${timestamp}"`,
       'timestamp',
       (timestamp - lookback).toFixed(0),
       'asc'

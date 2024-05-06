@@ -49,7 +49,7 @@ describe('Utils', () => {
       number: 19500000, timestamp: 1714760417 
     });
 
-    const result = await BlockUtil.blockForSubgraphFromOptions(basinSG, {});
+    const result = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, {});
 
     expect(getBlockSpy).toHaveBeenCalledWith(19500000);
     expect(result.number).toEqual(19500000);
