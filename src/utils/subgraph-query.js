@@ -7,21 +7,25 @@ class SubgraphQueryUtil {
    * @param {function} subgraphClient 
    * @param {string} query - the query to be paginated. Must NOT include any where clause here.
    * @param {string} where - additional fields to search by, of the form `field: "${value}, ..."`
-   * @param {string} paginateField - the field to paginate on
-   * @param {string} firstValue - the initial value to begin with of the paginateField
+   * @param {string[]} paginateFields - the fields to paginate on
+   * @param {string[]} firstValues - the initial values to begin with of the paginateFields
    * @param {'asc' | 'desc'} paginateDirection - the direction to paginate
+   * 
+   * Note that graphql can only order by a single field, and therefore it is possible for
+   * some results to be skipped in the case of paginating by multiple fields
    * 
    * @returns all results matching the query
    */
-  static async allPaginatedSG(subgraphClient, query, where, paginateField, firstValue, paginateDirection) {
+  static async allPaginatedSG(subgraphClient, query, where, paginateFields, firstValues, paginateDirection) {
 
     const PAGE_SIZE = 1000;
     const whereSuffix = paginateDirection === 'asc' ? '_gt' : '_lt';
 
     const retval = [];
-    while (firstValue) {
+    while (firstValues[0]) {
       // Construct arguments for pagination
-      const paginateArguments = `(where: {${paginateField}${whereSuffix}: "${firstValue}", ${where}}, first: ${PAGE_SIZE}, orderBy: ${paginateField}, orderDirection: ${paginateDirection})`
+      const whereClause = `{${paginateFields.map((v, idx) => `${v}${whereSuffix}: ${formatType(firstValues[idx])}`).join(', ')}, ${where}}`;
+      const paginateArguments = `(where: ${whereClause}, first: ${PAGE_SIZE}, orderBy: ${paginateFields[0]}, orderDirection: ${paginateDirection})`
       let entityName = '';
       // Add the generated arguments to the query
       const paginatedQuery = query.replace(/(\w+)\s{/, (match, p1) => {
@@ -33,9 +37,17 @@ class SubgraphQueryUtil {
 
       // Record the results and repeat as necessary
       retval.push(...result[entityName]);
-      firstValue = result[entityName][PAGE_SIZE - 1]?.[paginateField];
+      firstValues = paginateFields.map((v) => result[entityName][PAGE_SIZE - 1]?.[v]);
     }
     return retval;
+  }
+}
+
+function formatType(value) {
+  if (typeof value === 'number') {
+    return value;
+  } else {
+    return `"${value}"`;
   }
 }
 

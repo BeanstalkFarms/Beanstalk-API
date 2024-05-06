@@ -83,8 +83,8 @@ class CoingeckoService {
         }
       }`,
       `well: "${wellAddress}", timestamp_lte: "${timestamp}"`,
-      'timestamp',
-      (timestamp - lookback).toFixed(0),
+      ['timestamp', 'logIndex'],
+      [(timestamp - lookback).toFixed(0), 0],
       'asc'
     );
     allSwaps.map((swap) => {
