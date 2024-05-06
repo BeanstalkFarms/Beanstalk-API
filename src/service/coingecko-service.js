@@ -58,6 +58,7 @@ class CoingeckoService {
     return allTickers;
   }
 
+  // Gets the swap volume in terms of token amounts in the well
   static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
@@ -81,12 +82,12 @@ class CoingeckoService {
       `well: "${wellAddress}"`,
       'timestamp',
       (timestamp - lookback).toFixed(0),
-      'asc',
-      (swap) => {
-        swap.amountIn = BigNumber.from(swap.amountIn);
-        swap.amountOut = BigNumber.from(swap.amountOut);
-      }
+      'asc'
     );
+    allSwaps.map((swap) => {
+      swap.amountIn = BigNumber.from(swap.amountIn);
+      swap.amountOut = BigNumber.from(swap.amountOut);
+    });
 
     if (allSwaps.length === 0) {
       return createNumberSpread([BigNumber.from(0), BigNumber.from(0)], [1, 1]);
@@ -100,10 +101,9 @@ class CoingeckoService {
     }
 
     const decimals = {
-      [allSwaps[0].fromToken]: allSwaps[0].fromToken.decimals,
-      [allSwaps[0].toToken]: allSwaps[0].toToken.decimals,
+      [allSwaps[0].fromToken.id]: allSwaps[0].fromToken.decimals,
+      [allSwaps[0].toToken.id]: allSwaps[0].toToken.decimals,
     };
-    
     // Convert to the appropriate precision
     for (const token in swapVolume) {
       swapVolume[token] = createNumberSpread(swapVolume[token], decimals[token]);

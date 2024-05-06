@@ -10,11 +10,10 @@ class SubgraphQueryUtil {
    * @param {string} paginateField - the field to paginate on
    * @param {string} firstValue - the initial value to begin with of the paginateField
    * @param {'asc' | 'desc'} paginateDirection - the direction to paginate
-   * @param {function} postProcessing - optional function for any post processing
    * 
    * @returns all results matching the query
    */
-  static async allPaginatedSG(subgraphClient, query, where, paginateField, firstValue, paginateDirection, postProcessing) {
+  static async allPaginatedSG(subgraphClient, query, where, paginateField, firstValue, paginateDirection) {
 
     const PAGE_SIZE = 1000;
     const whereSuffix = paginateDirection === 'asc' ? '_gt' : '_lt';
@@ -34,10 +33,6 @@ class SubgraphQueryUtil {
       // Record the results and repeat as necessary
       retval.push(...result[entityName]);
       firstValue = result[entityName][PAGE_SIZE - 1]?.[paginateField];
-    }
-
-    if (postProcessing) {
-      retval.map(postProcessing);
     }
     return retval;
   }
