@@ -3,7 +3,8 @@ const { basinSG, gql } = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/pool/constant-product");
 const BlockUtil = require("../utils/block");
 const { calcPoolLiquidityUSD } = require("../utils/pool/liquidity");
-const subgraphClient = require("../datasources/subgraph-client");
+const SubgraphQueryUtil = require("../utils/subgraph-query");
+const { createNumberSpread } = require("../utils/number");
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -59,7 +60,7 @@ class CoingeckoService {
 
   static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
-    const sgResults = await allPaginatedSG(
+    const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
       basinSG,
       gql`
       {
@@ -77,50 +78,38 @@ class CoingeckoService {
           timestamp
         }
       }`,
+      `well: "${wellAddress}"`,
       'timestamp',
       (timestamp - lookback).toFixed(0),
-      'asc'
+      'asc',
+      (swap) => {
+        swap.amountIn = BigNumber.from(swap.amountIn);
+        swap.amountOut = BigNumber.from(swap.amountOut);
+      }
     );
-    console.log(sgResults);
+
+    if (allSwaps.length === 0) {
+      return createNumberSpread([BigNumber.from(0), BigNumber.from(0)], [1, 1]);
+    }
+    
+    // Add all of the swap amounts for each token
+    const swapVolume = {};
+    for (const swap of allSwaps) {
+      swapVolume[swap.fromToken.id] = swapVolume[swap.fromToken.id]?.add(swap.amountIn) ?? swap.amountIn;
+      swapVolume[swap.toToken.id] = swapVolume[swap.toToken.id]?.add(swap.amountOut) ?? swap.amountOut;
+    }
+
+    const decimals = {
+      [allSwaps[0].fromToken]: allSwaps[0].fromToken.decimals,
+      [allSwaps[0].toToken]: allSwaps[0].toToken.decimals,
+    };
+    
+    // Convert to the appropriate precision
+    for (const token in swapVolume) {
+      swapVolume[token] = createNumberSpread(swapVolume[token], decimals[token]);
+    }
+    return swapVolume;
   }
-}
-
-/**
- * Paginates a given subgraph query according to Graph Protocol's GraphQL API spec.
- * Only a single entity type should be requested at a time.
- * 
- * @param {function} subgraphClient 
- * @param {string} query - the query to be paginated
- * @param {string} paginateField - the field to paginate on
- * @param {string} firstValue - the initial value to begin with of the paginateField
- * @param {'asc' | 'desc'} paginateDirection 
- * 
- * TODO: need a terminating condition if desc direction is used
- * 
- * @returns all results matching the query
- */
-async function allPaginatedSG(subgraphClient, query, paginateField, firstValue, paginateDirection) {
-
-  const PAGE_SIZE = 1000;
-  const whereSuffix = paginateDirection === 'asc' ? '_gt' : '_lt';
-
-  const retval = [];
-  while (firstValue) {
-    // Construct arguments for pagination
-    const paginateArguments = `(where: {${paginateField}${whereSuffix}: "${firstValue}"}, first: ${PAGE_SIZE}, orderBy: ${paginateField}, orderDirection: ${paginateDirection})`
-    let entityName = '';
-    // Add the generated arguments to the query
-    const paginatedQuery = query.replace(/(\w+)\s{/, (match, p1) => {
-      entityName = p1;
-      return `${entityName} ${paginateArguments} {`;
-    });
-    const result = await subgraphClient(paginatedQuery);
-
-    // Record the results and repeat as necessary
-    retval.push(...result[entityName]);
-    firstValue = result[entityName][PAGE_SIZE - 1]?.[paginateField];
-  }
-  return retval;
 }
 
 module.exports = CoingeckoService;

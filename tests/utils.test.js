@@ -1,9 +1,3 @@
-jest.mock("../src/datasources/subgraph-client", () => ({
-  ...jest.requireActual("../src/datasources/subgraph-client"),
-  basinSG: jest.fn()
-}));
-const { basinSG } = require("../src/datasources/subgraph-client");
-
 const BlockUtil = require("../src/utils/block");
 
 // Create the provider beforehand as otherwise it would be re-created on each invocation to then
@@ -21,7 +15,7 @@ const alchemy = require("../src/datasources/alchemy");
 const { BigNumber } = require("alchemy-sdk");
 const { getConstantProductPrice } = require("../src/utils/pool/constant-product");
 const { parseQuery } = require("../src/utils/rest-parsing");
-
+const SubgraphClients = require("../src/datasources/subgraph-client");
 
 describe('Utils', () => {
   it('should format query parameters correctly', async () => {
@@ -38,7 +32,7 @@ describe('Utils', () => {
   });
 
   it('should maximally use block number that the subgraph has indexed', async () => {
-    basinSG.mockResolvedValue({
+    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValue({
       _meta: {
         block: {
           number: 19500000
