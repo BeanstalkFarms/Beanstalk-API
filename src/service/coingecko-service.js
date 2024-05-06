@@ -8,6 +8,7 @@ const SubgraphQueryUtil = require("../utils/subgraph-query");
 const { createNumberSpread } = require("../utils/number");
 const { ZERO_BN } = require("../constants/constants");
 const ConstantProductUtil = require("../utils/pool/constant-product");
+const BasinSubgraphRepository = require("../repository/basin-subgraph");
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -18,24 +19,12 @@ class CoingeckoService {
     const block = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, options);
   
     // Retrieve results from Basin subgraph
-    const result = await SubgraphClients.basinSG(gql`
-      {
-        wells(block: {number: ${block.number}}) {
-          id
-          tokens {
-            id
-            decimals
-          }
-          reserves
-        }
-      }`
-    );
-    result.wells.map(well => well.reserves = well.reserves.map(BigNumber.from));
+    const allWells = await BasinSubgraphRepository.getAllWells(block.number);
   
     const allTickers = [];
   
     // For each well in the subgraph, construct a formatted response
-    for (const well of result.wells) {
+    for (const well of allWells) {
 
       const token0 = well.tokens[0].id;
       const token1 = well.tokens[1].id;
@@ -66,33 +55,7 @@ class CoingeckoService {
   // Gets the swap volume in terms of token amounts in the well
   static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
-    const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      gql`
-      {
-        swaps {
-          amountIn
-          amountOut
-          fromToken {
-            id
-            decimals
-          }
-          toToken {
-            decimals
-            id
-          }
-          timestamp
-        }
-      }`,
-      `well: "${wellAddress}", timestamp_lte: "${timestamp}"`,
-      ['timestamp', 'logIndex'],
-      [(timestamp - lookback).toFixed(0), 0],
-      'asc'
-    );
-    allSwaps.map((swap) => {
-      swap.amountIn = BigNumber.from(swap.amountIn);
-      swap.amountOut = BigNumber.from(swap.amountOut);
-    });
+    const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
 
     if (allSwaps.length === 0) {
       return createNumberSpread([BigNumber.from(0), BigNumber.from(0)], [1, 1]);

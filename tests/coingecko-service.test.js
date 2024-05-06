@@ -41,7 +41,7 @@ describe('CoingeckoService', () => {
     expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
   });
 
-  it.only('should calculate high/low prices over the given period', async () => {
+  it('should calculate high/low prices over the given period', async () => {
     const swapsResponse = JSON.parse('[{"amountIn":"5000000000","amountOut":"1500000000000000000","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1714937735"},{"amountIn":"8000000000","amountOut":"2000000000000000000","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1714973123"},{"amountIn":"500000000000000000","amountOut":"2000000000","toToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"fromToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1714975211"}]');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(swapsResponse);
     const depositResponse = JSON.parse('[{"reserves":["2000000000","0"],"timestamp":"1715937735"},{"reserves":["0","1500000000000000000"],"timestamp":"1712938735"}]');
