@@ -10,11 +10,10 @@ class SubgraphQueryUtil {
    * @param {string[]} paginateFields - the fields to paginate on
    * @param {string[]} firstValues - the initial values to begin with of the paginateFields
    * @param {'asc' | 'desc'} paginateDirection - the direction to paginate
+   * @returns all results matching the query
    * 
    * Note that graphql can only order by a single field, and therefore it is possible for
    * some results to be skipped in the case of paginating by multiple fields
-   * 
-   * @returns all results matching the query
    */
   static async allPaginatedSG(subgraphClient, query, where, paginateFields, firstValues, paginateDirection) {
 

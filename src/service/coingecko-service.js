@@ -6,6 +6,8 @@ const BlockUtil = require("../utils/block");
 const { calcPoolLiquidityUSD } = require("../utils/pool/liquidity");
 const SubgraphQueryUtil = require("../utils/subgraph-query");
 const { createNumberSpread } = require("../utils/number");
+const { ZERO_BN } = require("../constants/constants");
+const ConstantProductUtil = require("../utils/pool/constant-product");
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -28,6 +30,7 @@ class CoingeckoService {
         }
       }`
     );
+    result.wells.map(well => well.reserves = well.reserves.map(BigNumber.from));
   
     const allTickers = [];
   
@@ -37,10 +40,9 @@ class CoingeckoService {
       const token0 = well.tokens[0].id;
       const token1 = well.tokens[1].id;
 
-      const reservesBN = well.reserves.map(BigNumber.from);
-      const poolPrice = getConstantProductPrice(reservesBN, well.tokens.map(t => t.decimals));
+      const poolPrice = getConstantProductPrice(well.reserves, well.tokens.map(t => t.decimals));
       // TODO: improve this with promise.all
-      const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, reservesBN, block.number);
+      const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, well.reserves, block.number);
       const pool24hVolume = await CoingeckoService.getWellVolume(well.id, block.timestamp);
       
       const ticker = {
@@ -112,6 +114,79 @@ class CoingeckoService {
       swapVolume[token] = createNumberSpread(swapVolume[token], decimals[token]);
     }
     return swapVolume;
+  }
+
+  /**
+   * Gets the high/low over the given time range
+   * @param {string} wellAddress - address of the well
+   * @param {object[]} wellTokens - tokens in the well and their decimals
+   * @param {BigNumber[]} endReserves - reserves in the well at `timestamp`
+   * @param {number} timestamp - the upper bound timestamp
+   * @param {number} lookback - amount of time to look in the past
+   * @returns high/low price over the given time period, in terms of the underlying tokens
+   * 
+   * In practice it is more performant to calculate the reserves in reverse from known reserves at `timestamp`,
+   * since in most cases we are calculating a price range in the past 24h, and the current block is known.
+   * If an older timestamp is desired, prior to calling this method, the block/reserves for that timestamp
+   * will need to be computed as well, which is a longer operation.
+   */
+  static async getWellPriceRange(wellAddress, wellTokens, endReserves, timestamp, lookback = ONE_DAY) {
+
+    // Retrieve relevant events
+    const allSwaps = await SubgraphQueryUtil.allPaginatedSG();
+    allSwaps.map((swap) => {
+      swap.amountIn = BigNumber.from(swap.amountIn);
+      swap.amountOut = BigNumber.from(swap.amountOut);
+    });
+    const allDeposits = await SubgraphQueryUtil.allPaginatedSG();
+    allDeposits.map((deposit) => deposit.reserves = deposit.reserves.map(BigNumber.from));
+    const allWithdraws = await SubgraphQueryUtil.allPaginatedSG();
+    allWithdraws.map((withdraw) => withdraw.reserves = withdraw.reserves.map(BigNumber.from));
+
+    // Aggregate all into one list
+    const aggregated = [];
+    for (const swap of allSwaps) {
+      aggregated.push({
+        [wellTokens.findIndex(t => t.id === swap.fromToken.id)]: swap.amountIn,
+        [wellTokens.findIndex(t => t.id === swap.toToken.id)]: ZERO_BN.sub(swap.amountOut),
+        timestamp: swap.timestamp
+      });
+    }
+
+    const addLiquidityEvents = (arr, neg) => {
+      for (const liqEvent of arr) {
+        const normalized = {
+          timestamp: liqEvent.timestamp
+        };
+        for (let i = 0; i < wellTokens.length; ++i) {
+          normalized[i] = neg ? ZERO_BN.sub(liqEvent.reserves[i]) : liqEvent.reserves[i];
+        }
+        aggregated.push(normalized);
+      }
+    }
+    addLiquidityEvents(allDeposits, false);
+    addLiquidityEvents(allWithdraws, true);
+
+    aggregated.sort((a, b) => b.timestamp - a.timestamp);
+    
+    // Track the running reserves and prices
+    const runningReserves = [...endReserves];
+    const tokenPrices = [];
+    for (const event of aggregated) {
+      for (let i = 0; i < runningReserves.length; ++i) {
+        runningReserves[i] = runningReserves[i].sub(event[i.toString()]);
+      }
+      // Calculate current price
+      const price = ConstantProductUtil.getConstantProductPrice(runningReserves, wellTokens.map(t => t.decimals));
+      price.reserves = [...runningReserves];
+      tokenPrices.push(price);
+    }
+    
+    // Return the min/max token price from the perspective of token0
+    return {
+      high: tokenPrices.reduce((max, obj) => obj.float[0] > max.float[0] ? obj : max, tokenPrices[0]),
+      low: tokenPrices.reduce((min, obj) => obj.float[0] < min.float[0] ? obj : min, tokenPrices[0])
+    };
   }
 }
 
