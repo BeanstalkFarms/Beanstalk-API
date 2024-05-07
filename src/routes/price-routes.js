@@ -12,6 +12,7 @@ const router = new Router({
  * ?timestamp: gets the price at the specified timestamp
  */
 router.get('/', async ctx => {
+  console.log('price requested');
   const options = RestParsingUtil.parseQuery(ctx.query);
   const price = await getBeanPrice(options);
   ctx.body = price;
