@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose -p beanstalk-api stop
+docker compose -p beanstalk-api stop
