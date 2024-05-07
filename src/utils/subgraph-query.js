@@ -33,7 +33,7 @@ class SubgraphQueryUtil {
         return `${entityName} ${paginateArguments} {`;
       });
       const result = await subgraphClient(paginatedQuery);
-      // console.log(JSON.stringify(result));
+      // console.log(JSON.stringify(result), paginatedQuery);
 
       // Record the results and repeat as necessary
       retval.push(...result[entityName]);

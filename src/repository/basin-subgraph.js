@@ -17,12 +17,13 @@ class BasinSubgraphRepository {
             decimals
           }
           reserves
+          symbol
         }
       }`,
       `block: {number: ${blockNumber}}`,
       '',
       ['symbol'],
-      ['a'],
+      [' '],
       'asc'
     );
     allWells.map(well => well.reserves = well.reserves.map(BigNumber.from));
@@ -47,9 +48,10 @@ class BasinSubgraphRepository {
             id
           }
           timestamp
+          logIndex
         }
       }`,
-      null,
+      '',
       `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
       [fromTimestamp.toFixed(0), 0],
@@ -61,6 +63,52 @@ class BasinSubgraphRepository {
     });
 
     return allSwaps;
+  }
+
+  static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
+
+    const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
+      SubgraphClients.basinSG,
+      SubgraphClients.gql`
+      {
+        deposits {
+          reserves
+          timestamp
+          logIndex
+        }
+      }`,
+      '',
+      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      ['timestamp', 'logIndex'],
+      [fromTimestamp.toFixed(0), 0],
+      'asc'
+    );
+    allDeposits.map((deposit) => deposit.reserves = deposit.reserves.map(BigNumber.from));
+
+    return allDeposits;
+  }
+
+  static async getAllWithdraws(wellAddress, fromTimestamp, toTimestamp) {
+
+    const allWithdraws = await SubgraphQueryUtil.allPaginatedSG(
+      SubgraphClients.basinSG,
+      SubgraphClients.gql`
+      {
+        withdraws {
+          reserves
+          timestamp
+          logIndex
+        }
+      }`,
+      '',
+      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      ['timestamp', 'logIndex'],
+      [fromTimestamp.toFixed(0), 0],
+      'asc'
+    );
+    allWithdraws.map((withdraw) => withdraw.reserves = withdraw.reserves.map(BigNumber.from));
+
+    return allWithdraws;
   }
 }
 

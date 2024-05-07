@@ -1,5 +1,4 @@
 const { BigNumber } = require("alchemy-sdk");
-const { gql } = require("../datasources/subgraph-client");
 const SubgraphClients = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/pool/constant-product");
 const BlockUtil = require("../utils/block");
@@ -33,6 +32,7 @@ class CoingeckoService {
       // TODO: improve this with promise.all
       const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, well.reserves, block.number);
       const pool24hVolume = await CoingeckoService.getWellVolume(well.id, block.timestamp);
+      const priceRange = await CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp);
       
       const ticker = {
         ticker_id: `${token0}_${token1}`,
@@ -43,8 +43,8 @@ class CoingeckoService {
         base_volume: pool24hVolume[token0].string,
         target_volume: pool24hVolume[token1].string,
         liquidity_in_usd: poolLiquidity.toFixed(0),
-        high: null,
-        low: null
+        high: priceRange.high.string[0],
+        low: priceRange.low.string[0]
       };
   
       allTickers.push(ticker);
@@ -96,15 +96,9 @@ class CoingeckoService {
   static async getWellPriceRange(wellAddress, wellTokens, endReserves, timestamp, lookback = ONE_DAY) {
 
     // Retrieve relevant events
-    const allSwaps = await SubgraphQueryUtil.allPaginatedSG();
-    allSwaps.map((swap) => {
-      swap.amountIn = BigNumber.from(swap.amountIn);
-      swap.amountOut = BigNumber.from(swap.amountOut);
-    });
-    const allDeposits = await SubgraphQueryUtil.allPaginatedSG();
-    allDeposits.map((deposit) => deposit.reserves = deposit.reserves.map(BigNumber.from));
-    const allWithdraws = await SubgraphQueryUtil.allPaginatedSG();
-    allWithdraws.map((withdraw) => withdraw.reserves = withdraw.reserves.map(BigNumber.from));
+    const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
+    const allDeposits = await BasinSubgraphRepository.getAllDeposits(wellAddress, timestamp - lookback, timestamp);
+    const allWithdraws = await BasinSubgraphRepository.getAllWithdraws(wellAddress, timestamp - lookback, timestamp);
 
     // Aggregate all into one list
     const aggregated = [];
