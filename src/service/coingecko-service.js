@@ -100,8 +100,12 @@ class CoingeckoService {
     const allDeposits = await BasinSubgraphRepository.getAllDeposits(wellAddress, timestamp - lookback, timestamp);
     const allWithdraws = await BasinSubgraphRepository.getAllWithdraws(wellAddress, timestamp - lookback, timestamp);
 
-    // Aggregate all into one list
-    const aggregated = [];
+    // Aggregate all into one list. Initial entry with big timestamp to also consider the current price.
+    const aggregated = [{
+      '0': ZERO_BN,
+      '1': ZERO_BN,
+      timestamp: 5000000000000
+    }];
     for (const swap of allSwaps) {
       aggregated.push({
         [wellTokens.findIndex(t => t.id === swap.fromToken.id)]: swap.amountIn,
@@ -140,6 +144,7 @@ class CoingeckoService {
     }
     
     // Return the min/max token price from the perspective of token0
+    // console.log(tokenPrices, tokenPrices.map(t => t.float[0] + "_" + t.reserves[0].toString() + "_" + t.reserves[1].toString()));
     return {
       high: tokenPrices.reduce((max, obj) => obj.float[0] > max.float[0] ? obj : max, tokenPrices[0]),
       low: tokenPrices.reduce((min, obj) => obj.float[0] < min.float[0] ? obj : min, tokenPrices[0])
