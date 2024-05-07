@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: ../  # Context is set to the project root
+      dockerfile: docker/Dockerfile
+    image: beanstalk-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../.env
