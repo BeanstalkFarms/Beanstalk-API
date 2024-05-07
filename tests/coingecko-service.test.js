@@ -3,7 +3,7 @@ const SubgraphClients = require("../src/datasources/subgraph-client");
 const BlockUtil = require("../src/utils/block");
 jest.spyOn(BlockUtil, 'blockForSubgraphFromOptions').mockResolvedValue({ number: 19000000, timestamp: 1705173443 });
 
-const { getTickers, getWellVolume, getWellPriceRange } = require("../src/service/coingecko-service");
+const { getTickers, getWellVolume, getWellPriceRange, getTrades } = require("../src/service/coingecko-service");
 const { BEANWETH, WETH, BEAN } = require("../src/constants/addresses");
 const { BigNumber } = require("alchemy-sdk");
 const SubgraphQueryUtil = require("../src/utils/subgraph-query");
@@ -17,7 +17,7 @@ describe('CoingeckoService', () => {
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(swapsResponse);
 
     const tickers = await getTickers({ blockNumber: 19000000 });
-    console.log(tickers);
+    // console.log(tickers);
     
     expect(tickers).toHaveLength(1);
     expect(tickers[0].ticker_id).toEqual('0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab_0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
@@ -63,5 +63,30 @@ describe('CoingeckoService', () => {
     const priceRange = await getWellPriceRange(BEANWETH, tokens, [BigNumber.from("20000000000"), BigNumber.from("10000000000000000000")], 1715020584);
     expect(priceRange.high.float[0]).toBeCloseTo(0.00075);
     expect(priceRange.low.float[0]).toBeCloseTo(0.001416666666666666);
+  });
+
+  it('should return swap history', async () => {
+    
+    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(JSON.parse('{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}]}]}'));
+    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(JSON.parse('{"swaps":[{"amountIn":"5000000000","amountOut":"1627986324056845061","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714705907","blockNumber":"19786824","logIndex":334},{"amountIn":"17587084351","amountOut":"5735653111300472776","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714701743","blockNumber":"19786480","logIndex":358},{"amountIn":"3351405114","amountOut":"1094643603804553368","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714701515","blockNumber":"19786461","logIndex":194},{"amountIn":"10000000000","amountOut":"3269377213099025460","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714687691","blockNumber":"19785315","logIndex":417},{"amountIn":"95676849","amountOut":"31303213763521321","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714685627","blockNumber":"19785144","logIndex":166},{"amountIn":"1026995528","amountOut":"336002541531334128","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714669619","blockNumber":"19783823","logIndex":348},{"amountIn":"947804302","amountOut":"310137813044956371","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714656515","blockNumber":"19782738","logIndex":377},{"amountIn":"1856781829","amountOut":"607694116854445958","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714647803","blockNumber":"19782016","logIndex":119},{"amountIn":"462377515790747244","amountOut":"1412728161","fromToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"toToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"timestamp":"1714613735","blockNumber":"19779197","logIndex":270},{"amountIn":"1419390950","amountOut":"464558430713920015","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"timestamp":"1714611683","blockNumber":"19779029","logIndex":255}]}'));
+
+    const options = {
+      ticker_id: `${BEAN}_${WETH}`,
+      // These technically arent necessary due to the above mocking
+      limit: 10,
+      start_time: 1714114912,
+      end_time: 1714719712
+    };
+    const trades = await getTrades(options);
+    // console.log(trades);
+
+    expect(trades.buy.length).toEqual(1);
+    expect(trades.sell.length).toEqual(9);
+    expect(trades.buy[0].price).toBeCloseTo(3055.356527);
+    expect(trades.buy[0].base_volume).toBeCloseTo(0.46237751579074726);
+    expect(trades.buy[0].target_volume).toBeCloseTo(1412.728161);
+    expect(trades.buy[0].trade_timestamp).toEqual(1714613735000);
+    expect(trades.buy[0].type).toEqual('buy');
+
   });
 });
