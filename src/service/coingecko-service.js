@@ -3,7 +3,6 @@ const SubgraphClients = require("../datasources/subgraph-client");
 const { getConstantProductPrice } = require("../utils/pool/constant-product");
 const BlockUtil = require("../utils/block");
 const { calcPoolLiquidityUSD } = require("../utils/pool/liquidity");
-const SubgraphQueryUtil = require("../utils/subgraph-query");
 const { createNumberSpread } = require("../utils/number");
 const { ZERO_BN } = require("../constants/constants");
 const ConstantProductUtil = require("../utils/pool/constant-product");
@@ -29,11 +28,12 @@ class CoingeckoService {
       const token1 = well.tokens[1].id;
 
       const poolPrice = getConstantProductPrice(well.reserves, well.tokens.map(t => t.decimals));
-      // TODO: improve this with promise.all
-      const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, well.reserves, block.number);
-      const pool24hVolume = await CoingeckoService.getWellVolume(well.id, block.timestamp);
-      const priceRange = await CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp);
-      
+      const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
+        calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
+        CoingeckoService.getWellVolume(well.id, block.timestamp),
+        CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
+      ]);
+
       const ticker = {
         ticker_id: `${token0}_${token1}`,
         base_currency: token0,
@@ -96,9 +96,11 @@ class CoingeckoService {
   static async getWellPriceRange(wellAddress, wellTokens, endReserves, timestamp, lookback = ONE_DAY) {
 
     // Retrieve relevant events
-    const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
-    const allDeposits = await BasinSubgraphRepository.getAllDeposits(wellAddress, timestamp - lookback, timestamp);
-    const allWithdraws = await BasinSubgraphRepository.getAllWithdraws(wellAddress, timestamp - lookback, timestamp);
+    const [allSwaps, allDeposits, allWithdraws] = await Promise.all([
+      BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp),
+      BasinSubgraphRepository.getAllDeposits(wellAddress, timestamp - lookback, timestamp),
+      BasinSubgraphRepository.getAllWithdraws(wellAddress, timestamp - lookback, timestamp)
+    ]);
 
     // Aggregate all into one list. Initial entry with big timestamp to also consider the current price.
     const aggregated = [{

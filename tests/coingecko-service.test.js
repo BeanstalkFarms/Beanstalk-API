@@ -28,8 +28,8 @@ describe('CoingeckoService', () => {
     expect(tickers[0].base_volume).toEqual('176336.03559');
     expect(tickers[0].target_volume).toEqual('68.711073712211718446');
     expect(tickers[0].liquidity_in_usd).toEqual('27491580');
-    // expect(tickers[0].high).toEqual('');
-    // expect(tickers[0].low).toEqual('');
+    expect(tickers[0].high).toEqual('0.000392979136931714');
+    expect(tickers[0].low).toEqual('0.000383640247389837');
 
   });
 
