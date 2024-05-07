@@ -7,7 +7,10 @@ const standardMapping = {
       return parseInt(p) / 1000;
     }
     return parseInt(p);
-  }
+  },
+  limit: parseInt,
+  start_time: (p) => new Date(p),
+  end_time: (p) => new Date(p),
 }
 
 class RestParsingUtil {

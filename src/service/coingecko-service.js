@@ -52,6 +52,39 @@ class CoingeckoService {
     return allTickers;
   }
 
+  static async getTrades(options) {
+
+    // Find the well matching the requested ticker
+    const tokens = options.ticker_id.split('_');
+    const wells = await BasinSubgraphRepository.getWellsForPair(tokens);
+
+    // Retrieve swaps matching the criteria
+    const limit = Math.min(options.limit ?? 500, 1000);
+    const swaps = await BasinSubgraphRepository.getSwaps(wells.map(w => w.id), options.start_time, options.end_time, limit);
+
+    // Format the response
+    const retval = {
+      buy: [],
+      sell: []
+    };
+    for (const swap of swaps) {
+      retval.push({
+        trade_id: swap.blockNumber * 10000 + swap.logIndex,
+        // price:
+        base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).string,
+        target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).string,
+        trade_timestamp: swap.timestamp,
+        type: swap.fromToken.id === tokens[0] ? 'sell' : 'buy'
+      });
+    }
+
+    if (options.type) {
+      // One of buy/sell was explicitly requested
+      return retval[options.type];
+    }
+    return retval;
+  }
+
   // Gets the swap volume in terms of token amounts in the well
   static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 

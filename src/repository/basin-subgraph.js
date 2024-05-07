@@ -30,6 +30,21 @@ class BasinSubgraphRepository {
     return allWells;
   }
 
+  static async getWellsForPair(tokens) {
+
+    const pairWells = await SubgraphClients.basinSG(SubgraphClients.gql`
+      {
+        wells(where: { tokens: [${tokens.map(t => `"${t}"`).join(', ')}] }) {
+          id
+          tokens {
+            id
+          }
+        }
+      }`
+    );
+    return pairWells.wells;
+  }
+
   static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
 
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
@@ -63,6 +78,41 @@ class BasinSubgraphRepository {
     });
 
     return allSwaps;
+  }
+
+  static async getSwaps(wellAddresses, fromTimestamp, toTimestamp, limit) {
+
+    const swaps = await SubgraphClients.basinSG(SubgraphClients.gql`
+      {
+        swaps(
+          where {
+            well_in: [${wellAddresses.map(a => `"${a}"`).join(', ')}]
+            timestamp_gte: ${fromTimestamp}
+            timestamp_lte: ${toTimestamp}
+          } first: ${limit}
+        ) {
+          amountIn
+          amountOut
+          fromToken {
+            id
+            decimals
+          }
+          toToken {
+            id
+            decimals
+          }
+          timestamp
+          blockNumber
+          logIndex
+        }
+      }`
+    );
+    swaps.map((swap) => {
+      swap.amountIn = BigNumber.from(swap.amountIn);
+      swap.amountOut = BigNumber.from(swap.amountOut);
+    });
+
+    return swaps;
   }
 
   static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
