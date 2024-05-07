@@ -82,14 +82,17 @@ class BasinSubgraphRepository {
 
   static async getSwaps(wellAddresses, fromTimestamp, toTimestamp, limit) {
 
-    const swaps = await SubgraphClients.basinSG(SubgraphClients.gql`
+    const result = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
         swaps(
-          where {
+          where: {
             well_in: [${wellAddresses.map(a => `"${a}"`).join(', ')}]
             timestamp_gte: ${fromTimestamp}
             timestamp_lte: ${toTimestamp}
-          } first: ${limit}
+          }
+          first: ${limit}
+          orderBy: timestamp
+          orderDirection: desc
         ) {
           amountIn
           amountOut
@@ -107,12 +110,12 @@ class BasinSubgraphRepository {
         }
       }`
     );
-    swaps.map((swap) => {
+    result.swaps.map((swap) => {
       swap.amountIn = BigNumber.from(swap.amountIn);
       swap.amountOut = BigNumber.from(swap.amountOut);
     });
 
-    return swaps;
+    return result.swaps;
   }
 
   static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {

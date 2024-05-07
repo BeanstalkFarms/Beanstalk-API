@@ -3,6 +3,7 @@ const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("..
 const BlockUtil = require("../utils/block");
 const { createNumberSpread } = require("../utils/number");
 const { BEAN, WETH } = require("../constants/addresses");
+const { TEN_BN } = require("../constants/constants");
 
 class PriceService {
 
@@ -36,7 +37,7 @@ class PriceService {
     const usdOracle = await asyncUsdOracleContractGetter();
     const result = await usdOracle.callStatic.getUsdPrice(WETH, { blockTag: block.number });
     // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion
-    const instPrice = BigNumber.from(10).pow(24).div(result);
+    const instPrice = TEN_BN.pow(24).div(result);
     
     const readable = {
       block: block.number,

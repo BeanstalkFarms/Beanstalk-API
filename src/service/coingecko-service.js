@@ -39,12 +39,12 @@ class CoingeckoService {
         base_currency: token0,
         target_currency: token1,
         pool_id: well.id,
-        last_price: poolPrice.string[0],
-        base_volume: pool24hVolume[token0].string,
-        target_volume: pool24hVolume[token1].string,
-        liquidity_in_usd: poolLiquidity.toFixed(0),
-        high: priceRange.high.string[0],
-        low: priceRange.low.string[0]
+        last_price: poolPrice.float[0],
+        base_volume: pool24hVolume[token0].float,
+        target_volume: pool24hVolume[token1].float,
+        liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
+        high: priceRange.high.float[0],
+        low: priceRange.low.float[0]
       };
   
       allTickers.push(ticker);
@@ -59,7 +59,7 @@ class CoingeckoService {
     const wells = await BasinSubgraphRepository.getWellsForPair(tokens);
 
     // Retrieve swaps matching the criteria
-    const limit = Math.min(options.limit ?? 500, 1000);
+    const limit = Math.min(options.limit, 1000);
     const swaps = await BasinSubgraphRepository.getSwaps(wells.map(w => w.id), options.start_time, options.end_time, limit);
 
     // Format the response
@@ -68,19 +68,22 @@ class CoingeckoService {
       sell: []
     };
     for (const swap of swaps) {
-      retval.push({
+      const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
+      retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        // price:
-        base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).string,
-        target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).string,
-        trade_timestamp: swap.timestamp,
-        type: swap.fromToken.id === tokens[0] ? 'sell' : 'buy'
+        price: getConstantProductPrice([swap.amountIn, swap.amountOut], [swap.fromToken.decimals, swap.toToken.decimals]).float[0],
+        base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).float,
+        target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).float,
+        trade_timestamp: parseInt(swap.timestamp) * 1000,
+        type: type
       });
     }
 
     if (options.type) {
       // One of buy/sell was explicitly requested
-      return retval[options.type];
+      return {
+        [options.type]: retval[options.type]
+      };
     }
     return retval;
   }
