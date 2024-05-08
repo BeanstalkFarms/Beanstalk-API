@@ -1,10 +1,9 @@
 services:
-  web:
+  koajs:
     build:
       context: ../  # Context is set to the project root
       dockerfile: docker/Dockerfile
-    image: beanstalk-api
-    container_name: koa-js
+    image: beanstalk-api:${NAMESPACE}
     ports:
       - "3000:3000"
     env_file:

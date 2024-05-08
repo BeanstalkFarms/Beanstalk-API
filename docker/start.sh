@@ -1,2 +1,8 @@
 #!/bin/bash
-docker compose -p beanstalk-api up -d
+
+export NAMESPACE=$1
+if [ "$#" -ne 1 ]; then
+  NAMESPACE="dev"
+fi
+
+docker compose -p web-api-$NAMESPACE up -d
