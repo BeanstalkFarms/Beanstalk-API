@@ -7,7 +7,7 @@ class BlockUtil {
   static async blockFromOptions(options) {
     let blockTag = options.blockNumber ?? 'latest';
     if (options.timestamp) {
-      return await findBlockByTimestamp(options.timestamp);
+      return await BlockUtil.findBlockByTimestamp(options.timestamp);
     } else {
       return await (await providerThenable).getBlock(blockTag);
     }
