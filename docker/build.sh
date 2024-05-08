@@ -1,8 +1,13 @@
 #!/bin/bash
 
-export NAMESPACE=$1
-if [ "$#" -ne 1 ]; then
-  NAMESPACE="dev"
+DOCKER_ENV=$1
+KOAJS_PORT=$2
+if [ "$#" -ne 2 ]; then
+  DOCKER_ENV="dev"
+  KOAJS_PORT="3000"
 fi
 
-docker build -t beanstalk-api:$NAMESPACE -f ./Dockerfile ../
+export DOCKER_ENV
+export KOAJS_PORT
+
+docker build -t beanstalk-api:$DOCKER_ENV -f ./Dockerfile ../

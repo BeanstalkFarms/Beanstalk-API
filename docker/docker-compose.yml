@@ -3,9 +3,9 @@ services:
     build:
       context: ../  # Context is set to the project root
       dockerfile: docker/Dockerfile
-    image: beanstalk-api:${NAMESPACE}
+    image: beanstalk-api:${DOCKER_ENV}
     ports:
-      - "3000:3000"
+      - "${KOAJS_PORT}:3000"
     env_file:
       - ../.env
     restart: on-failure
