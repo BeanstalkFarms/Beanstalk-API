@@ -7,6 +7,26 @@ const Router = require('koa-router');
 
 const app = new Koa();
 
+app.use(async (ctx, next) => {
+  console.log(`${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`);
+  try {
+    await next(); // pass control to the next function specified in .use()
+    const responseBody = JSON.stringify(ctx.body);
+    console.log(`${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`);
+  } catch (err) {
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = {
+      message: 'Internal Server Error.',
+      reference_id: Math.floor(Math.random() * 1000000)
+    };
+    // Include a reference number in the logs so it can be found easily
+    console.log(`ref ${ctx.body.reference_id}`);
+    ctx.app.emit('error', err, ctx);
+
+    console.log(`${new Date().toISOString()} [failure] ${ctx.method} ${ctx.originalUrl}`);
+  }
+});
+
 app.use(bodyParser());
 
 app.use(priceRoutes.routes());
@@ -16,7 +36,6 @@ app.use(coingeckoRoutes.allowedMethods());
 
 const router = new Router();
 router.get('/healthcheck', async ctx => {
-  console.log('healthcheck requested');
   ctx.body = "healthy";
 });
 
@@ -24,5 +43,5 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+  console.log('Server running on port 3000');
 });
