@@ -1,0 +1,223 @@
+openapi: 3.0.0
+info:
+  title: Beanstalk API
+  version: 0.0.1
+  description: REST API for getting information as to the current and historical state of Beanstalk and related protocols.
+servers:
+  - url: 'https://api.bean.money'
+  
+tags:
+  - name: Price
+  - name: Basin
+
+paths:
+  /price:
+    get:
+      tags:
+        - Price
+      summary: Retrieve the current Bean price, liquidity, and deltaB
+      operationId: price
+      parameters:
+        - $ref: '#/components/parameters/blockNumber'
+        - $ref: '#/components/parameters/timestamp'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  block:
+                    type: integer
+                    description: On-chain Ethereum block number of the requested price data
+                    example: 19804698
+                  timestamp:
+                    type: integer
+                    description: Unix timestamp of the block, in seconds
+                    example: 1714921799
+                  token:
+                    type: string
+                    description: Ethereum address of the token
+                    example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"
+                  usdPrice:
+                    type: number
+                    format: double
+                    description: Current price of the token in USD
+                    example: 0.9994
+                  liquidityUSD:
+                    type: number
+                    format: double
+                    description: Total liquidity in USD
+                    example: 28235107.24
+                  deltaB:
+                    type: integer
+                    description: Beanstalk Protocol deltaB
+                    example: -4331
+  /basin/tickers:
+    get:
+      tags: 
+        - Basin
+      summary: Retrieve tickers and 24h stats
+      operationId: getTickers
+      parameters:
+        - $ref: '#/components/parameters/blockNumber'
+        - $ref: '#/components/parameters/timestamp'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ticker_id:
+                      type: string
+                      description: Unique identifier for the ticker
+                      example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab_0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+                    base_currency:
+                      type: string
+                      description: Base currency identifier
+                      example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"
+                    target_currency:
+                      type: string
+                      description: Target currency identifier
+                      example: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+                    pool_id:
+                      type: string
+                      description: Pool identifier
+                      example: "0xbea0e11282e2bb5893bece110cf199501e872bad"
+                    last_price:
+                      type: number
+                      format: float
+                      description: Last recorded price
+                      example: 0.000389236771196659
+                    base_volume:
+                      type: number
+                      format: float
+                      description: 24h volume of the base currency
+                      example: 176336.03559
+                    target_volume:
+                      type: number
+                      format: float
+                      description: 24h volume of the target currency
+                      example: 68.71107371221171
+                    liquidity_in_usd:
+                      type: integer
+                      description: Liquidity in USD
+                      example: 27491580
+                    high:
+                      type: number
+                      format: float
+                      description: Highest 24h price
+                      example: 0.000392979136931714
+                    low:
+                      type: number
+                      format: float
+                      description: Lowest 24h price
+                      example: 0.000383640247389837
+  /basin/historical_trades:
+    get:
+      tags: 
+        - Basin
+      summary: Retrieve historical trades
+      operationId: getHistoricalTrades
+      parameters:
+        - name: ticker_id
+          in: query
+          required: true
+          description: Unique identifier for the ticker
+          schema:
+            type: string
+            example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab_0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+        - name: type
+          in: query
+          required: false
+          description: Type of the trade (buy or sell)
+          schema:
+            type: string
+            example: "buy | sell"
+        - name: limit
+          in: query
+          description: Limit the number of results returned
+          schema:
+            type: integer
+            example: 50
+        - name: start_time
+          in: query
+          description: Start time for filtering trades
+          schema:
+            type: string
+            format: date-time
+            example: "2024-05-01T00:00:00.000Z"
+        - name: end_time
+          in: query
+          description: End time for filtering trades
+          schema:
+            type: string
+            format: date-time
+            example: "2024-05-01T00:00:00.000Z"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  buy:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trade'
+                  sell:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trade'
+components:
+  parameters:
+    blockNumber:
+      name: blockNumber
+      in: query
+      required: false
+      description: Ethereum block number
+      schema:
+        type: integer
+        example: 19000000
+    timestamp:
+      name: timestamp
+      in: query
+      required: false
+      description: Unix timestamp, in seconds or milliseconds
+      schema:
+        type: integer
+        example: 1715204400
+  schemas:
+    Trade:
+      type: object
+      properties:
+        trade_id:
+          type: integer
+          format: int64
+          example: 198245000283
+        price:
+          type: number
+          format: float
+          example: 0.000318525481173441
+        base_volume:
+          type: number
+          format: float
+          example: 122.35605
+        target_volume:
+          type: number
+          format: float
+          example: 0.03897351970073168
+        trade_timestamp:
+          type: integer
+          format: int64
+          description: Unix timestamp of the trade, in milliseconds
+          example: 1715161115000
+        type:
+          type: string
+          example: "buy | sell"
