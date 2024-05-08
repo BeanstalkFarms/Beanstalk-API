@@ -8,11 +8,15 @@ const Router = require('koa-router');
 const app = new Koa();
 
 app.use(async (ctx, next) => {
-  console.log(`${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`);
+  if (!ctx.originalUrl.includes("healthcheck")) {
+    console.log(`${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`);
+  }
   try {
     await next(); // pass control to the next function specified in .use()
     const responseBody = JSON.stringify(ctx.body);
-    console.log(`${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`);
+    if (!ctx.originalUrl.includes("healthcheck")) {
+      console.log(`${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`);
+    }
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
