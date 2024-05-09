@@ -135,26 +135,26 @@ paths:
         - name: type
           in: query
           required: false
-          description: Type of the trade (buy or sell)
+          description: Type of the trade (buy or sell). Defaults to both.
           schema:
             type: string
             example: "buy | sell"
         - name: limit
           in: query
-          description: Limit the number of results returned
+          description: Limit the number of results returned. Defaults to 500.
           schema:
             type: integer
             example: 50
         - name: start_time
           in: query
-          description: Start time for filtering trades
+          description: Start time for filtering trades. Defaults to end_time minus 7 days.
           schema:
             type: string
             format: date-time
             example: "2024-05-01T00:00:00.000Z"
         - name: end_time
           in: query
-          description: End time for filtering trades
+          description: End time for filtering trades. Defaults to today.
           schema:
             type: string
             format: date-time
@@ -181,7 +181,7 @@ components:
       name: blockNumber
       in: query
       required: false
-      description: Ethereum block number
+      description: Ethereum block number. Defaults to the latest block.
       schema:
         type: integer
         example: 19000000
@@ -189,7 +189,7 @@ components:
       name: timestamp
       in: query
       required: false
-      description: Unix timestamp, in seconds or milliseconds
+      description: Unix timestamp, in seconds or milliseconds. Default behavior is to use blockNumber instead.
       schema:
         type: integer
         example: 1715204400
