@@ -4,7 +4,7 @@ DOCKER_ENV=$1
 KOAJS_PORT=$2
 if [ "$#" -ne 2 ]; then
   DOCKER_ENV="dev"
-  KOAJS_PORT="3000"
+  KOAJS_PORT="4000"
 fi
 
 export DOCKER_ENV

@@ -36,4 +36,4 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Execute Remote Deployment Script
-        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} "bash /path/to/deploy_script.sh ${{ needs.validation.outputs.environment }}"
+        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} "bash /home/${{ secrets.USERNAME }}/deploy.sh ${{ needs.validation.outputs.environment }}"
