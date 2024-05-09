@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment (prod/dev)'
+        required: true
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.check_env.outputs.environment }}
+    steps:
+      - name: Validate environment input
+        id: check_env
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" != "prod" && "${{ github.event.inputs.environment }}" != "dev" ]]; then
+            echo "Error: Environment must be 'prod' or 'dev'."
+            exit 1
+          fi
+          echo "Environment validated as ${{ github.event.inputs.environment }}"
+          # This echo actually sets the validated environment, to be used in the subsequent job
+          echo "::set-output name=environment::${{ github.event.inputs.environment }}"
+
+  deploy:
+    needs: validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Execute Remote Deployment Script
+        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} "bash /path/to/deploy_script.sh ${{ needs.validation.outputs.environment }}"
