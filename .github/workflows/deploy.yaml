@@ -6,6 +6,9 @@ on:
       environment:
         description: 'Deployment environment (prod/dev)'
         required: true
+      branch:
+        description: 'Branch name'
+        required: true
 
 jobs:
   validation:
@@ -16,13 +19,16 @@ jobs:
       - name: Validate environment input
         id: check_env
         run: |
+          # Check if the environment is either 'prod' or 'dev'
           if [[ "${{ github.event.inputs.environment }}" != "prod" && "${{ github.event.inputs.environment }}" != "dev" ]]; then
             echo "Error: Environment must be 'prod' or 'dev'."
             exit 1
           fi
-          echo "Environment validated as ${{ github.event.inputs.environment }}"
-          # This echo actually sets the validated environment, to be used in the subsequent job
-          echo "::set-output name=environment::${{ github.event.inputs.environment }}"
+          # Additional check for 'prod' deployment to be from 'main' branch only
+          if [[ "${{ github.event.inputs.environment }}" == "prod" && "${{ github.event.inputs.branch }}" != "main" ]]; then
+            echo "Error: Production deployments can only be made from the 'main' branch."
+            exit 1
+          fi
 
   deploy:
     needs: validation
@@ -36,4 +42,4 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Execute Remote Deployment Script
-        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} "bash /home/${{ secrets.USERNAME }}/deploy.sh ${{ needs.validation.outputs.environment }}"
+        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} "bash /home/${{ secrets.USERNAME }}/deploy.sh ${{ github.event.inputs.branch }} ${{ github.event.inputs.environment }}"
