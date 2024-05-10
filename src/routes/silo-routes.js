@@ -25,6 +25,15 @@ router.post('/grown-stalk', async ctx => {
       results = await getUnmigratedGrownStalk(ctx.request.body, options);
       break;
     case "all":
+      const [migrated, unmigrated] = await Promise.all([
+        getMigratedGrownStalk(ctx.request.body, options),
+        getUnmigratedGrownStalk(ctx.request.body, options)
+      ]);
+      results = {
+        total: migrated.total + unmigrated.total,
+        accounts: [...migrated.accounts, ...unmigrated.accounts]
+      };
+      results.accounts.sort((a, b) => b.total - a.total);
       break;
   }
   ctx.body = results;

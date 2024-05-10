@@ -5,7 +5,7 @@ jest.mock("../src/datasources/contracts", () => ({
 const { BigNumber } = require("alchemy-sdk");
 const { asyncBeanstalkContractGetter } = require("../src/datasources/contracts");
 const { TEN_BN } = require("../src/constants/constants");
-const { getGrownStalk } = require("../src/service/silo-service");
+const { getGrownStalk, getMigratedGrownStalk } = require("../src/service/silo-service");
 const BlockUtil = require("../src/utils/block");
 
 const defaultOptions = { blockNumber: 19000000 };
@@ -20,7 +20,7 @@ describe('SiloService', () => {
     jest.spyOn(BlockUtil, 'blockFromOptions').mockResolvedValue(mockBlock);
   });
 
-  it('should fetch grown stalk for requested stalkholders', async () => {
+  it('should fetch silov3 grown stalk for requested stalkholders', async () => {
 
     const accounts = ["0xabcd", "0x1234"];
     const mockStalk = {
@@ -29,22 +29,19 @@ describe('SiloService', () => {
           if (account == accounts[0]) {
             return BigNumber.from(50).mul(TEN_BN.pow(10));
           } else {
-            return BigNumber.from(10).mul(TEN_BN.pow(10));
+            return BigNumber.from(15).mul(TEN_BN.pow(10));
           }
-        }),
-        balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
-          return BigNumber.from(20).mul(TEN_BN.pow(10));
-        }),
+        })
       }
     };
     
     asyncBeanstalkContractGetter.mockResolvedValue(mockStalk);
 
-    const grownStalk = await getGrownStalk(accounts, defaultOptions);
-    // console.log(grownStalk);
+    const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
+    console.log(grownStalk);
 
-    expect(grownStalk.total).toEqual(340);
+    expect(grownStalk.total).toEqual(325);
     expect(grownStalk.accounts[0].account).toEqual(accounts[0]);
-    expect(grownStalk.accounts[1].total).toEqual(70);
+    expect(grownStalk.accounts[1].total).toEqual(75);
   });
 });

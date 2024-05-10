@@ -6,7 +6,7 @@ const BeanstalkSubgraphRepository = require("../repository/beanstalk-subgraph");
 const BlockUtil = require("../utils/block");
 const { createNumberSpread } = require("../utils/number");
 
-class SiloService {
+class SiloService { 
 
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
@@ -53,6 +53,8 @@ class SiloService {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
     const beanstalk = await asyncBeanstalkContractGetter(block.number);
 
+    // Assumption is that the user has either migrated everything or migrated nothing.
+    // In practice this should always be true because the ui does not allow partial migration.
     const depositedBdvs = await BeanstalkSubgraphRepository.getDepositedBdvs(accounts, block.number);
     const siloAssets = [BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP].map(s => s.toLowerCase());
 
@@ -62,7 +64,6 @@ class SiloService {
         beanstalk.callStatic.stemTipForToken(asset, { blockTag: MILESTONE.siloV3 }),
         beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number })
       ]);
-      console.log(migrationStemTip, stemTipNow);
       stemDeltas.push(stemTipNow.sub(migrationStemTip).toNumber());
     }
 
@@ -80,19 +81,19 @@ class SiloService {
       let total = uncategorizedFloat;
       const breakdown = {};
       for (let i = 0; i < stemDeltas.length; ++i) {
-        // console.log(stemDeltas[i], depositedBdv[siloAssets[i]]);
-        const grownStalk = stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]]) / Math.pow(10, 10);
+        let grownStalk = stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]]) / Math.pow(10, 10);
+        grownStalk = parseFloat(grownStalk.toFixed(2));
         total += grownStalk;
         breakdown[siloAssets[i]] = grownStalk;
       }
-      breakdown.upToStemsDeployment = uncategorizedFloat;
 
       retval.total += total;
       retval.accounts.push({
         account,
         siloV3: false,
         total,
-        breakdown
+        upToStemsDeployment: uncategorizedFloat,
+        afterStemsDeployment: breakdown
       });
     }
     // Sort the largest grown stalk amounts first
