@@ -21,6 +21,9 @@ class SiloService {
         promises.push(beanstalk.callStatic.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
       }
 
+      // Unmigrated stalk
+      promises.push(beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, { blockTag: block.number }));
+
       // Parallelize all calls for this account
       const grownStalkResults = (await Promise.all(promises)).map(bn => createNumberSpread(bn, 10, 2));
       
@@ -29,7 +32,8 @@ class SiloService {
       const breakdown = {};
       for (let i = 0; i < grownStalkResults.length; ++i) {
         total += grownStalkResults[i].float;
-        breakdown[siloAssets[i]] = grownStalkResults[i].float;
+        const label = siloAssets[i] ?? 'unmigrated';
+        breakdown[label] = grownStalkResults[i].float;
       }
 
       retval.total += total;

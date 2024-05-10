@@ -13,7 +13,6 @@ const router = new Router({
  */
 router.post('/grown-stalk', async ctx => {
   const options = RestParsingUtil.parseQuery(ctx.query);
-  console.log(ctx.request.body);
   const results = await getGrownStalk(ctx.request.body, options);
   ctx.body = results;
 });
