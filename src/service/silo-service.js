@@ -81,7 +81,7 @@ class SiloService {
       let total = uncategorizedFloat;
       const breakdown = {};
       for (let i = 0; i < stemDeltas.length; ++i) {
-        let grownStalk = stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]]) / Math.pow(10, 10);
+        let grownStalk = stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]] ?? 0) / Math.pow(10, 10);
         grownStalk = parseFloat(grownStalk.toFixed(2));
         total += grownStalk;
         breakdown[siloAssets[i]] = grownStalk;

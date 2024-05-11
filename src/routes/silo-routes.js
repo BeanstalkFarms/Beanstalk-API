@@ -16,18 +16,20 @@ router.post('/grown-stalk', async ctx => {
   const options = RestParsingUtil.parseQuery(ctx.query);
   options.type = options.type ?? 'all';
   
+  const wallets = ctx.request.body.map(s => s.toLowerCase());
+
   let results;
   switch (options.type) {
     case "migrated":
-      results = await getMigratedGrownStalk(ctx.request.body, options);
+      results = await getMigratedGrownStalk(wallets, options);
       break;
     case "unmigrated":
-      results = await getUnmigratedGrownStalk(ctx.request.body, options);
+      results = await getUnmigratedGrownStalk(wallets, options);
       break;
     case "all":
       const [migrated, unmigrated] = await Promise.all([
-        getMigratedGrownStalk(ctx.request.body, options),
-        getUnmigratedGrownStalk(ctx.request.body, options)
+        getMigratedGrownStalk(wallets, options),
+        getUnmigratedGrownStalk(wallets, options)
       ]);
       results = {
         total: migrated.total + unmigrated.total,
