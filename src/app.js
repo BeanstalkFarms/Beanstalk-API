@@ -4,8 +4,13 @@ const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const Router = require('koa-router');
+const cors = require('@koa/cors');
 
 const app = new Koa();
+
+app.use(cors({
+  origin: '*'
+}));
 
 app.use(async (ctx, next) => {
   if (!ctx.originalUrl.includes("healthcheck")) {
