@@ -13,9 +13,13 @@ app.use(cors({
   origin: '*'
 }));
 
+app.use(bodyParser());
+
 app.use(async (ctx, next) => {
   if (!ctx.originalUrl.includes("healthcheck")) {
-    console.log(`${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`);
+    const requestInfo = `${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`;
+    const requestBody = `${Array.isArray(ctx.request.body) ? 'array' : 'object'} ${JSON.stringify(ctx.request.body)}`;
+    console.log(`${requestInfo} - Request Body: ${requestBody}`);
   }
   try {
     await next(); // pass control to the next function specified in .use()
@@ -36,8 +40,6 @@ app.use(async (ctx, next) => {
     console.log(`${new Date().toISOString()} [failure] ${ctx.method} ${ctx.originalUrl}`);
   }
 });
-
-app.use(bodyParser());
 
 app.use(priceRoutes.routes());
 app.use(priceRoutes.allowedMethods());
