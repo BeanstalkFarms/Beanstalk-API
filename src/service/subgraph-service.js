@@ -4,10 +4,18 @@ const { slugSG, SLUGS } = require("../datasources/subgraph-client");
 
 // For retrieving current statuses of our subgraphs.
 class SubgraphService {
-
+ 
   static async getStatuses(environments) {
 
-    const deploymentStatuses = { allFatalErrors: [] };
+    let deploymentStatuses = { allFatalErrors: [] };
+
+    if (environments.indexOf('decentralized') >= 0) {
+      environments.splice(environments.indexOf('decentralized'), 1);
+      deploymentStatuses = {
+        ...deploymentStatuses,
+        ...await this.getDecentralizedStatuses()
+      };
+    }
 
     // Get deployment hash corresponding to the subgraph name
     const metaPromises = [];
@@ -93,6 +101,49 @@ class SubgraphService {
       }
     }
 
+    return deploymentStatuses;
+  }
+
+  static async getDecentralizedStatuses() {
+
+    const metaPromises = [];
+    const names = ['graph-beanstalk', 'graph-bean'];
+    const clients = [SubgraphClient.graphBeanstalk, SubgraphClient.graphBean];
+
+    for (const client of clients) {
+      metaPromises.push(client(SubgraphClient.gql`
+        {
+          _meta {
+            deployment
+            hasIndexingErrors
+            block {
+              number
+            }
+          }
+        }`
+      ));
+    }
+
+    const deploymentStatuses = {};
+
+    const currentBlock = (await (await providerThenable).getBlock()).number;
+
+    const metas = await Promise.allSettled(metaPromises);
+    for (let i = 0; i < metas.length; ++i) {
+      // Rejected promise will occur when the subgraph does not exist
+      if (metas[i].status === 'fulfilled') {
+        deploymentStatuses[names[i]] = {
+          deployment: metas[i].value._meta.deployment,
+          hasIndexingErrors: metas[i].value._meta.hasIndexingErrors,
+          indexedBlock: metas[i].value._meta.block.number,
+          blocksBehind: currentBlock - metas[i].value._meta.block.number
+        };
+      } else {
+        const errorMessage = metas[i].reason.response.errors[0].message;
+        deploymentStatuses[names[i]] = { error: errorMessage };
+      }
+    }
+    
     return deploymentStatuses;
   }
 }
