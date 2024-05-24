@@ -7,6 +7,12 @@ async function getContractAsync(address, blockNumber) {
   const key = JSON.stringify({ address, blockNumber });
   if (!contracts[key]) {
     contracts[key] = new Contract(address, ABIS[address], await providerThenable);
+
+    // Future development inclueds adding the option for a local rpc.
+    // This does not appear to work with the alchemy-sdk contract, and would therefore
+    // require a Proxy object wrapping the contract to bridge the .callStatic property.
+    // const provider = new ethers.JsonRpcProvider('http://localhost:8545');
+    // contracts[key] = new ethers.Contract(address, ABIS[address], provider);
   }
   return contracts[key];
 }

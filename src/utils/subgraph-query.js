@@ -6,7 +6,7 @@ class SubgraphQueryUtil {
    * 
    * @param {function} subgraphClient 
    * @param {string} query - the query to be paginated. Must NOT include any where clause here.
-   * @param {string} where - (optional) block argument, of the form `block: {number: ${value}}`
+   * @param {string} block - (optional) block argument, of the form `block: {number: ${value}}`
    * @param {string} where - (optional) additional fields to search by, of the form `field: "${value}, ..."`
    * @param {string[]} paginateFields - the fields to paginate on
    * @param {string[]} firstValues - the initial values to begin with of the paginateFields
@@ -22,7 +22,7 @@ class SubgraphQueryUtil {
     const whereSuffix = paginateDirection === 'asc' ? '_gt' : '_lt';
 
     const retval = [];
-    while (firstValues[0]) {
+    while (firstValues[0] !== undefined) {
       // Construct arguments for pagination
       const whereClause = `{${paginateFields.map((v, idx) => `${v}${whereSuffix}: ${formatType(firstValues[idx])}`).join(', ')}, ${where}}`;
       const paginateArguments = `(${block} where: ${whereClause} first: ${PAGE_SIZE} orderBy: ${paginateFields[0]} orderDirection: ${paginateDirection})`
