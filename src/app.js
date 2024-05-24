@@ -1,6 +1,7 @@
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
+const subgraphRoutes = require('./routes/subgraph-routes.js');
 
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
@@ -47,6 +48,8 @@ app.use(coingeckoRoutes.routes());
 app.use(coingeckoRoutes.allowedMethods());
 app.use(siloRoutes.routes());
 app.use(siloRoutes.allowedMethods());
+app.use(subgraphRoutes.routes());
+app.use(subgraphRoutes.allowedMethods());
 
 const router = new Router();
 router.get('/healthcheck', async ctx => {
