@@ -11,7 +11,7 @@ const router = new Router({
 router.get('/status', async ctx => {
   const env = (ctx.query.env ?? 'prod,decentralized').split(',').map(item => item.trim());
 
-  const statuses = await SubgraphService.getStatus(env);
+  const statuses = await SubgraphService.getStatuses(env);
   ctx.body = statuses;
 });
 
