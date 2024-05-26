@@ -7,15 +7,18 @@ class SubgraphService {
  
   static async getStatuses(environments) {
 
-    let deploymentStatuses = { allFatalErrors: [] };
+    let deploymentStatuses = {};
 
     if (environments.indexOf('decentralized') >= 0) {
       environments.splice(environments.indexOf('decentralized'), 1);
-      deploymentStatuses = {
-        ...deploymentStatuses,
-        ...await this.getDecentralizedStatuses()
-      };
+      deploymentStatuses = await this.getDecentralizedStatuses();
     }
+
+    if (environments.length == 0) {
+      return deploymentStatuses;
+    }
+
+    deploymentStatuses.allFatalErrors = [];
 
     // Get deployment hash corresponding to the subgraph name
     const metaPromises = [];
@@ -78,7 +81,7 @@ class SubgraphService {
     const currentBlock = (await (await providerThenable).getBlock()).number;
 
     for (const status of allStatuses.indexingStatuses) {
-      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph);
+      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter(n => !n.startsWith('graph-'));
       for (const name of deployedNames) {
         deploymentStatuses[name].synced = status.synced;
         deploymentStatuses[name].healthy = status.health === 'healthy';
