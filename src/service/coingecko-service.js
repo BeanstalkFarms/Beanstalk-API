@@ -30,7 +30,7 @@ class CoingeckoService {
       const poolPrice = getConstantProductPrice(well.reserves, well.tokens.map(t => t.decimals));
       const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
         calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
-        CoingeckoService.calcWellSwapVolume(well.id, block.timestamp),
+        CoingeckoService.get24hVolume(well.id, block.number),
         CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
       ]);
 
@@ -40,8 +40,8 @@ class CoingeckoService {
         target_currency: token1,
         pool_id: well.id,
         last_price: poolPrice.float[0],
-        base_volume: pool24hVolume[token0].float,
-        target_volume: pool24hVolume[token1].float,
+        base_volume: pool24hVolume[token0],
+        target_volume: pool24hVolume[token1],
         liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
         high: priceRange.high.float[0],
         low: priceRange.low.float[0]
@@ -88,7 +88,25 @@ class CoingeckoService {
     return retval;
   }
 
-  // Gets the swap volume in terms of token amounts in the well
+  // Gets the 24h volume in usd and in terms of the tokens in the well
+  static async get24hVolume(wellAddress, blockNumber) {
+
+    // Retrieves the rolling 24h volume from the subgraph
+    const volumeResult = await BasinSubgraphRepository.getRollingVolume(wellAddress, blockNumber);
+
+    // CoinGecko expects volume to be presented in equal proportion on both tokens.
+    // i.e. if there is $50k volume, it expects something like 50k BEAN and 15 ETH to be reported,
+    // despite the additive value of those tokens being $100k. The best workaround is to
+    // use the accurate 24h volume from the subgraph and estimate the token amounts from there.
+    const usdVolume = parseFloat(volumeResult.rollingDailyTradeVolumeUSD);
+    const swapVolume = { totalUSD: usdVolume };
+    for (const token of volumeResult.tokens) {
+      swapVolume[token.id] = usdVolume / token.lastPriceUSD;
+    }
+    return swapVolume;
+  }
+
+  // Gets the swap volume in terms of token amounts in the well over the requested period
   static async calcWellSwapVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
     const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
