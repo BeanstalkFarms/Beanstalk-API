@@ -30,7 +30,7 @@ class CoingeckoService {
       const poolPrice = getConstantProductPrice(well.reserves, well.tokens.map(t => t.decimals));
       const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
         calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
-        CoingeckoService.getWellVolume(well.id, block.timestamp),
+        CoingeckoService.calcWellSwapVolume(well.id, block.timestamp),
         CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
       ]);
 
@@ -89,7 +89,7 @@ class CoingeckoService {
   }
 
   // Gets the swap volume in terms of token amounts in the well
-  static async getWellVolume(wellAddress, timestamp, lookback = ONE_DAY) {
+  static async calcWellSwapVolume(wellAddress, timestamp, lookback = ONE_DAY) {
 
     const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
 
