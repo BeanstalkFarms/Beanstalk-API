@@ -163,6 +163,27 @@ class BasinSubgraphRepository {
 
     return allWithdraws;
   }
+
+  static async getRollingVolume(wellAddress, blockNumber) {
+
+    const result = await SubgraphClients.basinSG(SubgraphClients.gql`
+      {
+        wells(
+          block: {number: ${blockNumber}}
+          where: {id: "${wellAddress}"}
+        ) {
+          tokens {
+            id
+            decimals
+            lastPriceUSD
+          }
+          rollingDailyTradeVolumeUSD
+        }
+      }`
+    );
+
+    return result.wells[0];
+  }
 }
 
 module.exports = BasinSubgraphRepository;
