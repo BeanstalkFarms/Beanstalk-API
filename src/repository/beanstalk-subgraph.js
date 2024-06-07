@@ -35,6 +35,29 @@ class BeanstalkSubgraphRepository {
     }
     return retval;
   }
+
+  static async getSiloHourlyRewardMints(beanstalk, fromSeason, toSeason) {
+    const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
+      SubgraphClients.beanstalkSG,
+      SubgraphClients.gql`
+      {
+        siloHourlySnapshots {
+          season
+          deltaBeanMints
+        }
+      }`,
+      '',
+      `silo: "${beanstalk}", season_lte: ${toSeason}`,
+      // Lower bound seson is applied here
+      ['season'],
+      [fromSeason],
+      'asc'
+    );
+    return siloHourlySnapshots.reduce((result, next) => {
+      result[next.season] = next.deltaBeanMints;
+      return result;
+    }, {});
+  }
 }
 
 module.exports = BeanstalkSubgraphRepository;

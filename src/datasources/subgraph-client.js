@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { GraphQLClient, gql } = require('graphql-request');
+const fs = require('fs');
 
 const BASE_URL = 'https://graph.node.bean.money/subgraphs/name/';
 const STATUS_URL = 'http://graph.node.bean.money:8030/graphql';
@@ -17,10 +18,18 @@ function getClient(url) {
   return clients[url];
 }
 
+let callNumber = 2;
 function clientBuilder(url) {
   return async (query) => {
     const client = getClient(url);
-    return await client.request(query);
+    const response = await client.request(query);
+
+    // if (process.env.ENV === 'local') {
+    //   // Use this to assist in mocking. Should be commented in/out as needed.
+    //   await fs.promises.writeFile(`${__dirname}/../../test/mock-responses/subgraph/siloHourlyRewardMints_${callNumber++}.json`, JSON.stringify(response, null, 2));
+    //   console.log('wrote subgraph output to test directory');
+    // }
+    return response;
   }
 }
 

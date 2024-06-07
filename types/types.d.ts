@@ -1,7 +1,7 @@
 export type CalcApysOptions = {
   beanstalk: string;
   season: number;
-  lookback: number;
+  window: number;
   assets: string[];
 };
 
@@ -14,6 +14,11 @@ export type TokenApy = {
 export type CalcApysResult = {
   beanstalk: string;
   season: number;
-  lookback: number;
+  window: number;
   apys: TokenApy[];
+};
+
+export type WindowEMAResult = {
+  window: number;
+  beansPerSeason: number;
 };
