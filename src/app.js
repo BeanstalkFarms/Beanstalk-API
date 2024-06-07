@@ -7,6 +7,10 @@ const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
+const { activateJobs } = require('./scheduled/cron-schedule.js');
+
+// Activate whichever cron jobs are configured, if any
+activateJobs(process.env.ENABLED_CRON_JOBS?.split(','));
 
 const app = new Koa();
 
