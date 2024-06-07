@@ -1,24 +1,6 @@
 /**
- * @typedef {Object} CalcApysOptions
- * @property {string} beanstalk
- * @property {number} season
- * @property {number} lookback
- * @property {string[]} assets
- */
-
-/**
- * @typedef {Object} TokenApy
- * @property {string} token
- * @property {number} beanApy
- * @property {number} stalkApy
- */
-
-/**
- * @typedef {Object} CalcApysResult
- * @property {string} beanstalk
- * @property {number} season
- * @property {number} lookback
- * @property {TokenApy[]} apys
+ * @typedef {import('../../types/types').CalcApysOptions} CalcApysOptions
+ * @typedef {import('../../types/types').CalcApysResult} CalcApysResult
  */
 
 /**
@@ -27,7 +9,12 @@
  * @returns {Promise<CalcApysResult[]>}
  */
 async function calcApys(options) {
-  
+  return null;
+}
+
+async function calcWindowEMA() {
+
+
 }
 
 module.exports = {
