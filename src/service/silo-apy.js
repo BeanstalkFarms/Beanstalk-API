@@ -17,6 +17,8 @@ async function calcApy(options) {
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
+// First sunrise after BIP-45 Seed Gauge was deployed. This is when the APY formula changes
+const GAUGE_SEASON = 21798;
 
 /**
  * Calculates the beans per season EMA for the requested season and windows
