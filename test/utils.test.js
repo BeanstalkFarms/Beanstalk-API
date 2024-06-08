@@ -16,6 +16,7 @@ const { BigNumber } = require("alchemy-sdk");
 const { getConstantProductPrice } = require("../src/utils/pool/constant-product");
 const { parseQuery } = require("../src/utils/rest-parsing");
 const SubgraphClients = require("../src/datasources/subgraph-client");
+const { BEANSTALK } = require("../src/constants/addresses");
 
 describe('Utils', () => {
   it('should format query parameters correctly', async () => {
@@ -66,5 +67,18 @@ describe('Utils', () => {
     expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
     expect(prices.float[1]).toBeCloseTo(3060.898953);
 
+  });
+
+  it('should find block number for a requested season', async () => {
+    jest.spyOn(SubgraphClients, 'beanstalkSG').mockResolvedValue({
+      seasons: [
+        {
+          sunriseBlock: 20042493
+        }
+      ]
+    });
+
+    const blockForSeason = await BlockUtil.findBlockForSeason(BEANSTALK, 22183);
+    expect(blockForSeason).toBe(20042493);
   });
 });

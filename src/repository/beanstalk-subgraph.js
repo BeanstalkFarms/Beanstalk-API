@@ -58,6 +58,17 @@ class BeanstalkSubgraphRepository {
       return result;
     }, {});
   }
+
+  static async getBlockForSeason(beanstalk, season) {
+    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+      {
+        seasons(where: {beanstalk: "${beanstalk}", season: ${season}}) {
+          sunriseBlock
+        }
+      }`
+    );
+    return result.seasons[0]?.sunriseBlock;
+  }
 }
 
 module.exports = BeanstalkSubgraphRepository;
