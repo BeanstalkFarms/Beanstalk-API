@@ -1,65 +1,71 @@
 /**
  * @typedef {import('../../../types/types').CalcApysPreGaugeInputs} CalcApysPreGaugeInputs
- * @typedef {import('../../../types/types').TokenApy} TokenApy
+ * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
 /**
  * Calculates the silo apy before seed gauge was implemented
  * @param {CalcApysPreGaugeInputs} params 
- * @returns {TokenApy}
+ * @returns {DepositYield}
  */
 function calcApyPreGauge(params) {
 
-  // TODO: consider using BigNumber
-  let { beansPerSeason, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds } = params;
+  // TODO: consider using BigNumber for input parameters
+  let { beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds } = params;
   const duration = params.duration ?? 8760;
 
   // Initialization
   beansPerSeason /= Math.pow(10, 6);
-  seedsPerTokenBdv /= Math.pow(10, 6);
   seedsPerBeanBdv /= Math.pow(10, 6);
   totalSeeds /= Math.pow(10, 6);
   totalStalk /= Math.pow(10, 10);
-  let userBdv = params.initialUserValues ? params.initialUserValues.bdv / Math.pow(10, 6) : 1;
-  let userStalk = params.initialUserValues ? params.initialUserValues.stalk / Math.pow(10, 10) : 1;
-  let ownership = userStalk / totalStalk;
+  let userBdv = tokens.map((_, idx) => (
+    params.initialUserValues ? params.initialUserValues[idx].bdv / Math.pow(10, 6) : 1
+  ));
+  let userStalk = tokens.map((_, idx) => (
+    params.initialUserValues ? params.initialUserValues[idx].stalk / Math.pow(10, 10) : 1
+  ));
+  let ownership = userStalk.map(u => u / totalStalk);
 
-  let bdvStart = userBdv;
-  let stalkStart = userStalk;
-  let ownershipStart = ownership;
+  let bdvStart = userBdv.map(b => b);
+  let stalkStart = userStalk.map(s => s);
+  let ownershipStart = ownership.map(o => o);
 
   let totalSeeds_i;
   let totalStalk_i;
-  let userBdv_i;
-  let userStalk_i;
+  let userBdv_i = tokens.map(_ => 0);
+  let userStalk_i = tokens.map(_ => 0);
 
   const STALK_PER_SEED = 0.0001;
-  const GROWN_STALK_PER_TOKEN = seedsPerTokenBdv / 10000;
+  const GROWN_STALK_PER_TOKEN = seedsPerTokenBdv.map(s => s / Math.pow(10, 10));
   const GROWN_STALK_PER_BEAN = seedsPerBeanBdv / 10000;
 
   // Simulate minting for the requested duration
   for (let i = 0; i < duration; ++i) {
-    ownership = userStalk / totalStalk;
-    let newBdv = beansPerSeason * ownership;
 
     totalSeeds_i = totalSeeds + beansPerSeason * seedsPerBeanBdv;
     totalStalk_i = totalStalk + beansPerSeason + STALK_PER_SEED * totalSeeds;
-    userBdv_i = userBdv + newBdv;
-    userStalk_i = userStalk + newBdv + GROWN_STALK_PER_BEAN * (userBdv - 1) + GROWN_STALK_PER_TOKEN;
-
     totalSeeds = totalSeeds_i;
     totalStalk = totalStalk_i;
-    userBdv = userBdv_i;
-    userStalk = userStalk_i;
+
+    for (let t = 0; t < tokens.length; ++t) {
+      ownership[t] = userStalk[t] / totalStalk;
+      const newBdv = beansPerSeason * ownership[t];
+
+      userBdv_i[t] = userBdv[t] + newBdv;
+      userStalk_i[t] = userStalk[t] + newBdv + GROWN_STALK_PER_BEAN * (userBdv[t] - 1) + GROWN_STALK_PER_TOKEN[t];
+      userBdv[t] = userBdv_i[t];
+      userStalk[t] = userStalk_i[t];
+    }
   }
 
   // Return yields
-  return {
-    token: params.token,
-    beanYield: (userBdv - bdvStart) / bdvStart,
-    stalkYield: (userStalk - stalkStart) / stalkStart,
-    ownershipGrowth: (ownership - ownershipStart) / ownershipStart
-  };
+  return tokens.map((token, idx) => ({
+    token,
+    beanYield: (userBdv[idx] - bdvStart[idx]) / bdvStart[idx],
+    stalkYield: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
+    ownershipGrowth: (ownership[idx] - ownershipStart[idx]) / ownershipStart[idx]
+  }));
 }
 
 module.exports = {

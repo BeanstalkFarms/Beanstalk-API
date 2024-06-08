@@ -1,11 +1,11 @@
 export type CalcApysOptions = {
   beanstalk: string;
   season: number;
-  window: number;
+  windows: number[];
   assets: string[];
 };
 
-export type TokenApy = {
+export type DepositYield = {
   // The token that these yields were calculated for
   token: string;
   // Percentage growth in depositor's bdv
@@ -20,7 +20,7 @@ export type CalcApysResult = {
   beanstalk: string;
   season: number;
   window: number;
-  apys: TokenApy[];
+  apys: DepositYield[];
 };
 
 export type WindowEMAResult = {
@@ -36,18 +36,18 @@ export type Deposit = {
 export type CalcApysPreGaugeInputs = {
   // The current EMA
   beansPerSeason: number;
-  // The token calculating on (informational)
-  token: string;
-  // The amount of seeds awarded per bdv for the whitelisted token being calculated
-  seedsPerTokenBdv: number;
+  // The token(s) calculating on (informational)
+  tokens: string[];
+  // The amount of seeds awarded per bdv for the whitelisted token(s) being calculated
+  seedsPerTokenBdv: number[];
   // The amount of seeds awarded per bdv for bean deposits
   seedsPerBeanBdv: number;
   // Total outstanding stalk
   totalStalk: number;
   // Total outstanding seeds
   totalSeeds: number;
-  // Initial values of a deposit's starting state
-  initialUserValues?: Deposit;
+  // Initial values of a deposit starting states
+  initialUserValues?: Deposit[];
   // The duration for which to calculate the apy (if other than 1 year)
   duration?: number;
 }

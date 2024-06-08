@@ -5,6 +5,7 @@
  */
 
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const { calcApyPreGauge } = require('../utils/apy/pre-gauge');
 
 /**
  * Calculates vAPYs.
@@ -12,7 +13,20 @@ const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
  * @returns {Promise<CalcApysResult[]>}
  */
 async function calcApy(options) {
-  return null;
+  
+  const windowEMAs = calcWindowEMA(options.beanstalk, options.season, options.windows);
+
+  // To get results onchain, need to be able to determine which block to use given a season number.
+  // Otherwise the subgraph should be usable for the necessary data.
+  
+  if (options.season < GAUGE_SEASON) {
+    for (const ema of windowEMAs) {
+      // calcApyPreGauge({
+      //   beansPerSeason: ema,
+      //   tokens: options.tokens,
+      // });
+    }
+  }
 }
 
 // First sunrise after replant was for season 6075

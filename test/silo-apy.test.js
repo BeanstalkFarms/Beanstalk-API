@@ -49,49 +49,63 @@ describe('Pre-Gauge Silo APY', () => {
   it('should calculate basic apy', () => {
     const apy = calcApyPreGauge({
       beansPerSeason: 1278000000,
-      token: 'BEAN',
-      seedsPerTokenBdv: 3000000,
+      tokens: ['BEAN', 'BEAN:WETH'],
+      seedsPerTokenBdv: [3000000, 4500000],
       seedsPerBeanBdv: 3000000,
       totalStalk: 1636664801904743831,
       totalSeeds: 24942000280720
     });
     
-    expect(apy.beanYield).toBeCloseTo(0.14346160171559408);
-    expect(apy.stalkYield).toBeCloseTo(2.929361317570831);
-    expect(apy.ownershipGrowth).toBeCloseTo(2.041655409481871);
+    expect(apy[0].beanYield).toBeCloseTo(0.14346160171559408);
+    expect(apy[0].stalkYield).toBeCloseTo(2.929361317570831);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(2.041655409481871);
+
+    expect(apy[1].beanYield).toBeCloseTo(0.18299360215739835);
+    expect(apy[1].stalkYield).toBeCloseTo(4.318722210196328);
+    expect(apy[1].ownershipGrowth).toBeCloseTo(3.1169670763419854);
   });
 
   it('should calculate with optional inputs', () => {
     let apy = calcApyPreGauge({
       beansPerSeason: 1278000000,
-      token: 'BEAN',
-      seedsPerTokenBdv: 3000000,
+      tokens: ['BEAN', 'BEAN:WETH'],
+      seedsPerTokenBdv: [3000000, 4500000],
       seedsPerBeanBdv: 3000000,
       totalStalk: 1636664801904743831,
       totalSeeds: 24942000280720,
       // User starts with a deposit
-      initialUserValues: {
-        bdv: 2000 * Math.pow(10, 6),
-        stalk: 5000 * Math.pow(10, 10)
-      }
+      initialUserValues: [
+        {
+          bdv: 2000 * Math.pow(10, 6),
+          stalk: 5000 * Math.pow(10, 10)
+        },
+        {
+          bdv: 2000 * Math.pow(10, 6),
+          stalk: 6500 * Math.pow(10, 10)
+        }
+      ]
     });
 
-    expect(apy.beanYield).toBeCloseTo(0.24004075085759974);
-    expect(apy.stalkYield).toBeCloseTo(1.262114557519065);
-    expect(apy.ownershipGrowth).toBeCloseTo(0.7511041890951874);
+    expect(apy[0].beanYield).toBeCloseTo(0.24004075085759974);
+    expect(apy[0].stalkYield).toBeCloseTo(1.262114557519065);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(0.7511041890951874);
+
+    expect(apy[1].beanYield).toBeCloseTo(0.2883411617711251);
+    expect(apy[1].stalkYield).toBeCloseTo(1.0058229586659946);
+    expect(apy[1].ownershipGrowth).toBeCloseTo(0.5526664099665303);
 
     apy = calcApyPreGauge({
       beansPerSeason: 1278000000,
-      token: 'BEAN',
-      seedsPerTokenBdv: 3000000,
+      tokens: ['BEAN'],
+      seedsPerTokenBdv: [3000000],
       seedsPerBeanBdv: 3000000,
       totalStalk: 1636664801904743831,
       totalSeeds: 24942000280720,
       duration: 720 // 1 month
     });
     
-    expect(apy.beanYield).toBeCloseTo(0.006192371144229325);
-    expect(apy.stalkYield).toBeCloseTo(0.2228397591012936);
-    expect(apy.ownershipGrowth).toBeCloseTo(0.2018846550220293);
+    expect(apy[0].beanYield).toBeCloseTo(0.006192371144229325);
+    expect(apy[0].stalkYield).toBeCloseTo(0.2228397591012936);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(0.2018846550220293);
   });
 });
