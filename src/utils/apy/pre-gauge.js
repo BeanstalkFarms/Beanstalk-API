@@ -20,13 +20,13 @@ class PreGaugeApyUtil {
     // Initialization
     beansPerSeason = fromBigInt(beansPerSeason, 6, 6);
     seedsPerBeanBdv = fromBigInt(seedsPerBeanBdv, 6, 6);
-    totalSeeds = fromBigInt(totalSeeds, 6, 6);
-    totalStalk = fromBigInt(totalStalk, 10, 10);
+    totalSeeds = fromBigInt(totalSeeds, 6, 2);
+    totalStalk = fromBigInt(totalStalk, 10, 0);
     let userBdv = tokens.map((_, idx) => (
-      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].bdv, 6, 6) : 1
+      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].bdv, 6, 2) : 1
     ));
     let userStalk = tokens.map((_, idx) => (
-      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].stalk, 10, 10) : 1
+      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].stalk, 10, 2) : 1
     ));
     let ownership = userStalk.map(u => u / totalStalk);
   
