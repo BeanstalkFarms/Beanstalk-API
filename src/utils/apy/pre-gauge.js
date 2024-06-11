@@ -12,7 +12,7 @@ class PreGaugeApyUtil {
    * @param {CalcApysPreGaugeInputs} params 
    * @returns {DepositYield}
    */
-  static calcApyPreGauge(params) {
+  static calcApy(params) {
   
     let { beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds } = params;
     const duration = params.duration ?? 8760;

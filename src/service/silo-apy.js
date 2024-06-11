@@ -5,12 +5,12 @@
  */
 
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
-const { calcApyPreGauge } = require('../utils/apy/pre-gauge');
 const { providerThenable } = require('../datasources/alchemy');
 
 const ContractStorage = require("@beanstalk/contract-storage/src/contract-storage");
 const StorageBIP47 = require('../datasources/storage/beanstalk/StorageBIP47.json');
 const { BEAN } = require('../constants/addresses');
+const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
@@ -26,6 +26,8 @@ class SiloApyService {
    */
   static async calcApy(options) {
     
+    const retval = [];
+    
     const windowEMAs = await SiloApyService.calcWindowEMA(options.beanstalk, options.season, options.windows);
 
     // To get results onchain, need to be able to determine which block to use given a season number.
@@ -34,10 +36,9 @@ class SiloApyService {
     if (options.season < GAUGE_SEASON) {
       
       const inputs = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(options.beanstalk, options.season);
-      console.log(inputs);
 
       for (const ema of windowEMAs) {
-        calcApyPreGauge({
+        const result = PreGaugeApyUtil.calcApy({
           beansPerSeason: ema.beansPerSeason,
           tokens: options.tokens,
           seedsPerTokenBdv: options.tokens.map(t => inputs.tokens[t].grownStalkPerSeason),
@@ -45,10 +46,17 @@ class SiloApyService {
           totalStalk: inputs.silo.stalk,
           totalSeeds: inputs.silo.seeds
         });
+        retval.push({
+          beanstalk: options.beanstalk,
+          season: options.season,
+          window: ema.window,
+          apys: result
+        });
       }
     } else {
       // const bs = new ContractStorage(await providerThenable, BEANSTALK, StorageBIP47);
     }
+    return retval;
   }
 
   /**
