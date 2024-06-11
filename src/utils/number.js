@@ -38,6 +38,35 @@ class NumberUtil {
     }
   }
 
+  static allToBigInt(obj) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
+          try {
+            obj[key] = BigInt(obj[key]);
+          } catch (e) {}
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          NumberUtil.allToBigInt(obj[key]);
+        }
+      }
+    }
+    return obj;
+  }
+
+  /**
+   * Convert the given value into a number with the desired decimal precision. For example, if converting
+   * something with 18 decimals, it may be desired to keep some of that precision rather than truncating, but
+   * still performing sufficient division
+   * @param {BigInt} v - the value to convert
+   * @param {number} precision - the precision of v
+   * @param {number} resultPrecision - the desired number of decimal points in the result
+   */
+  static fromBigInt(v, precision, resultPrecision) {
+    if (resultPrecision < 0 || resultPrecision > precision) {
+      throw new Error('Invalid result precision');
+    }
+    return Number(v / BigInt(10 ** (precision - resultPrecision))) / Math.pow(10, resultPrecision);
+  }
 }
 
 module.exports = NumberUtil;

@@ -2,13 +2,14 @@
  * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
-/**
- * @returns {DepositYield}
- */
-function calcApyGauge(params) {
+class GaugeApyUtil {
 
+  /**
+   * @returns {DepositYield}
+   */
+  static calcApyGauge(params) {
+
+  }
 }
 
-module.exports = {
-  calcApyGauge
-}
+module.exports = GaugeApyUtil;

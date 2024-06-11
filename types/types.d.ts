@@ -2,7 +2,7 @@ export type CalcApysOptions = {
   beanstalk: string;
   season: number;
   windows: number[];
-  assets: string[];
+  tokens: string[];
 };
 
 export type DepositYield = {

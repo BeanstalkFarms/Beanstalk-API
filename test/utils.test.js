@@ -17,6 +17,7 @@ const { getConstantProductPrice } = require("../src/utils/pool/constant-product"
 const { parseQuery } = require("../src/utils/rest-parsing");
 const SubgraphClients = require("../src/datasources/subgraph-client");
 const { BEANSTALK } = require("../src/constants/addresses");
+const { convertStringsallToBigInt, allToBigInt, fromBigInt } = require("../src/utils/number");
 
 describe('Utils', () => {
   it('should format query parameters correctly', async () => {
@@ -81,4 +82,33 @@ describe('Utils', () => {
     const blockForSeason = await BlockUtil.findBlockForSeason(BEANSTALK, 22183);
     expect(blockForSeason).toBe(20042493);
   });
+
+  it('should convert all strings to BigInt', () => {
+    const obj = allToBigInt({
+      p1: '123456',
+      p2: 10,
+      p3: {
+        p4: '7890',
+        p5: '0x1234',
+        p6: 9275n,
+        p7: 'yes',
+        p8: null
+      }
+    });
+
+    expect(obj.p1).toEqual(123456n);
+    expect(obj.p2).toEqual(10n);
+    expect(obj.p3.p4).toEqual(7890n);
+    expect(obj.p3.p5).toEqual(4660n);
+    expect(obj.p3.p6).toEqual(9275n);
+    expect(obj.p3.p7).toEqual('yes');
+    expect(obj.p3.p8).toEqual(null);
+
+  });
+
+  it('should retain some precision', () => {
+    const n1 = fromBigInt(123456789n, 6, 2);
+    expect(n1).toEqual(123.45);
+    expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
+  })
 });
