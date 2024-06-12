@@ -11,8 +11,8 @@ const SLUGS = [
   process.env.SG_BEANFT ?? 'beanft'
 ];
 
-const DECENTRALIZED_BEANSTALK = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/CQgB9aDyd13X6rUtJcCWr8KtFpGGRMifu1mM6k4xQ9YA`
-const DECENTRALIZED_BEAN = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/Hqtmas8CJUHXwFf7acS2sjaTw6tvdNQM3kaz2CqtYM3V`
+const DECENTRALIZED_BEANSTALK = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/CQgB9aDyd13X6rUtJcCWr8KtFpGGRMifu1mM6k4xQ9YA`;
+const DECENTRALIZED_BEAN = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/Hqtmas8CJUHXwFf7acS2sjaTw6tvdNQM3kaz2CqtYM3V`;
 
 const clients = {};
 
@@ -35,7 +35,7 @@ function clientBuilder(url) {
     //   console.log('wrote subgraph output to test directory');
     // }
     return response;
-  }
+  };
 }
 
 module.exports = {
@@ -50,4 +50,4 @@ module.exports = {
   urlGql: clientBuilder,
   gql,
   SLUGS
-}
+};

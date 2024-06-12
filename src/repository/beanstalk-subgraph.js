@@ -1,12 +1,10 @@
-const { BigNumber } = require("alchemy-sdk");
-const SubgraphClients = require("../datasources/subgraph-client");
-const SubgraphQueryUtil = require("../utils/subgraph-query");
-const { allToBigInt } = require("../utils/number");
+const { BigNumber } = require('alchemy-sdk');
+const SubgraphClients = require('../datasources/subgraph-client');
+const SubgraphQueryUtil = require('../utils/subgraph-query');
+const { allToBigInt } = require('../utils/number');
 
 class BeanstalkSubgraphRepository {
-
   static async getDepositedBdvs(accounts, blockNumber) {
-
     const silos = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.beanstalkSG,
       SubgraphClients.gql`
@@ -21,7 +19,7 @@ class BeanstalkSubgraphRepository {
         }
       }`,
       `block: {number: ${blockNumber}}`,
-      `id_in: [${accounts.map(a => `"${a}"`).join(', ')}]`,
+      `id_in: [${accounts.map((a) => `"${a}"`).join(', ')}]`,
       ['stalk'],
       [0],
       'asc'
@@ -54,14 +52,15 @@ class BeanstalkSubgraphRepository {
       [fromSeason],
       'asc'
     );
-    return allToBigInt(siloHourlySnapshots.reduce((result, next) => {
-      result[next.season] = next.deltaBeanMints;
-      return result;
-    }, {}));
+    return allToBigInt(
+      siloHourlySnapshots.reduce((result, next) => {
+        result[next.season] = next.deltaBeanMints;
+        return result;
+      }, {})
+    );
   }
 
   static async getPreGaugeApyInputs(beanstalk, season) {
-
     const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
 
     const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
@@ -81,13 +80,12 @@ class BeanstalkSubgraphRepository {
           stalk
           depositedBDV
         }
-      }`
-    );
+      }`);
     const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
       result[nextToken.id] = {
         baseStalk: nextToken.stalkIssuedPerBdv,
         grownStalkPerSeason: nextToken.stalkEarnedPerSeason
-      }
+      };
       return result;
     }, {});
     return allToBigInt({
@@ -102,8 +100,7 @@ class BeanstalkSubgraphRepository {
         seasons(where: {beanstalk: "${beanstalk}", season: ${season}}) {
           sunriseBlock
         }
-      }`
-    );
+      }`);
     return result.seasons[0]?.sunriseBlock;
   }
 }

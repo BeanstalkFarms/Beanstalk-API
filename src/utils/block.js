@@ -1,7 +1,7 @@
-const { BEANSTALK } = require("../constants/addresses");
-const { providerThenable } = require("../datasources/alchemy");
-const { gql } = require("../datasources/subgraph-client");
-const BeanstalkSubgraphRepository = require("../repository/beanstalk-subgraph");
+const { BEANSTALK } = require('../constants/addresses');
+const { providerThenable } = require('../datasources/alchemy');
+const { gql } = require('../datasources/subgraph-client');
+const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 
 class BlockUtil {
   // Returns the block data to use for the given options.
@@ -18,19 +18,21 @@ class BlockUtil {
   // Returns the block data to use for the given options,
   // constrained by the maximal indexed block of the given subgraph.
   static async blockForSubgraphFromOptions(subgraphClient, options) {
-    const subgraphBlock = (await subgraphClient(gql`
-      {
-        _meta {
-          block {
-            number
+    const subgraphBlock = (
+      await subgraphClient(gql`
+        {
+          _meta {
+            block {
+              number
+            }
           }
         }
-      }`
-    ))._meta.block.number;
+      `)
+    )._meta.block.number;
 
     const optionsBlock = await BlockUtil.blockFromOptions(options);
     const blockToUse = Math.min(subgraphBlock, optionsBlock.number);
-    
+
     return await (await providerThenable).getBlock(blockToUse);
   }
 
@@ -47,7 +49,8 @@ class BlockUtil {
 
       if (bestBlock.timestamp == timestamp) {
         break;
-      } if (bestBlock.timestamp < timestamp) {
+      }
+      if (bestBlock.timestamp < timestamp) {
         lower = mid + 1;
       } else {
         upper = mid - 1;
@@ -63,4 +66,3 @@ class BlockUtil {
 }
 
 module.exports = BlockUtil;
-

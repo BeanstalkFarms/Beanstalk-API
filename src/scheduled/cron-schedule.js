@@ -8,13 +8,15 @@ const ALL_JOBS = {
     cron: '0 * * * *',
     function: calcNewSeasonApy
   },
-  'alert': {
+  alert: {
     cron: '*/10 * * * * *',
     function: () => console.log('10 seconds Alert!!')
   },
-  'failing': {
+  failing: {
     cron: '*/5 * * * * *',
-    function: () => { throw new Error("ERROR!") }
+    function: () => {
+      throw new Error('ERROR!');
+    }
   }
 };
 
@@ -31,7 +33,6 @@ async function errorWrapper(fn) {
 
 // Activates the requested cron jobs. If a job isn't included in ALL_JOBS, nothing happens
 function activateJobs(jobNames) {
-
   if (!jobNames) {
     console.log('Skipping cron job activation');
     return;
@@ -52,10 +53,10 @@ function activateJobs(jobNames) {
   console.log(`Activated ${activated.length} jobs: ${activated.join(', ')}`);
   if (failed.length > 0) {
     sendWebhookMessage(`Failed to activate jobs: ${failed.join(', ')}`);
-    console.log(`Failed to activate jobs: ${failed.join(', ')}`)
+    console.log(`Failed to activate jobs: ${failed.join(', ')}`);
   }
 }
 
 module.exports = {
   activateJobs
-}
+};

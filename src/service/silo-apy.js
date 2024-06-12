@@ -6,7 +6,7 @@
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 const { providerThenable } = require('../datasources/alchemy');
 
-const ContractStorage = require("@beanstalk/contract-storage/src/contract-storage");
+const ContractStorage = require('@beanstalk/contract-storage/src/contract-storage');
 const StorageBIP47 = require('../datasources/storage/beanstalk/StorageBIP47.json');
 const { BEAN } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
@@ -17,7 +17,6 @@ const ZERO_SEASON = 6074;
 const GAUGE_SEASON = 21798;
 
 class SiloApyService {
-
   /**
    * Calculates vAPYs.
    * @param {string} beanstalk
@@ -27,11 +26,9 @@ class SiloApyService {
    * @returns {Promise<CalcApysResult[]>}
    */
   static async calcApy(beanstalk, season, windows, tokens) {
-    
     const retval = [];
     const windowEMAs = await SiloApyService.calcWindowEMA(beanstalk, season, windows);
     if (season < GAUGE_SEASON) {
-      
       const inputs = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
@@ -39,7 +36,7 @@ class SiloApyService {
         const result = PreGaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokens,
-          tokens.map(t => inputs.tokens[t].grownStalkPerSeason),
+          tokens.map((t) => inputs.tokens[t].grownStalkPerSeason),
           inputs.tokens[BEAN].grownStalkPerSeason,
           inputs.silo.stalk,
           inputs.silo.seeds
@@ -65,7 +62,6 @@ class SiloApyService {
    * @returns {WindowEMAResult[]}
    */
   static async calcWindowEMA(beanstalk, season, windows) {
-
     if (season <= ZERO_SEASON) {
       throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${ZERO_SEASON}.`);
     }
@@ -89,7 +85,6 @@ class SiloApyService {
     // Compute the EMA for each window
     const windowResults = [];
     for (const effectiveWindow of effectiveWindows) {
-
       const beta = 2 / (effectiveWindow + 1);
 
       let currentEMA = 0;

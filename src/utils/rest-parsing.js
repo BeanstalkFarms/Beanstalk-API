@@ -10,11 +10,10 @@ const standardMapping = {
   },
   limit: parseInt,
   start_time: (p) => new Date(p),
-  end_time: (p) => new Date(p),
-}
+  end_time: (p) => new Date(p)
+};
 
 class RestParsingUtil {
-
   static parseQuery(query, parseMapping = standardMapping) {
     const retval = {};
     for (const property in query) {

@@ -7,29 +7,17 @@ const contracts = {
   BEANWETH: ['0xBEA0e11282e2bB5893bEcE110cF199501e872bAd', 18, null],
   UNRIPE_BEAN: ['0x1BEA0050E63e05FBb5D8BA2f10cf5800B6224449', 6, null],
   UNRIPE_LP: ['0x1BEA3CcD22F4EBd3d37d731BA31Eeca95713716D', 6, null],
-  WETH: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18, null],
+  WETH: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18, null]
 };
 
-const addressesOnly = Object.fromEntries(
-  Object.entries(contracts).map(
-    ([k, v]) => [k, v[0].toLowerCase()]
-  )
-);
+const addressesOnly = Object.fromEntries(Object.entries(contracts).map(([k, v]) => [k, v[0].toLowerCase()]));
 
-const decimals = Object.fromEntries(
-  Object.entries(contracts).map(
-    ([k, v]) => [v[0].toLowerCase(), v[1]]
-  )
-);
+const decimals = Object.fromEntries(Object.entries(contracts).map(([k, v]) => [v[0].toLowerCase(), v[1]]));
 
-const abis = Object.fromEntries(
-  Object.entries(contracts).map(
-    ([k, v]) => [v[0].toLowerCase(), v[2]]
-  )
-);
+const abis = Object.fromEntries(Object.entries(contracts).map(([k, v]) => [v[0].toLowerCase(), v[2]]));
 
 module.exports = {
   ...addressesOnly,
   DECIMALS: decimals,
   ABIS: abis
-}
+};

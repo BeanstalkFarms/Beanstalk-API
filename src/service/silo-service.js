@@ -1,13 +1,12 @@
-const { BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require("../constants/addresses");
-const { MILESTONE } = require("../constants/constants");
-const { asyncBeanstalkContractGetter } = require("../datasources/contracts");
-const subgraphClient = require("../datasources/subgraph-client");
-const BeanstalkSubgraphRepository = require("../repository/beanstalk-subgraph");
-const BlockUtil = require("../utils/block");
-const { createNumberSpread } = require("../utils/number");
+const { BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
+const { MILESTONE } = require('../constants/constants');
+const { asyncBeanstalkContractGetter } = require('../datasources/contracts');
+const subgraphClient = require('../datasources/subgraph-client');
+const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const BlockUtil = require('../utils/block');
+const { createNumberSpread } = require('../utils/number');
 
-class SiloService { 
-
+class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
     const beanstalk = await asyncBeanstalkContractGetter(block.number);
@@ -19,15 +18,14 @@ class SiloService {
       accounts: []
     };
     for (const account of accounts) {
-
       const promises = [];
       for (const asset of siloAssets) {
         promises.push(beanstalk.callStatic.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
       }
 
       // Parallelize all calls for this account
-      const grownStalkResults = (await Promise.all(promises)).map(bn => createNumberSpread(bn, 10, 2));
-      
+      const grownStalkResults = (await Promise.all(promises)).map((bn) => createNumberSpread(bn, 10, 2));
+
       // Compute total and by asset breakdown
       let total = 0;
       const breakdown = {};
@@ -56,7 +54,7 @@ class SiloService {
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
     const depositedBdvs = await BeanstalkSubgraphRepository.getDepositedBdvs(accounts, block.number);
-    const siloAssets = [BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP].map(s => s.toLowerCase());
+    const siloAssets = [BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP].map((s) => s.toLowerCase());
 
     const stemDeltas = [];
     for (const asset of siloAssets) {
@@ -72,7 +70,6 @@ class SiloService {
       accounts: []
     };
     for (const account in depositedBdvs) {
-      
       const uncategorized = await beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, { blockTag: block.number });
       const uncategorizedFloat = createNumberSpread(uncategorized, 10, 2).float;
 
@@ -81,7 +78,7 @@ class SiloService {
       let total = uncategorizedFloat;
       const breakdown = {};
       for (let i = 0; i < stemDeltas.length; ++i) {
-        let grownStalk = stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]] ?? 0) / Math.pow(10, 10);
+        let grownStalk = (stemDeltas[i] * parseInt(depositedBdv[siloAssets[i]] ?? 0)) / Math.pow(10, 10);
         grownStalk = parseFloat(grownStalk.toFixed(2));
         total += grownStalk;
         breakdown[siloAssets[i]] = grownStalk;

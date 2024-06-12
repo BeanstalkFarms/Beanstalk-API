@@ -7,4 +7,4 @@ function calcNewSeasonApy() {
 
 module.exports = {
   calcNewSeasonApy
-}
+};

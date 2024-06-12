@@ -1,14 +1,13 @@
-const { formatUnits } = require("ethers");
+const { formatUnits } = require('ethers');
 
 class NumberUtil {
-
   // For the given BigNumber/decimal precision, spread into bn, string, and float result.
   // bns/decimals can either be a single value, or an array
   static createNumberSpread(bns, decimals, floatPrecision = undefined) {
     if (!Array.isArray(bns)) {
       return NumberUtil.#getSpread(bns, decimals, floatPrecision);
     }
-  
+
     const retval = {
       bn: [],
       string: [],
@@ -22,7 +21,7 @@ class NumberUtil {
     }
     return retval;
   }
-  
+
   // Internal function for spreading an individual BigNumber
   static #getSpread(bn, decimals, floatPrecision) {
     let string = formatUnits(bn.toString(), decimals);
@@ -35,7 +34,7 @@ class NumberUtil {
       bn,
       string,
       float
-    }
+    };
   }
 
   static allToBigInt(obj) {

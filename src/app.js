@@ -14,14 +14,16 @@ activateJobs(process.env.ENABLED_CRON_JOBS?.split(','));
 
 const app = new Koa();
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: '*'
+  })
+);
 
 app.use(bodyParser());
 
 app.use(async (ctx, next) => {
-  if (!ctx.originalUrl.includes("healthcheck")) {
+  if (!ctx.originalUrl.includes('healthcheck')) {
     const requestInfo = `${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`;
     const requestBody = `${Array.isArray(ctx.request.body) ? 'array' : 'object'} ${JSON.stringify(ctx.request.body)}`;
     console.log(`${requestInfo} - Request Body: ${requestBody}`);
@@ -29,8 +31,10 @@ app.use(async (ctx, next) => {
   try {
     await next(); // pass control to the next function specified in .use()
     const responseBody = JSON.stringify(ctx.body);
-    if (!ctx.originalUrl.includes("healthcheck")) {
-      console.log(`${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`);
+    if (!ctx.originalUrl.includes('healthcheck')) {
+      console.log(
+        `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`
+      );
     }
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
@@ -56,8 +60,8 @@ app.use(subgraphRoutes.routes());
 app.use(subgraphRoutes.allowedMethods());
 
 const router = new Router();
-router.get('/healthcheck', async ctx => {
-  ctx.body = "healthy";
+router.get('/healthcheck', async (ctx) => {
+  ctx.body = 'healthy';
 });
 
 app.use(router.routes());

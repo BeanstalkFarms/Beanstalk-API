@@ -1,12 +1,11 @@
-const { BigNumber } = require("alchemy-sdk");
-const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require("../datasources/contracts");
-const BlockUtil = require("../utils/block");
-const { createNumberSpread } = require("../utils/number");
-const { BEAN, WETH } = require("../constants/addresses");
-const { TEN_BN } = require("../constants/constants");
+const { BigNumber } = require('alchemy-sdk');
+const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require('../datasources/contracts');
+const BlockUtil = require('../utils/block');
+const { createNumberSpread } = require('../utils/number');
+const { BEAN, WETH } = require('../constants/addresses');
+const { TEN_BN } = require('../constants/constants');
 
 class PriceService {
-
   // Gets the price of the requested token
   static async getTokenPrice(token, options = {}) {
     const priceFunction = PriceService.#getPriceFunction(token);
@@ -18,7 +17,7 @@ class PriceService {
     const block = await BlockUtil.blockFromOptions(options);
     const priceContract = await asyncPriceV1ContractGetter();
     const priceResult = await priceContract.callStatic.price({ blockTag: block.number });
-  
+
     // Convert from hex to a readable format. For now the pool prices are omitted
     const readable = {
       block: block.number,
@@ -26,11 +25,11 @@ class PriceService {
       token: BEAN,
       usdPrice: createNumberSpread(priceResult.price, 6, 4).float,
       liquidityUSD: createNumberSpread(priceResult.liquidity, 6, 2).float,
-      deltaB: createNumberSpread(priceResult.deltaB, 6, 0).float,
+      deltaB: createNumberSpread(priceResult.deltaB, 6, 0).float
     };
     return readable;
   }
-  
+
   // In practice, current implementation of getUsdPrice can only get the eth price
   static async getEthPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
@@ -38,7 +37,7 @@ class PriceService {
     const result = await usdOracle.callStatic.getUsdPrice(WETH, { blockTag: block.number });
     // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion
     const instPrice = TEN_BN.pow(24).div(result);
-    
+
     const readable = {
       block: block.number,
       timestamp: block.timestamp,
@@ -54,7 +53,7 @@ class PriceService {
     } else if (token === WETH) {
       return PriceService.getEthPrice;
     }
-    throw new Error("Price not implemented for the requested token.");
+    throw new Error('Price not implemented for the requested token.');
   }
 }
 

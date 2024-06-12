@@ -1,12 +1,10 @@
-const { providerThenable } = require("../datasources/alchemy");
-const SubgraphClient = require("../datasources/subgraph-client");
-const { slugSG, SLUGS } = require("../datasources/subgraph-client");
+const { providerThenable } = require('../datasources/alchemy');
+const SubgraphClient = require('../datasources/subgraph-client');
+const { slugSG, SLUGS } = require('../datasources/subgraph-client');
 
 // For retrieving current statuses of our subgraphs.
 class SubgraphService {
- 
   static async getStatuses(environments) {
-
     let deploymentStatuses = {};
 
     if (environments.indexOf('decentralized') >= 0) {
@@ -33,8 +31,8 @@ class SubgraphService {
               _meta {
                 deployment
               }
-            }`
-        ));
+            }`)
+        );
       }
     }
 
@@ -75,13 +73,12 @@ class SubgraphService {
             }
           }
         }
-      }`
-    );
+      }`);
 
     const currentBlock = (await (await providerThenable).getBlock()).number;
 
     for (const status of allStatuses.indexingStatuses) {
-      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter(n => !n.startsWith('graph-'));
+      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter((n) => !n.startsWith('graph-'));
       for (const name of deployedNames) {
         deploymentStatuses[name].synced = status.synced;
         deploymentStatuses[name].healthy = status.health === 'healthy';
@@ -94,7 +91,7 @@ class SubgraphService {
         deploymentStatuses[name].progress = parseFloat((blocksIndexed / totalBlocks).toFixed(4));
         deploymentStatuses[name].chainHeadBlockLag = currentBlock - status.chains[0].chainHeadBlock.number;
       }
-      
+
       // Keep a list of all fatal errors, though not correlated to a particular subgraph
       if (status.fatalError?.message) {
         deploymentStatuses.allFatalErrors.push({
@@ -108,13 +105,13 @@ class SubgraphService {
   }
 
   static async getDecentralizedStatuses() {
-
     const metaPromises = [];
     const names = ['graph-beanstalk', 'graph-bean'];
     const clients = [SubgraphClient.graphBeanstalk, SubgraphClient.graphBean];
 
     for (const client of clients) {
-      metaPromises.push(client(SubgraphClient.gql`
+      metaPromises.push(
+        client(SubgraphClient.gql`
         {
           _meta {
             deployment
@@ -123,8 +120,8 @@ class SubgraphService {
               number
             }
           }
-        }`
-      ));
+        }`)
+      );
     }
 
     const deploymentStatuses = {};
@@ -146,7 +143,7 @@ class SubgraphService {
         deploymentStatuses[names[i]] = { error: errorMessage };
       }
     }
-    
+
     return deploymentStatuses;
   }
 }

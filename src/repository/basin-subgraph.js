@@ -1,11 +1,9 @@
-const { BigNumber } = require("alchemy-sdk");
-const SubgraphClients = require("../datasources/subgraph-client");
-const SubgraphQueryUtil = require("../utils/subgraph-query");
+const { BigNumber } = require('alchemy-sdk');
+const SubgraphClients = require('../datasources/subgraph-client');
+const SubgraphQueryUtil = require('../utils/subgraph-query');
 
 class BasinSubgraphRepository {
-
   static async getAllWells(blockNumber) {
-
     const allWells = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
@@ -26,27 +24,24 @@ class BasinSubgraphRepository {
       [' '],
       'asc'
     );
-    allWells.map(well => well.reserves = well.reserves.map(BigNumber.from));
+    allWells.map((well) => (well.reserves = well.reserves.map(BigNumber.from)));
     return allWells;
   }
 
   static async getWellsForPair(tokens) {
-
     const pairWells = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
-        wells(where: { tokens: [${tokens.map(t => `"${t}"`).join(', ')}] }) {
+        wells(where: { tokens: [${tokens.map((t) => `"${t}"`).join(', ')}] }) {
           id
           tokens {
             id
           }
         }
-      }`
-    );
+      }`);
     return pairWells.wells;
   }
 
   static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
-
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
@@ -81,12 +76,11 @@ class BasinSubgraphRepository {
   }
 
   static async getSwaps(wellAddresses, fromTimestamp, toTimestamp, limit) {
-
     const result = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
         swaps(
           where: {
-            well_in: [${wellAddresses.map(a => `"${a}"`).join(', ')}]
+            well_in: [${wellAddresses.map((a) => `"${a}"`).join(', ')}]
             timestamp_gte: ${fromTimestamp}
             timestamp_lte: ${toTimestamp}
           }
@@ -108,8 +102,7 @@ class BasinSubgraphRepository {
           blockNumber
           logIndex
         }
-      }`
-    );
+      }`);
     result.swaps.map((swap) => {
       swap.amountIn = BigNumber.from(swap.amountIn);
       swap.amountOut = BigNumber.from(swap.amountOut);
@@ -119,7 +112,6 @@ class BasinSubgraphRepository {
   }
 
   static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
-
     const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
@@ -136,13 +128,12 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allDeposits.map((deposit) => deposit.reserves = deposit.reserves.map(BigNumber.from));
+    allDeposits.map((deposit) => (deposit.reserves = deposit.reserves.map(BigNumber.from)));
 
     return allDeposits;
   }
 
   static async getAllWithdraws(wellAddress, fromTimestamp, toTimestamp) {
-
     const allWithdraws = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
@@ -159,13 +150,12 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allWithdraws.map((withdraw) => withdraw.reserves = withdraw.reserves.map(BigNumber.from));
+    allWithdraws.map((withdraw) => (withdraw.reserves = withdraw.reserves.map(BigNumber.from)));
 
     return allWithdraws;
   }
 
   static async getRollingVolume(wellAddress, blockNumber) {
-
     const result = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
         wells(
@@ -179,8 +169,7 @@ class BasinSubgraphRepository {
           }
           rollingDailyTradeVolumeUSD
         }
-      }`
-    );
+      }`);
 
     return result.wells[0];
   }

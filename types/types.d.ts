@@ -24,11 +24,11 @@ export type WindowEMAResult = {
 export type Deposit = {
   bdv: number;
   stalk: number;
-}
+};
 
 export type CalcApyOptions = {
   // Initial values of a deposit starting states
   initialUserValues: Deposit[];
   // The duration for which to calculate the apy (if other than 1 year)
   duration: number;
-}
+};
