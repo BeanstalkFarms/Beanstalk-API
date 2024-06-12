@@ -14,12 +14,12 @@ class PreGaugeApyUtil {
    */
   /**
    * Calculates the silo apy before seed gauge was implemented
-   * @param {number} beansPerSeason - The provided EMA
-   * @param {string[]} tokens - The token(s) calculating on (informational)
-   * @param {number[]} seedsPerTokenBdv - The amount of seeds awarded per bdv for the whitelisted token(s) being calculated
-   * @param {number} seedsPerBeanBdv - The amount of seeds awarded per bdv for bean deposits
-   * @param {number} totalStalk - Total outstanding stalk
-   * @param {number} totalSeeds - Total outstanding seeds
+   * @param {BigInt} beansPerSeason - The provided EMA
+   * @param {string[]} tokens (informational) - The token(s) calculating on
+   * @param {BigInt[]} seedsPerTokenBdv - The amount of seeds awarded per bdv for the whitelisted token(s) being calculated
+   * @param {BigInt} seedsPerBeanBdv - The amount of seeds awarded per bdv for bean deposits
+   * @param {BigInt} totalStalk - Total outstanding stalk
+   * @param {BigInt} totalSeeds - Total outstanding seeds
    * @params {CalcApyOptions} options - optional configuration
    * @returns {DepositYield}
    */
