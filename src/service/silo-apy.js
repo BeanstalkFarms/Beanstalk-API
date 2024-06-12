@@ -1,5 +1,4 @@
 /**
- * @typedef {import('../../types/types').CalcApysOptions} CalcApysOptions
  * @typedef {import('../../types/types').CalcApysResult} CalcApysResult
  * @typedef {import('../../types/types').WindowEMAResult} WindowEMAResult
  */
@@ -21,34 +20,33 @@ class SiloApyService {
 
   /**
    * Calculates vAPYs.
-   * @param {CalcApysOptions} options
+   * @param {string} beanstalk
+   * @param {number} season
+   * @param {number[]} windows
+   * @param {string[]} tokens
    * @returns {Promise<CalcApysResult[]>}
    */
-  static async calcApy(options) {
+  static async calcApy(beanstalk, season, windows, tokens) {
     
     const retval = [];
-    
-    const windowEMAs = await SiloApyService.calcWindowEMA(options.beanstalk, options.season, options.windows);
-
-    // To get results onchain, need to be able to determine which block to use given a season number.
-    // Otherwise the subgraph should be usable for the necessary data.
-    
-    if (options.season < GAUGE_SEASON) {
+    const windowEMAs = await SiloApyService.calcWindowEMA(beanstalk, season, windows);
+    if (season < GAUGE_SEASON) {
       
-      const inputs = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(options.beanstalk, options.season);
+      const inputs = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 
+      // Calculate the apy for each window, i.e. each avg bean reward per season
       for (const ema of windowEMAs) {
-        const result = PreGaugeApyUtil.calcApy({
-          beansPerSeason: ema.beansPerSeason,
-          tokens: options.tokens,
-          seedsPerTokenBdv: options.tokens.map(t => inputs.tokens[t].grownStalkPerSeason),
-          seedsPerBeanBdv: inputs.tokens[BEAN].grownStalkPerSeason,
-          totalStalk: inputs.silo.stalk,
-          totalSeeds: inputs.silo.seeds
-        });
+        const result = PreGaugeApyUtil.calcApy(
+          ema.beansPerSeason,
+          tokens,
+          tokens.map(t => inputs.tokens[t].grownStalkPerSeason),
+          inputs.tokens[BEAN].grownStalkPerSeason,
+          inputs.silo.stalk,
+          inputs.silo.seeds
+        );
         retval.push({
-          beanstalk: options.beanstalk,
-          season: options.season,
+          beanstalk: beanstalk,
+          season: season,
           window: ema.window,
           apys: result
         });

@@ -47,14 +47,14 @@ describe('Window EMA', () => {
 describe('Pre-Gauge Silo APY', () => {
 
   it('should calculate basic apy', () => {
-    const apy = PreGaugeApyUtil.calcApy({
-      beansPerSeason: 1278000000n,
-      tokens: ['BEAN', 'BEAN:WETH'],
-      seedsPerTokenBdv: [3000000n, 4500000n],
-      seedsPerBeanBdv: 3000000n,
-      totalStalk: 1636664801904743831n,
-      totalSeeds: 24942000280720n
-    });
+    const apy = PreGaugeApyUtil.calcApy(
+      1278000000n,
+      ['BEAN', 'BEAN:WETH'],
+      [3000000n, 4500000n],
+      3000000n,
+      1636664801904743831n,
+      24942000280720n
+    );
     
     expect(apy[0].beanYield).toBeCloseTo(0.14346160171559408);
     expect(apy[0].stalkYield).toBeCloseTo(2.929361317570831);
@@ -66,25 +66,27 @@ describe('Pre-Gauge Silo APY', () => {
   });
 
   it('should calculate with optional inputs', () => {
-    let apy = PreGaugeApyUtil.calcApy({
-      beansPerSeason: 1278000000n,
-      tokens: ['BEAN', 'BEAN:WETH'],
-      seedsPerTokenBdv: [3000000n, 4500000n],
-      seedsPerBeanBdv: 3000000n,
-      totalStalk: 1636664801904743831n,
-      totalSeeds: 24942000280720n,
+    let apy = PreGaugeApyUtil.calcApy(
+      1278000000n,
+      ['BEAN', 'BEAN:WETH'],
+      [3000000n, 4500000n],
+      3000000n,
+      1636664801904743831n,
+      24942000280720n,
       // User starts with a deposit
-      initialUserValues: [
-        {
-          bdv: 2000n * BigInt(10 ** 6),
-          stalk: 5000n * BigInt(10 ** 10)
-        },
-        {
-          bdv: 2000n * BigInt(10 ** 6),
-          stalk: 6500n * BigInt(10 ** 10)
-        }
-      ]
-    });
+      {
+        initialUserValues: [
+          {
+            bdv: 2000n * BigInt(10 ** 6),
+            stalk: 5000n * BigInt(10 ** 10)
+          },
+          {
+            bdv: 2000n * BigInt(10 ** 6),
+            stalk: 6500n * BigInt(10 ** 10)
+          }
+        ]
+      }
+    );
 
     expect(apy[0].beanYield).toBeCloseTo(0.24004075085759974);
     expect(apy[0].stalkYield).toBeCloseTo(1.262114557519065);
@@ -94,15 +96,17 @@ describe('Pre-Gauge Silo APY', () => {
     expect(apy[1].stalkYield).toBeCloseTo(1.0058229586659946);
     expect(apy[1].ownershipGrowth).toBeCloseTo(0.5526664099665303);
 
-    apy = PreGaugeApyUtil.calcApy({
-      beansPerSeason: 1278000000n,
-      tokens: ['BEAN'],
-      seedsPerTokenBdv: [3000000n],
-      seedsPerBeanBdv: 3000000n,
-      totalStalk: 1636664801904743831n,
-      totalSeeds: 24942000280720n,
-      duration: 720 // 1 month
-    });
+    apy = PreGaugeApyUtil.calcApy(
+      1278000000n,
+      ['BEAN'],
+      [3000000n],
+      3000000n,
+      1636664801904743831n,
+      24942000280720n,
+      {
+        duration: 720 // 1 month
+      }
+    );
     
     expect(apy[0].beanYield).toBeCloseTo(0.006192371144229325);
     expect(apy[0].stalkYield).toBeCloseTo(0.2228397591012936);
@@ -138,24 +142,19 @@ describe('SiloApyService Orchestration', () => {
       }
     ]);
 
-    const result = await SiloApyService.calcApy({
-      beanstalk: BEANSTALK,
-      season: 19000,
-      windows: [720],
-      tokens: [BEAN, BEAN3CRV]
-    });
+    const result = await SiloApyService.calcApy(BEANSTALK, 19000, [720], [BEAN, BEAN3CRV]);
 
-    expect(spy).toHaveBeenCalledWith({
-      beansPerSeason: 322227371n,
-      tokens: [
+    expect(spy).toHaveBeenCalledWith(
+      322227371n,
+      [
         '0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab',
         '0xc9c32cd16bf7efb85ff14e0c8603cc90f6f2ee49'
       ],
-      seedsPerTokenBdv: [ 3000000n, 3250000n ],
-      seedsPerBeanBdv: 3000000n,
-      totalStalk: 1448607918287565335n,
-      totalSeeds: 29993650158762n
-    });
+      [ 3000000n, 3250000n ],
+      3000000n,
+      1448607918287565335n,
+      29993650158762n
+    );
 
     expect(result[0].season).toEqual(19000);
     expect(result[0].apys[0].beanYield).toEqual(0.10);

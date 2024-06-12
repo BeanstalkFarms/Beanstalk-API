@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../../../types/types').CalcApysPreGaugeInputs} CalcApysPreGaugeInputs
+ * @typedef {import('../../../types/types').CalcApyOptions} CalcApyOptions
  * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
@@ -12,10 +12,28 @@ class PreGaugeApyUtil {
    * @param {CalcApysPreGaugeInputs} params 
    * @returns {DepositYield}
    */
-  static calcApy(params) {
-  
-    let { beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds } = params;
-    const duration = params.duration ?? 8760;
+  /**
+   * Calculates the silo apy before seed gauge was implemented
+   * @param {number} beansPerSeason - The provided EMA
+   * @param {string[]} tokens - The token(s) calculating on (informational)
+   * @param {number[]} seedsPerTokenBdv - The amount of seeds awarded per bdv for the whitelisted token(s) being calculated
+   * @param {number} seedsPerBeanBdv - The amount of seeds awarded per bdv for bean deposits
+   * @param {number} totalStalk - Total outstanding stalk
+   * @param {number} totalSeeds - Total outstanding seeds
+   * @params {CalcApyOptions} options - optional configuration
+   * @returns {DepositYield}
+   */
+  static calcApy(
+    beansPerSeason,
+    tokens,
+    seedsPerTokenBdv,
+    seedsPerBeanBdv,
+    totalStalk,
+    totalSeeds,
+    options
+  ) {
+
+    const duration = options?.duration ?? 8760;
   
     // Initialization
     beansPerSeason = fromBigInt(beansPerSeason, 6, 6);
@@ -23,10 +41,10 @@ class PreGaugeApyUtil {
     totalSeeds = fromBigInt(totalSeeds, 6, 2);
     totalStalk = fromBigInt(totalStalk, 10, 0);
     let userBdv = tokens.map((_, idx) => (
-      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].bdv, 6, 2) : 1
+      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].bdv, 6, 2) : 1
     ));
     let userStalk = tokens.map((_, idx) => (
-      params.initialUserValues ? fromBigInt(params.initialUserValues[idx].stalk, 10, 2) : 1
+      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].stalk, 10, 2) : 1
     ));
     let ownership = userStalk.map(u => u / totalStalk);
   
