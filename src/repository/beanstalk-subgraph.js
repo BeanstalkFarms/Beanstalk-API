@@ -127,6 +127,14 @@ class BeanstalkSubgraphRepository {
           token
           depositedBDV
         }
+        germinatings(
+          where: {isFarmer: false}
+          block: {number: ${blockNumber}}
+        ) {
+          address
+          type
+          bdv
+        }
       }`);
 
     const depositAmounts = apyInputs.siloAssets.reduce((result, nextAsset) => {
@@ -137,31 +145,13 @@ class BeanstalkSubgraphRepository {
       return result;
     }, {});
 
-    // Germination info must be retrieved in a separate call now that the tokens are known.
-    // Ids are of the form token-(EVEN|ODD)
-    // TODO: consider refactoring after the new subgraph is available; query by !isFarmer
-    const germinationIds = Object.keys(depositAmounts).flatMap((t) => [`${t}-ODD`, `${t}-EVEN`]);
-    const germinationResult = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
-      {
-        germinatings(
-          where: {id_in: [${germinationIds.map((id) => `"${id}"`).join(', ')}]}
-          block: {number: ${blockNumber}}
-        ) {
-          id
-          bdv
-        }
-      }
-    `);
-    const germinationInfo = germinationIds.reduce((result, next) => {
-      const elem = next.split('-');
-      const savedGermination = germinationResult.germinatings.find((g) => g.id === next);
-      if (!result[elem[0]]) {
-        result[elem[0]] = [];
-      }
-      result[elem[0]][elem[1] === 'EVEN' ? 0 : 1] = savedGermination?.bdv ?? '0';
-      return result;
-    }, {});
-    // console.log(germinationIds, germinationResult, germinationInfo);
+    const germinationInfo = {};
+    for (const token in depositAmounts) {
+      germinationInfo[token] = [
+        apyInputs.germinatings.find((g) => g.address === token && g.type === 'EVEN')?.bdv ?? '0',
+        apyInputs.germinatings.find((g) => g.address === token && g.type === 'ODD')?.bdv ?? '0'
+      ];
+    }
 
     const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
       const { id, gpSelector, ...rest } = nextToken;
