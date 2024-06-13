@@ -8,7 +8,7 @@ const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 const { BEAN } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
-const { formatBigintDecimal } = require('../utils/json-formatter');
+const { formatBigintDecimal } = require('../utils/bigint');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;

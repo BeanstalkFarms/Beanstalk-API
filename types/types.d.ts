@@ -1,3 +1,4 @@
+// TODO: consider changing this to use a mapping rather than list
 export type DepositYield = {
   // The token that these yields were calculated for
   token: string;

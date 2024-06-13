@@ -3,6 +3,10 @@
  * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
+const { toBigInt } = require('ethers');
+const { PRECISION } = require('../../constants/constants');
+const { fromBigInt } = require('../number');
+
 class GaugeApyUtil {
   /**
    * Calculates silo Bean/Stalk vAPY when Seed Gauge is active.
@@ -64,11 +68,146 @@ class GaugeApyUtil {
     const catchUpRate = options?.duration ?? 8760;
     const duration = options?.duration ?? 8760;
 
-    // const currentPercentLpBdv = [];
-    // const sumLpBdv = ?;
-    // for (let i = 0; i < gaugeLpDepositedBdv.length; ++i) {
-    //   currentPercentLpBdv.push(fromBigInt(gaugeLpDepositedBdv[i] / sumLpBdv, ?, ?));
-    // }
+    // Current LP GP allocation per BDV
+    const lpGpPerBdv = [];
+    // Transform these inputs
+    const gaugeLpPointsCopy = [];
+    const gaugeLpDepositedBdvCopy = [];
+    const gaugeLpOptimalPercentBdvCopy = [];
+    for (let i = 0; i < gaugeLpPoints.length; ++i) {
+      const points = fromBigInt(gaugeLpPoints[i], PRECISION.gaugePoints, PRECISION.gaugePoints / 3);
+      const bdv = fromBigInt(gaugeLpDepositedBdv[i], PRECISION.bdv, PRECISION.bdv / 3);
+      lpGpPerBdv.push(points / bdv);
+      gaugeLpPointsCopy.push(points);
+      gaugeLpDepositedBdvCopy.push(bdv);
+      gaugeLpOptimalPercentBdvCopy.push(fromBigInt(gaugeLpOptimalPercentBdv[i], PRECISION.optimalPercentDepositedBdv));
+    }
+
+    // Current percentages allocations of each LP
+    const currentPercentLpBdv = [];
+    const sumLpBdv = Math.sum(gaugeLpDepositedBdvCopy);
+    for (let i = 0; i < gaugeLpDepositedBdvCopy.length; ++i) {
+      currentPercentLpBdv.push(gaugeLpDepositedBdvCopy[i] / sumLpBdv);
+    }
+
+    let r = fromBigInt(initialR, PRECISION.beanToMaxLpGpPerBdvRatio, PRECISION.beanToMaxLpGpPerBdvRatio / 2);
+    const siloReward = fromBigInt(beansPerSeason, PRECISION.bdv, PRECISION.bdv);
+    let beanBdv = fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3);
+    let totalStalk = fromBigInt(siloStalk, PRECISION.stalk, 0);
+    let gaugeBdv = beanBdv + Math.sum(gaugeLpDepositedBdvCopy);
+    let nonGaugeDepositedBdv_ = fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3);
+    let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
+    let largestLpGpPerBdv = Math.max(lpGpPerBdv);
+
+    // TODO: use options here for initial state
+    const startingGrownStalk = totalStalk / totalBdv - 1;
+    const userBeans = [];
+    const userLp = [];
+    const userStalk = [];
+    for (let i = 0; i < tokens.length; ++i) {
+      userBeans.push(tokens[i] === -1 ? 1 : 0);
+      userLp.push(tokens[i] === -1 ? 0 : 1);
+      // Initial stalk from deposit + avg grown stalk
+      userStalk.push(1 + startingGrownStalk);
+    }
+
+    // TODO: seed precision?
+    for (let i = 0; i < duration; ++i) {
+      r = GaugeApyUtil.#updateR(r, GaugeApyUtil.#deltaRFromState(beansPerSeason));
+      const rScaled = GaugeApyUtil.#scaleR(r);
+
+      // Add germinating bdv to actual bdv in the first 2 simulated seasons
+      if (i < 2) {
+        const index = season % 2 == 0 ? 1 : 0;
+        beanBdv += fromBigInt(germinatingBeanBdv[index], PRECISION.bdv, PRECISION.bdv / 3);
+        for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
+          gaugeLpDepositedBdvCopy[j] += fromBigInt(gaugeLpGerminatingBdv[j][index], PRECISION.bdv, PRECISION.bdv / 3);
+        }
+        gaugeBdv = beanBdv + Math.sum(gaugeLpDepositedBdvCopy);
+        nonGaugeDepositedBdv_ += fromBigInt(nonGaugeGerminatingBdv[index], PRECISION.bdv, PRECISION.bdv / 3);
+        totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
+      }
+
+      // Handle multiple whitelisted gauge LP
+      if (gaugeLpPoints.length > 1) {
+        for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++i) {
+          gaugeLpPointsCopy[j] = GaugeApyUtil.#updateGaugePoints(
+            gaugeLpPointsCopy[j],
+            currentPercentLpBdv[j],
+            gaugeLpOptimalPercentBdvCopy[j]
+          );
+          lpGpPerBdv[j] = gaugeLpPointsCopy[j] / gaugeLpDepositedBdvCopy[j];
+        }
+        largestLpGpPerBdv = Math.max(lpGpPerBdv);
+      }
+
+      const beanGpPerBdv = largestLpGpPerBdv * rScaled;
+      const gpTotal = Math.sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
+      const avgGsPerBdv = totalStalk / totalBdv - 1;
+      const gs = (avgGsPerBdv / catchUpRate) * gaugeBdv;
+      const beanSeeds = (gs / gpTotal) * beanGpPerBdv; //TODO *seedsprecision
+
+      totalStalk += gs + siloReward;
+      gaugeBdv += siloReward;
+      totalBdv += siloReward;
+      beanBdv += siloReward;
+
+      for (let j = 0; j < tokens.length; ++j) {
+        let lpSeeds = 0;
+        if (tokens[j] !== -1) {
+          if (tokens[j] < 0) {
+            lpSeeds = fromBigInt(staticSeeds[j], PRECISION.seeds);
+          } else {
+            lpSeeds = (gs / gpTotal) * lpGpPerBdv[tokens[j]]; //TODO *seedsprecision
+          }
+        }
+
+        // Handles germinating deposits not receiving seignorage for 2 seasons.
+        // TODO: need to determine based on inputs whether the user deposit is germinating
+        // const userBeanShare = i < 2 ? toBigInt(ZERO_BD, PRECISION) : siloReward.times(userStalk[j]).div(totalStalk);
+        const userBeanShare = (siloReward * userStalk[j]) / totalStalk;
+        userStalk[j] += userBeanShare + userBeans[j] * beanSeeds + userLp[j] * lpSeeds; // TOOD all / seedsprecision
+        userBeans[j] += userBeanShare;
+      }
+    }
+
+    return tokens.map((token, idx) => ({
+      token,
+      // TOOD: update based on options
+      beanYield: userBeans[idx] + userLp[idx],
+      stalkYield: userStalk[i],
+      ownershipGrowth: 0
+    }));
+  }
+
+  static #updateR(R, change) {
+    const newR = R + change;
+    if (newR > 1) {
+      return 1;
+    } else if (newR < 0) {
+      return 0;
+    }
+    return newR;
+  }
+
+  static #scaleR(R) {
+    return 0.5 + 0.5 * R;
+  }
+
+  // For now we return an increasing R value only when there are no beans minted over the period.
+  // In the future this needs to take into account beanstalk state and the frequency of how many seasons have mints
+  static #deltaRFromState(earnedBeans) {
+    if (earnedBeans == ZERO_BD) {
+      return 0.01;
+    }
+    return -0.01;
+  }
+
+  // TODO: implement the various gauge point functions and choose which one to call based on the stored selector
+  // see {GaugePointFacet.defaultGaugePointFunction} for implementation.
+  // This will become relevant once there are multiple functions implemented in the contract.
+  static #updateGaugePoints(gaugePoints, currentPercent, optimalPercent) {
+    return gaugePoints;
   }
 }
 

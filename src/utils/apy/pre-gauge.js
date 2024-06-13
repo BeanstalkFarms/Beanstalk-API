@@ -21,7 +21,7 @@ class PreGaugeApyUtil {
    * @param {BigInt} totalStalk - Total outstanding stalk
    * @param {BigInt} totalSeeds - Total outstanding seeds
    * @param {CalcApyOptions} options - optional configuration
-   * @returns {DepositYield}
+   * @returns {DepositYield[]}
    */
   static calcApy(beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds, options) {
     const duration = options?.duration ?? 8760;
@@ -35,7 +35,9 @@ class PreGaugeApyUtil {
       options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].bdv, PRECISION.bdv, PRECISION.bdv / 2) : 1
     );
     let userStalk = tokens.map((_, idx) =>
-      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].stalk, PRECISION.stalk, PRECISION.stalk / 2) : 1
+      options?.initialUserValues
+        ? fromBigInt(options.initialUserValues[idx].stalk, PRECISION.stalk, PRECISION.stalk / 2)
+        : 1
     );
     let ownership = userStalk.map((u) => u / totalStalk);
 
