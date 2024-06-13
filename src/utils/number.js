@@ -69,6 +69,14 @@ class NumberUtil {
     }
     return Number(v / BigInt(10 ** (precision - resultPrecision))) / Math.pow(10, resultPrecision);
   }
+
+  static toBigInt(v, precision) {
+    return BigInt(v * 10 ** precision);
+  }
+
+  static sum(a) {
+    return a.reduce((r, c) => r + c, 0);
+  }
 }
 
 module.exports = NumberUtil;

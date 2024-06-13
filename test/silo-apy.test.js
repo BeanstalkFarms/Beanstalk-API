@@ -1,8 +1,10 @@
 const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../src/constants/addresses');
+const { PRECISION } = require('../src/constants/constants');
 const subgraphClient = require('../src/datasources/subgraph-client');
 const SiloApyService = require('../src/service/silo-apy');
 const GaugeApyUtil = require('../src/utils/apy/gauge');
 const PreGaugeApyUtil = require('../src/utils/apy/pre-gauge');
+const { toBigInt } = require('../src/utils/number');
 
 describe('Window EMA', () => {
   afterEach(() => {
@@ -46,7 +48,7 @@ describe('Window EMA', () => {
 });
 
 describe('Pre-Gauge Silo APY', () => {
-  it.only('should calculate basic apy', () => {
+  it('should calculate basic apy', () => {
     const apy = PreGaugeApyUtil.calcApy(
       1278000000n,
       ['BEAN', 'BEAN:WETH'],
@@ -103,6 +105,29 @@ describe('Pre-Gauge Silo APY', () => {
     expect(apy[0].beanYield).toBeCloseTo(0.006192371144229325);
     expect(apy[0].stalkYield).toBeCloseTo(0.2228397591012936);
     expect(apy[0].ownershipGrowth).toBeCloseTo(0.2018846550220293);
+  });
+});
+
+describe('Gauge Silo APY', () => {
+  it.only('should calculate with required inputs', () => {
+    const apy = GaugeApyUtil.calcApy(
+      toBigInt(1278, PRECISION.bdv),
+      [BEAN, BEANWETH, UNRIPE_BEAN],
+      [-1, 0, -2],
+      [toBigInt(100, PRECISION.gaugePoints)],
+      [toBigInt(899088, PRECISION.bdv)],
+      toBigInt(44139839, PRECISION.bdv),
+      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
+      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, PRECISION.bdv),
+      toBigInt(161540879, PRECISION.stalk),
+      0,
+      [0n, 0n],
+      [[0n, 0n]],
+      [0n, 0n],
+      [null, null, 0n]
+    );
+    console.log(apy);
   });
 });
 

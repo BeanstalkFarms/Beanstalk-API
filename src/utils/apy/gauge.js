@@ -6,6 +6,7 @@
 const { toBigInt } = require('ethers');
 const { PRECISION } = require('../../constants/constants');
 const { fromBigInt } = require('../number');
+const NumberUtil = require('../number');
 
 class GaugeApyUtil {
   /**
@@ -29,7 +30,7 @@ class GaugeApyUtil {
    * GERMINATING PARAMS - First index corresponds to Even germinating, second index is Odd.
    *
    * @param {number} season - The current season, required for germinating.
-   * @param {BigInt} germinatingBeanBdv - Germinating beans bdv
+   * @param {BigInt[]} germinatingBeanBdv - Germinating beans bdv
    * @param {BigInt[][]} gaugeLpGerminatingBdv - Germinating bdv of each gauge lp. Each outer array entry corresponds to one lp
    * @param {BigInt[]} nonGaugeGerminatingBdv - Germinating bdv of all non-gauge whitelisted assets
    *
@@ -65,7 +66,7 @@ class GaugeApyUtil {
     staticSeeds,
     options
   ) {
-    const catchUpRate = options?.duration ?? 8760;
+    const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
     // Current LP GP allocation per BDV
@@ -85,7 +86,7 @@ class GaugeApyUtil {
 
     // Current percentages allocations of each LP
     const currentPercentLpBdv = [];
-    const sumLpBdv = Math.sum(gaugeLpDepositedBdvCopy);
+    const sumLpBdv = NumberUtil.sum(gaugeLpDepositedBdvCopy);
     for (let i = 0; i < gaugeLpDepositedBdvCopy.length; ++i) {
       currentPercentLpBdv.push(gaugeLpDepositedBdvCopy[i] / sumLpBdv);
     }
@@ -94,7 +95,7 @@ class GaugeApyUtil {
     const siloReward = fromBigInt(beansPerSeason, PRECISION.bdv, PRECISION.bdv);
     let beanBdv = fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3);
     let totalStalk = fromBigInt(siloStalk, PRECISION.stalk, 0);
-    let gaugeBdv = beanBdv + Math.sum(gaugeLpDepositedBdvCopy);
+    let gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
     let nonGaugeDepositedBdv_ = fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3);
     let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
     let largestLpGpPerBdv = Math.max(lpGpPerBdv);
@@ -123,7 +124,7 @@ class GaugeApyUtil {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
           gaugeLpDepositedBdvCopy[j] += fromBigInt(gaugeLpGerminatingBdv[j][index], PRECISION.bdv, PRECISION.bdv / 3);
         }
-        gaugeBdv = beanBdv + Math.sum(gaugeLpDepositedBdvCopy);
+        gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
         nonGaugeDepositedBdv_ += fromBigInt(nonGaugeGerminatingBdv[index], PRECISION.bdv, PRECISION.bdv / 3);
         totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
       }
@@ -142,7 +143,7 @@ class GaugeApyUtil {
       }
 
       const beanGpPerBdv = largestLpGpPerBdv * rScaled;
-      const gpTotal = Math.sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
+      const gpTotal = NumberUtil.sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
       const avgGsPerBdv = totalStalk / totalBdv - 1;
       const gs = (avgGsPerBdv / catchUpRate) * gaugeBdv;
       const beanSeeds = (gs / gpTotal) * beanGpPerBdv; //TODO *seedsprecision
@@ -171,11 +172,11 @@ class GaugeApyUtil {
       }
     }
 
-    return tokens.map((token, idx) => ({
+    return tokenNames.map((token, idx) => ({
       token,
       // TOOD: update based on options
       beanYield: userBeans[idx] + userLp[idx],
-      stalkYield: userStalk[i],
+      stalkYield: userStalk[idx],
       ownershipGrowth: 0
     }));
   }
@@ -197,7 +198,7 @@ class GaugeApyUtil {
   // For now we return an increasing R value only when there are no beans minted over the period.
   // In the future this needs to take into account beanstalk state and the frequency of how many seasons have mints
   static #deltaRFromState(earnedBeans) {
-    if (earnedBeans == ZERO_BD) {
+    if (earnedBeans == 0) {
       return 0.01;
     }
     return -0.01;
