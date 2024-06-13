@@ -40,8 +40,8 @@ class CoingeckoService {
         target_currency: token1,
         pool_id: well.id,
         last_price: poolPrice.float[0],
-        base_volume: pool24hVolume[token0],
-        target_volume: pool24hVolume[token1],
+        base_volume: pool24hVolume.float[0],
+        target_volume: pool24hVolume.float[1],
         liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
         high: priceRange.high.float[0],
         low: priceRange.low.float[0]
@@ -90,20 +90,11 @@ class CoingeckoService {
 
   // Gets the 24h volume in usd and in terms of the tokens in the well
   static async get24hVolume(wellAddress, blockNumber) {
-
-    // Retrieves the rolling 24h volume from the subgraph
-    const volumeResult = await BasinSubgraphRepository.getRollingVolume(wellAddress, blockNumber);
-
+    // Retrieves the rolling 24h volume from the subgraph.
     // CoinGecko expects volume to be presented in equal proportion on both tokens.
-    // i.e. if there is $50k volume, it expects something like 50k BEAN and 15 ETH to be reported,
-    // despite the additive value of those tokens being $100k. The best workaround is to
-    // use the accurate 24h volume from the subgraph and estimate the token amounts from there.
-    const usdVolume = parseFloat(volumeResult.rollingDailyTradeVolumeUSD);
-    const swapVolume = { totalUSD: usdVolume };
-    for (const token of volumeResult.tokens) {
-      swapVolume[token.id] = usdVolume / token.lastPriceUSD;
-    }
-    return swapVolume;
+    // i.e. if there is $50k volume, it expects something like 50k BEAN and 15 ETH to be reported
+    const rollingVolume = await BasinSubgraphRepository.getRollingVolume(wellAddress, blockNumber);
+    return createNumberSpread(rollingVolume.map(v => v.bn), rollingVolume.map(v => v.decimals));
   }
 
   // Gets the swap volume in terms of token amounts in the well over the requested period
