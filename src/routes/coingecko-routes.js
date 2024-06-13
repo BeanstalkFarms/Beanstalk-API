@@ -31,7 +31,9 @@ router.get('/historical_trades', async (ctx) => {
   // Defaults for optional variables
   options.limit = options.limit ?? 500;
   options.end_time = Math.floor((options.end_time ?? new Date()).getTime() / 1000);
-  options.start_time = Math.floor((options.start_time?.getTime() ?? options.end_time * 1000 - 7 * 24 * 60 * 60 * 1000) / 1000);
+  options.start_time = Math.floor(
+    (options.start_time?.getTime() ?? options.end_time * 1000 - 7 * 24 * 60 * 60 * 1000) / 1000
+  );
 
   const trades = await getTrades(options);
   ctx.body = trades;

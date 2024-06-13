@@ -70,7 +70,9 @@ class SiloService {
       accounts: []
     };
     for (const account in depositedBdvs) {
-      const uncategorized = await beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, { blockTag: block.number });
+      const uncategorized = await beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, {
+        blockTag: block.number
+      });
       const uncategorizedFloat = createNumberSpread(uncategorized, 10, 2).float;
 
       // Compute total and by asset breakdown

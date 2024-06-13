@@ -78,7 +78,9 @@ class SubgraphService {
     const currentBlock = (await (await providerThenable).getBlock()).number;
 
     for (const status of allStatuses.indexingStatuses) {
-      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter((n) => !n.startsWith('graph-'));
+      const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter(
+        (n) => !n.startsWith('graph-')
+      );
       for (const name of deployedNames) {
         deploymentStatuses[name].synced = status.synced;
         deploymentStatuses[name].healthy = status.health === 'healthy';

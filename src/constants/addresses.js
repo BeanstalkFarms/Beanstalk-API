@@ -1,6 +1,10 @@
 const contracts = {
   BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, require('../datasources/abi/Beanstalk-BIP44.json')],
-  BEANSTALK_PRICE: ['0xb01CE0008CaD90104651d6A84b6B11e182a9B62A', null, require('../datasources/abi/BeanstalkPriceV1.json')],
+  BEANSTALK_PRICE: [
+    '0xb01CE0008CaD90104651d6A84b6B11e182a9B62A',
+    null,
+    require('../datasources/abi/BeanstalkPriceV1.json')
+  ],
   USD_ORACLE: ['0x1aa19ed7DfC555E4644c9353Ad383c33024855F7', null, require('../datasources/abi/UsdOracle.json')],
   BEAN: ['0xBEA0000029AD1c77D3d5D23Ba2D8893dB9d1Efab', 6, null],
   BEAN3CRV: ['0xc9C32cd16Bf7eFB85Ff14e0c8603cc90F6F2eE49', 18, null],

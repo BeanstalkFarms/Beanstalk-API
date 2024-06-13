@@ -76,7 +76,10 @@ class CoingeckoService {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: getConstantProductPrice([swap.amountIn, swap.amountOut], [swap.fromToken.decimals, swap.toToken.decimals]).float[0],
+        price: getConstantProductPrice(
+          [swap.amountIn, swap.amountOut],
+          [swap.fromToken.decimals, swap.toToken.decimals]
+        ).float[0],
         base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).float,
         target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).float,
         trade_timestamp: parseInt(swap.timestamp) * 1000,
