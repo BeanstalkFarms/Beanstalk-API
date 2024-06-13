@@ -63,7 +63,7 @@ class NumberUtil {
    * @param {number} precision - the precision of v
    * @param {number} resultPrecision - the desired number of decimal points in the result
    */
-  static fromBigInt(v, precision, resultPrecision) {
+  static fromBigInt(v, precision, resultPrecision = precision) {
     if (resultPrecision < 0 || resultPrecision > precision) {
       throw new Error('Invalid result precision');
     }

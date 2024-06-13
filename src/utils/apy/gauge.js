@@ -1,4 +1,5 @@
 /**
+ * @typedef {import('../../../types/types').CalcApyOptions} CalcApyOptions
  * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
@@ -20,7 +21,6 @@ class GaugeApyUtil {
    * @param {BigInt} initialR - Initial ratio of max LP gauge points per bdv to Bean gauge points per bdv
    * @param {BigInt} siloDepositedBeanBdv - The total number of Beans in the silo
    * @param {BigInt} siloStalk - The total amount of stalk in the silo
-   * @param {number} catchUpRate - Target number of hours for a deposit's grown stalk to catch up
    *
    * GERMINATING PARAMS - First index corresponds to Even germinating, second index is Odd.
    *
@@ -33,6 +33,10 @@ class GaugeApyUtil {
    *
    * @param {Array<BigInt | null>} staticSeeds - Provided when `token` does not have its seeds dynamically changed by gauge
    *
+   * OTHER
+   *
+   * @param {CalcApyOptions} options - optional configuration
+   *
    * Future work includes improvement of the `r` value simulation. This involves using Beanstalk's current state,
    * including L2SR and debt level (temperature cases). Also can be improved by tracking an expected ratio of
    * seasons with mints to seasons without mints. This will allow for a more accurate simulation of its fluctuation.
@@ -40,25 +44,31 @@ class GaugeApyUtil {
    * @returns {DepositYield}
    */
   static calcApy(
-    // beansPerSeason,
-    // tokenNames,
-    // tokens,
-    // gaugeLpPoints,
-    // gaugeLpDepositedBdv,
-    // nonGaugeDepositedBdv,
-    // gaugeLpOptimalPercentBdv,
-    // initialR,
-    // siloDepositedBeanBdv,
-    // siloStalk,
-    // catchUpRate,
-    // season,
-    // germinatingBeanBdv,
-    // gaugeLpGerminatingBdv,
-    // nonGaugeGerminatingBdv,
-    // staticSeeds
-    ...params
+    beansPerSeason,
+    tokenNames,
+    tokens,
+    gaugeLpPoints,
+    gaugeLpDepositedBdv,
+    nonGaugeDepositedBdv,
+    gaugeLpOptimalPercentBdv,
+    initialR,
+    siloDepositedBeanBdv,
+    siloStalk,
+    season,
+    germinatingBeanBdv,
+    gaugeLpGerminatingBdv,
+    nonGaugeGerminatingBdv,
+    staticSeeds,
+    options
   ) {
-    console.log('calcApy received params', params);
+    const catchUpRate = options?.duration ?? 8760;
+    const duration = options?.duration ?? 8760;
+
+    // const currentPercentLpBdv = [];
+    // const sumLpBdv = ?;
+    // for (let i = 0; i < gaugeLpDepositedBdv.length; ++i) {
+    //   currentPercentLpBdv.push(fromBigInt(gaugeLpDepositedBdv[i] / sumLpBdv, ?, ?));
+    // }
   }
 }
 

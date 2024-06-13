@@ -124,7 +124,6 @@ class SiloApyService {
           sgResult.silo.beanToMaxLpGpPerBdvRatio,
           depositedBeanBdv,
           sgResult.silo.stalk + sgResult.silo.plantableStalk,
-          4320,
           season,
           germinatingBeanBdv,
           germinatingGaugeLpBdv,

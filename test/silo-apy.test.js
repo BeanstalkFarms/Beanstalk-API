@@ -46,7 +46,7 @@ describe('Window EMA', () => {
 });
 
 describe('Pre-Gauge Silo APY', () => {
-  it('should calculate basic apy', () => {
+  it.only('should calculate basic apy', () => {
     const apy = PreGaugeApyUtil.calcApy(
       1278000000n,
       ['BEAN', 'BEAN:WETH'],
@@ -149,7 +149,7 @@ describe('SiloApyService Orchestration', () => {
     expect(result[0].apys[1].stalkYield).toEqual(5.5);
   });
 
-  it.only('gauge should supply appropriate parameters', async () => {
+  it('gauge should supply appropriate parameters', async () => {
     const spy = jest.spyOn(GaugeApyUtil, 'calcApy');
 
     const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
@@ -166,7 +166,6 @@ describe('SiloApyService Orchestration', () => {
       100000000000000000000n,
       4496580226358n,
       1718032876867569323n,
-      4320,
       22096,
       [0n, 2059972416n],
       [[0n, 0n]],

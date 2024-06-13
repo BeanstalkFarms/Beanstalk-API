@@ -3,6 +3,7 @@
  * @typedef {import('../../../types/types').DepositYield} DepositYield
  */
 
+const { PRECISION } = require('../../constants/constants');
 const { fromBigInt } = require('../number');
 
 class PreGaugeApyUtil {
@@ -19,19 +20,23 @@ class PreGaugeApyUtil {
    * @param {BigInt} seedsPerBeanBdv - The amount of seeds awarded per bdv for bean deposits
    * @param {BigInt} totalStalk - Total outstanding stalk
    * @param {BigInt} totalSeeds - Total outstanding seeds
-   * @params {CalcApyOptions} options - optional configuration
+   * @param {CalcApyOptions} options - optional configuration
    * @returns {DepositYield}
    */
   static calcApy(beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds, options) {
     const duration = options?.duration ?? 8760;
 
     // Initialization
-    beansPerSeason = fromBigInt(beansPerSeason, 6, 6);
-    seedsPerBeanBdv = fromBigInt(seedsPerBeanBdv, 6, 6);
-    totalSeeds = fromBigInt(totalSeeds, 6, 2);
-    totalStalk = fromBigInt(totalStalk, 10, 0);
-    let userBdv = tokens.map((_, idx) => (options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].bdv, 6, 2) : 1));
-    let userStalk = tokens.map((_, idx) => (options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].stalk, 10, 2) : 1));
+    beansPerSeason = fromBigInt(beansPerSeason, PRECISION.bdv);
+    seedsPerBeanBdv = fromBigInt(seedsPerBeanBdv, PRECISION.bdv);
+    totalSeeds = fromBigInt(totalSeeds, PRECISION.seeds, 2);
+    totalStalk = fromBigInt(totalStalk, PRECISION.stalk, 0);
+    let userBdv = tokens.map((_, idx) =>
+      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].bdv, PRECISION.bdv, PRECISION.bdv / 2) : 1
+    );
+    let userStalk = tokens.map((_, idx) =>
+      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].stalk, PRECISION.stalk, PRECISION.stalk / 2) : 1
+    );
     let ownership = userStalk.map((u) => u / totalStalk);
 
     let bdvStart = userBdv.map((b) => b);
@@ -44,7 +49,7 @@ class PreGaugeApyUtil {
     let userStalk_i = tokens.map((_) => 0);
 
     const STALK_PER_SEED = 0.0001;
-    const GROWN_STALK_PER_TOKEN = seedsPerTokenBdv.map((s) => fromBigInt(s, 10, 10));
+    const GROWN_STALK_PER_TOKEN = seedsPerTokenBdv.map((s) => fromBigInt(s, PRECISION.stalk));
     const GROWN_STALK_PER_BEAN = seedsPerBeanBdv / 10000;
 
     // Simulate minting for the requested duration

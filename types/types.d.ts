@@ -27,8 +27,10 @@ export type Deposit = {
 };
 
 export type CalcApyOptions = {
+  // Target number of hours for a deposit's grown stalk to catch up (for gauge only)
+  catchUpRate?: number;
   // Initial values of a deposit starting states
-  initialUserValues: Deposit[];
+  initialUserValues?: Deposit[];
   // The duration for which to calculate the apy (if other than 1 year)
-  duration: number;
+  duration?: number;
 };
