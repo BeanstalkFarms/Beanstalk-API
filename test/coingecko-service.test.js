@@ -11,13 +11,11 @@ const SubgraphQueryUtil = require('../src/utils/subgraph-query');
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
     const wellsResponse = JSON.parse(
-      '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18}],"reserves":["13776890377201","5362472327552046319200"]}]}'
+      '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18}],"reserves":["13776890377201","5362472327552046319200"],"symbol":"BEANWETHCP2w"}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
-    // const swapsResponse = JSON.parse('{"swaps":[{"amountIn":"31550733364","amountOut":"12135361453186685996","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705087739"},{"amountIn":"2221211344","amountOut":"852281445355575130","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705092503"},{"amountIn":"819909419","amountOut":"319078792113307509","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705095059"},{"amountIn":"14881783000000000000","amountOut":"38136920283","fromToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"toToken":{"decimals":6,"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},"timestamp":"1705098539"},{"amountIn":"9970000000000000000","amountOut":"25431883809","fromToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"toToken":{"decimals":6,"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},"timestamp":"1705098995"},{"amountIn":"356372497087637724","amountOut":"906908354","fromToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18},"toToken":{"decimals":6,"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},"timestamp":"1705102751"},{"amountIn":"125144976","amountOut":"49178915992265078","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705102811"},{"amountIn":"654517381","amountOut":"257194707714557195","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705104971"},{"amountIn":"701649551","amountOut":"275688185035951467","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705108955"},{"amountIn":"1630986350","amountOut":"640728991377665191","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705109171"},{"amountIn":"38136920283","amountOut":"14938684353974365046","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705112387"},{"amountIn":"409175618","amountOut":"159829846323998063","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705112663"},{"amountIn":"25431883809","amountOut":"9915431347242893965","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705116479"},{"amountIn":"231552660","amountOut":"90110089924784099","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705117655"},{"amountIn":"2722158958","amountOut":"1059117306704162070","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705134539"},{"amountIn":"616761625","amountOut":"239906893509136283","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705135043"},{"amountIn":"642325269","amountOut":"249965222820550482","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705150751"},{"amountIn":"4858299716","amountOut":"1889886110483877212","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705155431"},{"amountIn":"1107092821","amountOut":"430474553364305936","fromToken":{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},"toToken":{"decimals":18,"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},"timestamp":"1705158947"}]}');
-    // jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(swapsResponse);
     const wellVolumeResponse = JSON.parse(
-      '{"wells":[{"tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6,"lastPriceUSD":"0.961579"},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18,"lastPriceUSD":"3809.019202375386134509816908503638"}],"rollingDailyTradeVolumeUSD":"26385.68890075838949285097406793472"}]}'
+      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
@@ -30,8 +28,8 @@ describe('CoingeckoService', () => {
     expect(tickers[0].target_currency).toEqual('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
     expect(tickers[0].pool_id).toEqual('0xbea0e11282e2bb5893bece110cf199501e872bad');
     expect(tickers[0].last_price).toBeCloseTo(0.000389236771196659);
-    expect(tickers[0].base_volume).toBeCloseTo(27439.95958809249);
-    expect(tickers[0].target_volume).toBeCloseTo(6.927160903863049);
+    expect(tickers[0].base_volume).toBeCloseTo(362621.652657);
+    expect(tickers[0].target_volume).toBeCloseTo(141.01800893122126);
     expect(tickers[0].liquidity_in_usd).toEqual(27491580);
     expect(tickers[0].high).toBeCloseTo(0.000392979136931714);
     expect(tickers[0].low).toBeCloseTo(0.000383640247389837);
@@ -39,14 +37,13 @@ describe('CoingeckoService', () => {
 
   it('should get 24h token volume from subgraph calculation', async () => {
     const wellVolumeResponse = JSON.parse(
-      '{"wells":[{"tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6,"lastPriceUSD":"0.961579"},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18,"lastPriceUSD":"3809.019202375386134509816908503638"}],"rollingDailyTradeVolumeUSD":"26385.68890075838949285097406793472"}]}'
+      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
-    const volume = await get24hVolume(BEANWETH, 20028709);
-    expect(volume.totalUSD).toBeCloseTo(26385.68890075838949285097406793472);
-    expect(volume[BEAN]).toBeCloseTo(27439.95958809249);
-    expect(volume[WETH]).toBeCloseTo(6.927160903863049);
+    const volume = await get24hVolume(BEANWETH, 19000000);
+    expect(volume.float[0]).toBeCloseTo(362621.652657);
+    expect(volume.float[1]).toBeCloseTo(141.01800893122126);
   });
 
   it('should calculate token volume in the well (calculated directly from swaps only)', async () => {

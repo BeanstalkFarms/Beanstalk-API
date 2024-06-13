@@ -163,15 +163,15 @@ class BasinSubgraphRepository {
           where: {id: "${wellAddress}"}
         ) {
           tokens {
-            id
             decimals
-            lastPriceUSD
           }
-          rollingDailyTradeVolumeUSD
+          rollingDailyBiTradeVolumeReserves
         }
       }`);
-
-    return result.wells[0];
+    return result.wells[0].tokens.map((t, idx) => ({
+      bn: BigNumber.from(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
+      decimals: t.decimals
+    }));
   }
 }
 
