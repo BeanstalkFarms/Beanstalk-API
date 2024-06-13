@@ -4,12 +4,11 @@
  */
 
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
-const { providerThenable } = require('../datasources/alchemy');
 
-const ContractStorage = require('@beanstalk/contract-storage/src/contract-storage');
-const StorageBIP47 = require('../datasources/storage/beanstalk/StorageBIP47.json');
 const { BEAN } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
+const GaugeApyUtil = require('../utils/apy/gauge');
+const { formatBigintDecimal } = require('../utils/json-formatter');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
@@ -26,20 +25,23 @@ class SiloApyService {
    * @returns {Promise<CalcApysResult[]>}
    */
   static async calcApy(beanstalk, season, windows, tokens) {
+    // TODO: refactor this method such that the majority of the logic can be provided by callbacks in the
+    // respective apy util. this will avoid redundant loop implementation
+
     const retval = [];
     const windowEMAs = await SiloApyService.calcWindowEMA(beanstalk, season, windows);
     if (season < GAUGE_SEASON) {
-      const inputs = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
+      const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
       for (const ema of windowEMAs) {
         const result = PreGaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokens,
-          tokens.map((t) => inputs.tokens[t].grownStalkPerSeason),
-          inputs.tokens[BEAN].grownStalkPerSeason,
-          inputs.silo.stalk,
-          inputs.silo.seeds
+          tokens.map((t) => sgResult.tokens[t].grownStalkPerSeason),
+          sgResult.tokens[BEAN].grownStalkPerSeason,
+          sgResult.silo.stalk + sgResult.silo.plantableStalk,
+          sgResult.silo.seeds
         );
         retval.push({
           beanstalk: beanstalk,
@@ -49,7 +51,74 @@ class SiloApyService {
         });
       }
     } else {
-      // const bs = new ContractStorage(await providerThenable, BEANSTALK, StorageBIP47);
+      const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(beanstalk, season);
+      console.log(JSON.stringify(sgResult, formatBigintDecimal, 2));
+
+      const tokensToCalc = [];
+      const gaugeLpPoints = [];
+      const gaugeLpDepositedBdv = [];
+      const gaugeLpOptimalPercentBdv = [];
+
+      let nonGaugeDepositedBdv = 0n;
+      let depositedBeanBdv = 0n;
+
+      let germinatingBeanBdv = [];
+      const germinatingGaugeLpBdv = [];
+      const germinatingNonGaugeBdv = [0n, 0n];
+
+      const staticSeeds = [];
+
+      for (const token in sgResult.tokens) {
+        const tokenInfo = sgResult.tokens[token];
+        if (!tokenInfo.isWhitelisted) {
+          nonGaugeDepositedBdv += tokenInfo.depositedBDV;
+          continue;
+        }
+
+        if (tokenInfo.isGauge) {
+          tokensToCalc.push(gaugeLpPoints.length);
+          gaugeLpPoints.push(tokenInfo.gaugePoints);
+          gaugeLpOptimalPercentBdv.push(tokenInfo.optimalPercentDepositedBdv);
+          gaugeLpDepositedBdv.push(tokenInfo.depositedBDV);
+          germinatingGaugeLpBdv.push(tokenInfo.germinatingBDV);
+          staticSeeds.push(null);
+        } else {
+          if (token === BEAN) {
+            tokensToCalc.push(-1);
+            depositedBeanBdv = tokenInfo.depositedBDV;
+            germinatingBeanBdv = tokenInfo.germinatingBDV;
+            staticSeeds.push(null);
+          } else {
+            tokensToCalc.push(-2);
+            nonGaugeDepositedBdv = nonGaugeDepositedBdv + tokenInfo.depositedBDV;
+            germinatingNonGaugeBdv[0] += tokenInfo.germinatingBDV[0];
+            germinatingNonGaugeBdv[1] += tokenInfo.germinatingBDV[1];
+            staticSeeds.push(tokenInfo.stalkEarnedPerSeason);
+          }
+        }
+      }
+
+      for (const ema of windowEMAs) {
+        const result = GaugeApyUtil.calcApy(
+          ema.beansPerSeason,
+          tokens,
+          tokensToCalc,
+          gaugeLpPoints,
+          gaugeLpDepositedBdv,
+          nonGaugeDepositedBdv,
+          gaugeLpOptimalPercentBdv,
+          sgResult.silo.beanToMaxLpGpPerBdvRatio,
+          depositedBeanBdv,
+          sgResult.silo.stalk + sgResult.silo.plantableStalk,
+          4320,
+          season,
+          germinatingBeanBdv,
+          germinatingGaugeLpBdv,
+          germinatingNonGaugeBdv,
+          staticSeeds
+        );
+        console.log('gauge apy result', JSON.stringify(result, formatBigintDecimal, 2));
+      }
     }
     return retval;
   }

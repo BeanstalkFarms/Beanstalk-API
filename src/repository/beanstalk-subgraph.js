@@ -73,11 +73,12 @@ class BeanstalkSubgraphRepository {
           stalkIssuedPerBdv
         }
         silo(
-          id: "0xc1e088fc1323b20bcbee9bd1b9fc9546db5624c5",
+          id: "${beanstalk}",
           block: {number: ${blockNumber}}
         ) {
           seeds
           stalk
+          plantableStalk
           depositedBDV
         }
       }`);
@@ -92,6 +93,94 @@ class BeanstalkSubgraphRepository {
       silo: apyInputs.silo,
       tokens
     });
+  }
+
+  static async getGaugeApyInputs(beanstalk, season) {
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+
+    const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+      {
+        whitelistTokenSettings(
+          block: {number: ${blockNumber}}
+        ) {
+          id
+          stalkEarnedPerSeason
+          stalkIssuedPerBdv
+          gpSelector
+          gaugePoints
+          optimalPercentDepositedBdv
+        }
+        silo(
+          id: "${beanstalk}",
+          block: {number: ${blockNumber}}
+        ) {
+          beanToMaxLpGpPerBdvRatio
+          seeds
+          stalk
+          plantableStalk
+          whitelistedTokens
+        }
+        siloAssets(
+          where: {silo: "${beanstalk}", depositedBDV_gt: "0"}
+          block: {number: ${blockNumber}}
+        ) {
+          token
+          depositedBDV
+        }
+      }`);
+
+    const depositAmounts = apyInputs.siloAssets.reduce((result, nextAsset) => {
+      const { token, ...rest } = nextAsset;
+      result[token] = {
+        ...rest
+      };
+      return result;
+    }, {});
+
+    // Germination info must be retrieved in a separate call now that the tokens are known.
+    // Ids are of the form token-(EVEN|ODD)
+    const germinationIds = Object.keys(depositAmounts).flatMap((t) => [`${t}-ODD`, `${t}-EVEN`]);
+    const germinationResult = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+      {
+        germinatings(
+          where: {id_in: [${germinationIds.map((id) => `"${id}"`).join(', ')}]}
+          block: {number: ${blockNumber}}
+        ) {
+          id
+          bdv
+        }
+      }
+    `);
+    const germinationInfo = germinationIds.reduce((result, next) => {
+      const elem = next.split('-');
+      const savedGermination = germinationResult.germinatings.find((g) => g.id === next);
+      if (!result[elem[0]]) {
+        result[elem[0]] = [];
+      }
+      result[elem[0]][elem[1] === 'EVEN' ? 0 : 1] = savedGermination?.bdv ?? 0;
+      return result;
+    }, {});
+    // console.log(germinationIds, germinationResult, germinationInfo);
+
+    const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
+      const { id, gpSelector, ...rest } = nextToken;
+      result[id] = {
+        depositedBDV: depositAmounts[id].depositedBDV,
+        germinatingBDV: germinationInfo[id],
+        isWhitelisted: apyInputs.silo.whitelistedTokens.includes(id),
+        isGauge: gpSelector != null,
+        ...rest
+      };
+      return result;
+    }, {});
+
+    return allToBigInt(
+      {
+        silo: apyInputs.silo,
+        tokens
+      },
+      ['whitelistedTokens', 'gpSelector']
+    );
   }
 
   static async getBlockForSeason(beanstalk, season) {

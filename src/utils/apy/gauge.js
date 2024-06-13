@@ -10,7 +10,7 @@ class GaugeApyUtil {
    *
    * @param {BigInt} beansPerSeason - The provided EMA
    * @param {string[]} tokenNames (informational) - The token(s) calculating on
-   * @param {number[]} token - Which tokens to calculate the apy for. For a gauge lp token,
+   * @param {number[]} tokens - Which tokens to calculate the apy for. For a gauge lp token,
    *        provide an index corresponding to the position of that lp in the other array parameters.
    *        For Bean, provide -1. For a non-gauge token, provide -2. See staticSeeds parameter below
    * @param {BigInt[]} gaugeLpPoints - Array of gauge points assigned to each gauge lp. With a single lp, there will be one entry
@@ -39,23 +39,27 @@ class GaugeApyUtil {
    *
    * @returns {DepositYield}
    */
-  static calcApyGauge(
-    beansPerSeason,
-    tokens,
-    gaugeLpPoints,
-    gaugeLpDepositedBdv,
-    nonGaugeDepositedBdv,
-    gaugeLpOptimalPercentBdv,
-    initialR,
-    siloDepositedBeanBdv,
-    siloStalk,
-    catchUpRate,
-    season,
-    germinatingBeanBdv,
-    gaugeLpGerminatingBdv,
-    nonGaugeGerminatingBdv,
-    staticSeeds
-  ) {}
+  static calcApy(
+    // beansPerSeason,
+    // tokenNames,
+    // tokens,
+    // gaugeLpPoints,
+    // gaugeLpDepositedBdv,
+    // nonGaugeDepositedBdv,
+    // gaugeLpOptimalPercentBdv,
+    // initialR,
+    // siloDepositedBeanBdv,
+    // siloStalk,
+    // catchUpRate,
+    // season,
+    // germinatingBeanBdv,
+    // gaugeLpGerminatingBdv,
+    // nonGaugeGerminatingBdv,
+    // staticSeeds
+    ...params
+  ) {
+    console.log('calcApy received params', params);
+  }
 }
 
 module.exports = GaugeApyUtil;

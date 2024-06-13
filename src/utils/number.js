@@ -37,15 +37,18 @@ class NumberUtil {
     };
   }
 
-  static allToBigInt(obj) {
+  static allToBigInt(obj, ignoreList = []) {
     for (let key in obj) {
+      if (ignoreList.includes(key)) {
+        continue;
+      }
       if (obj.hasOwnProperty(key)) {
         if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
           try {
             obj[key] = BigInt(obj[key]);
           } catch (e) {}
         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          NumberUtil.allToBigInt(obj[key]);
+          NumberUtil.allToBigInt(obj[key], ignoreList);
         }
       }
     }

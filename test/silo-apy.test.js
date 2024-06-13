@@ -108,11 +108,11 @@ describe('Pre-Gauge Silo APY', () => {
 describe('SiloApyService Orchestration', () => {
   beforeEach(() => {
     jest.spyOn(SiloApyService, 'calcWindowEMA').mockResolvedValue([{ window: 720, beansPerSeason: 322227371n }]);
-    const seasonBlockResponse = require('./mock-responses/subgraph/preGaugeApyInputs_1.json');
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(seasonBlockResponse);
   });
 
   it('pre-gauge should supply appropriate parameters', async () => {
+    const seasonBlockResponse = require('./mock-responses/subgraph/preGaugeApyInputs_1.json');
+    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(seasonBlockResponse);
     const preGaugeApyInputsResponse = require('./mock-responses/subgraph/preGaugeApyInputs_2.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(preGaugeApyInputsResponse);
 
@@ -148,7 +148,8 @@ describe('SiloApyService Orchestration', () => {
     expect(result[0].apys[1].stalkYield).toEqual(5.5);
   });
 
-  // it('gauge should supply appropriate parameters', async () => {
-
-  // });
+  it.only('gauge should supply appropriate parameters', async () => {
+    const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV]);
+    console.log('outer apy result', result);
+  });
 });
