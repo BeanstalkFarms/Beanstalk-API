@@ -139,6 +139,7 @@ class BeanstalkSubgraphRepository {
 
     // Germination info must be retrieved in a separate call now that the tokens are known.
     // Ids are of the form token-(EVEN|ODD)
+    // TODO: consider refactoring after the new subgraph is available; query by !isFarmer
     const germinationIds = Object.keys(depositAmounts).flatMap((t) => [`${t}-ODD`, `${t}-EVEN`]);
     const germinationResult = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
@@ -157,7 +158,7 @@ class BeanstalkSubgraphRepository {
       if (!result[elem[0]]) {
         result[elem[0]] = [];
       }
-      result[elem[0]][elem[1] === 'EVEN' ? 0 : 1] = savedGermination?.bdv ?? 0;
+      result[elem[0]][elem[1] === 'EVEN' ? 0 : 1] = savedGermination?.bdv ?? '0';
       return result;
     }, {});
     // console.log(germinationIds, germinationResult, germinationInfo);

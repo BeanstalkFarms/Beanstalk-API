@@ -1,6 +1,7 @@
 const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../src/constants/addresses');
 const subgraphClient = require('../src/datasources/subgraph-client');
 const SiloApyService = require('../src/service/silo-apy');
+const GaugeApyUtil = require('../src/utils/apy/gauge');
 const PreGaugeApyUtil = require('../src/utils/apy/pre-gauge');
 
 describe('Window EMA', () => {
@@ -149,7 +150,28 @@ describe('SiloApyService Orchestration', () => {
   });
 
   it.only('gauge should supply appropriate parameters', async () => {
-    const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV]);
+    const spy = jest.spyOn(GaugeApyUtil, 'calcApy');
+
+    const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
     console.log('outer apy result', result);
+
+    expect(spy).toHaveBeenCalledWith(
+      322227371n,
+      [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN],
+      [-1, -2, 0, -2],
+      [100000000000000000000n],
+      [1876895701119n],
+      44983287794775n,
+      [100000000n],
+      100000000000000000000n,
+      4496580226358n,
+      1718032876867569323n,
+      4320,
+      22096,
+      [0n, 2059972416n],
+      [[0n, 0n]],
+      [0n, 0n],
+      [null, 1n, null, 1n]
+    );
   });
 });

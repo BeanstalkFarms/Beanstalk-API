@@ -68,32 +68,46 @@ class SiloApyService {
 
       const staticSeeds = [];
 
+      // Gather info on all tokens
       for (const token in sgResult.tokens) {
         const tokenInfo = sgResult.tokens[token];
         if (!tokenInfo.isWhitelisted) {
           nonGaugeDepositedBdv += tokenInfo.depositedBDV;
+          // We might still want to calculate apy of a dewhitelisted token since users may still hold it in the silo
+          if (tokens.includes(token)) {
+            tokensToCalc.push(-2);
+            staticSeeds.push(1n);
+          }
           continue;
         }
 
         if (tokenInfo.isGauge) {
-          tokensToCalc.push(gaugeLpPoints.length);
+          // Gauge LP
           gaugeLpPoints.push(tokenInfo.gaugePoints);
           gaugeLpOptimalPercentBdv.push(tokenInfo.optimalPercentDepositedBdv);
           gaugeLpDepositedBdv.push(tokenInfo.depositedBDV);
           germinatingGaugeLpBdv.push(tokenInfo.germinatingBDV);
-          staticSeeds.push(null);
+          if (tokens.includes(token)) {
+            tokensToCalc.push(gaugeLpPoints.length - 1);
+            staticSeeds.push(null);
+          }
         } else {
           if (token === BEAN) {
-            tokensToCalc.push(-1);
             depositedBeanBdv = tokenInfo.depositedBDV;
             germinatingBeanBdv = tokenInfo.germinatingBDV;
-            staticSeeds.push(null);
+            if (tokens.includes(token)) {
+              tokensToCalc.push(-1);
+              staticSeeds.push(null);
+            }
           } else {
-            tokensToCalc.push(-2);
+            // Something other than Bean, but untracked by seed gauge (i.e. unripe)
             nonGaugeDepositedBdv = nonGaugeDepositedBdv + tokenInfo.depositedBDV;
             germinatingNonGaugeBdv[0] += tokenInfo.germinatingBDV[0];
             germinatingNonGaugeBdv[1] += tokenInfo.germinatingBDV[1];
-            staticSeeds.push(tokenInfo.stalkEarnedPerSeason);
+            if (tokens.includes(token)) {
+              tokensToCalc.push(-2);
+              staticSeeds.push(tokenInfo.stalkEarnedPerSeason);
+            }
           }
         }
       }
