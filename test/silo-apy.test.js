@@ -12,7 +12,7 @@ describe('Window EMA', () => {
   });
 
   it('should calculate window EMA', async () => {
-    const rewardMintResponse = require('./mock-responses/subgraph/siloHourlyRewardMints_1.json');
+    const rewardMintResponse = require('./mock-responses/subgraph/silo-apy/siloHourlyRewardMints_1.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValue(rewardMintResponse);
 
     const emaResult = await SiloApyService.calcWindowEMA(BEANSTALK, 21816, [24, 168, 720]);
@@ -37,7 +37,7 @@ describe('Window EMA', () => {
   });
 
   it('should use up to as many season as are available', async () => {
-    const rewardMintResponse = require('./mock-responses/subgraph/siloHourlyRewardMints_2.json');
+    const rewardMintResponse = require('./mock-responses/subgraph/silo-apy/siloHourlyRewardMints_2.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValue(rewardMintResponse);
 
     const emaResult = await SiloApyService.calcWindowEMA(BEANSTALK, 6100, [10000, 20000]);
@@ -148,9 +148,9 @@ describe('SiloApyService Orchestration', () => {
   });
 
   it('pre-gauge should supply appropriate parameters', async () => {
-    const seasonBlockResponse = require('./mock-responses/subgraph/preGaugeApyInputs_1.json');
+    const seasonBlockResponse = require('./mock-responses/subgraph/silo-apy/preGaugeApyInputs_1.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(seasonBlockResponse);
-    const preGaugeApyInputsResponse = require('./mock-responses/subgraph/preGaugeApyInputs_2.json');
+    const preGaugeApyInputsResponse = require('./mock-responses/subgraph/silo-apy/preGaugeApyInputs_2.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(preGaugeApyInputsResponse);
 
     const spy = jest.spyOn(PreGaugeApyUtil, 'calcApy');
@@ -185,11 +185,30 @@ describe('SiloApyService Orchestration', () => {
     expect(result[0].apys[1].stalkYield).toEqual(5.5);
   });
 
-  it('gauge should supply appropriate parameters', async () => {
+  it.only('gauge should supply appropriate parameters', async () => {
+    const seasonBlockResponse = require('./mock-responses/subgraph/silo-apy/gaugeApyInputs_1.json');
+    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(seasonBlockResponse);
+    const preGaugeApyInputsResponse = require('./mock-responses/subgraph/silo-apy/gaugeApyInputs_2.json');
+    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(preGaugeApyInputsResponse);
+
     const spy = jest.spyOn(GaugeApyUtil, 'calcApy');
+    spy.mockReturnValueOnce([
+      {
+        token: BEAN,
+        beanYield: 0.1,
+        stalkYield: 5,
+        ownershipGrowth: 1.5
+      },
+      {
+        token: BEAN3CRV,
+        beanYield: 0.12,
+        stalkYield: 5.5,
+        ownershipGrowth: 1.7
+      }
+    ]);
 
     const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
-    console.log('outer apy result', result);
+    // console.log('outer apy result', result);
 
     expect(spy).toHaveBeenCalledWith(
       322227371n,
@@ -208,5 +227,9 @@ describe('SiloApyService Orchestration', () => {
       [0n, 0n],
       [null, 1n, null, 1n]
     );
+
+    expect(result[0].season).toEqual(22096);
+    expect(result[0].apys[0].beanYield).toEqual(0.1);
+    expect(result[0].apys[1].stalkYield).toEqual(5.5);
   });
 });

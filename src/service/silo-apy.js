@@ -52,7 +52,6 @@ class SiloApyService {
       }
     } else {
       const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(beanstalk, season);
-      console.log(JSON.stringify(sgResult, formatBigintDecimal, 2));
 
       const tokensToCalc = [];
       const gaugeLpPoints = [];
@@ -68,9 +67,15 @@ class SiloApyService {
 
       const staticSeeds = [];
 
-      // Gather info on all tokens
-      for (const token in sgResult.tokens) {
+      // Gather info on all tokens. Process requested tokens in the order received.
+      // This might not be necessary as other things get refactored
+      const allTokens = [...new Set([...tokens, ...Object.keys(sgResult.tokens)])];
+      for (const token of allTokens) {
         const tokenInfo = sgResult.tokens[token];
+        if (!tokenInfo) {
+          throw new Error(`Unrecognized token ${token}`);
+        }
+
         if (!tokenInfo.isWhitelisted) {
           nonGaugeDepositedBdv += tokenInfo.depositedBDV;
           // We might still want to calculate apy of a dewhitelisted token since users may still hold it in the silo
@@ -130,7 +135,12 @@ class SiloApyService {
           germinatingNonGaugeBdv,
           staticSeeds
         );
-        console.log('gauge apy result', JSON.stringify(result, formatBigintDecimal, 2));
+        retval.push({
+          beanstalk: beanstalk,
+          season: season,
+          window: ema.window,
+          apys: result
+        });
       }
     }
     return retval;
