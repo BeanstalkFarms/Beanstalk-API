@@ -60,7 +60,14 @@ class PreGaugeApyUtil {
         const newBdv = beansPerSeason * ownership[t];
 
         userBdv_i[t] = userBdv[t] + newBdv;
-        userStalk_i[t] = userStalk[t] + newBdv + GROWN_STALK_PER_BEAN * (userBdv[t] - 1) + GROWN_STALK_PER_TOKEN[t];
+        userStalk_i[t] =
+          userStalk[t] +
+          // Earned stalk
+          newBdv +
+          // Grown stalk from earned beans that were planted
+          (userBdv[t] - bdvStart[t]) * GROWN_STALK_PER_BEAN +
+          // Grown stalk from the intial deposit token
+          bdvStart[t] * GROWN_STALK_PER_TOKEN[t];
         userBdv[t] = userBdv_i[t];
         userStalk[t] = userStalk_i[t];
         ownership[t] = userStalk_i[t] / totalStalk;

@@ -8,7 +8,6 @@ const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
 
 class GaugeApyUtil {
-  // TODO: refactor such that the tokens integer list is not needed. should be possible to use tokenNames and staticSeeds
   /**
    * Calculates silo Bean/Stalk vAPY when Seed Gauge is active.
    *

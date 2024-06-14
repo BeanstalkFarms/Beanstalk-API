@@ -29,6 +29,7 @@ export type WindowEMAResult = {
 export type Deposit = {
   bdv: number;
   stalk: number;
+  germinatingSeasons?: number;
 };
 
 export type CalcApyOptions = {

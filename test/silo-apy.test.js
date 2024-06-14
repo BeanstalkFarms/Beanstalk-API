@@ -94,9 +94,9 @@ describe('Pre-Gauge Silo APY', () => {
     expect(apy['BEAN'].stalk).toBeCloseTo(1.2621145577496613);
     expect(apy['BEAN'].ownership).toBeCloseTo(0.7511709069463572);
 
-    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.28835009461615935);
-    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(1.0058288057734435);
-    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(0.5527723991483761);
+    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.327868076925108);
+    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(1.4331142254568838);
+    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(0.883546892132657);
 
     apy = PreGaugeApyUtil.calcApy(1278000000n, ['BEAN'], [3000000n], 3000000n, 1636664801904743831n, 24942000280720n, {
       duration: 720 // 1 month
@@ -141,7 +141,7 @@ describe('Gauge Silo APY', () => {
     expect(apy[UNRIPE_BEAN].ownership).toBeCloseTo(-0.10136317582302204);
   });
 
-  it.only('should calculate with optional inputs', () => {
+  it('should calculate with optional inputs', () => {
     const apy = GaugeApyUtil.calcApy(
       toBigInt(1278, PRECISION.bdv),
       [BEAN, BEANWETH],
