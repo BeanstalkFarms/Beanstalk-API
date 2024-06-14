@@ -105,12 +105,18 @@ class GaugeApyUtil {
     const userBeans = [];
     const userLp = [];
     const userStalk = [];
+    const userOwnership = [];
     for (let i = 0; i < tokens.length; ++i) {
       userBeans.push(tokens[i] === -1 ? 1 : 0);
       userLp.push(tokens[i] === -1 ? 0 : 1);
       // Initial stalk from deposit + avg grown stalk
       userStalk.push(1 + startingGrownStalk);
+      userOwnership.push(userStalk[i] / totalStalk);
     }
+
+    let bdvStart = userBeans.map((_, idx) => Math.max(userBeans[idx], userLp[idx]));
+    let stalkStart = userStalk.map((s) => s);
+    let ownershipStart = userOwnership.map((o) => o);
 
     // TODO: seed precision?
     for (let i = 0; i < duration; ++i) {
@@ -166,18 +172,18 @@ class GaugeApyUtil {
         // Handles germinating deposits not receiving seignorage for 2 seasons.
         // TODO: need to determine based on inputs whether the user deposit is germinating
         // const userBeanShare = i < 2 ? toBigInt(ZERO_BD, PRECISION) : siloReward.times(userStalk[j]).div(totalStalk);
-        const userBeanShare = (siloReward * userStalk[j]) / totalStalk;
+        const userBeanShare = siloReward * userOwnership[j];
         userStalk[j] += userBeanShare + userBeans[j] * beanSeeds + userLp[j] * lpSeeds; // TOOD all / seedsprecision
         userBeans[j] += userBeanShare;
+        userOwnership[j] = userStalk[j] / totalStalk;
       }
     }
 
     return tokenNames.map((token, idx) => ({
       token,
-      // TOOD: update based on options
-      beanYield: userBeans[idx] + userLp[idx],
-      stalkYield: userStalk[idx],
-      ownershipGrowth: 0
+      beanYield: (userBeans[idx] + userLp[idx] - bdvStart[idx]) / bdvStart[idx],
+      stalkYield: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
+      ownershipGrowth: (userOwnership[idx] - ownershipStart[idx]) / ownershipStart[idx]
     }));
   }
 

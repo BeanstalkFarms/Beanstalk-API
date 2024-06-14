@@ -62,13 +62,13 @@ class PreGaugeApyUtil {
       totalStalk = totalStalk_i;
 
       for (let t = 0; t < tokens.length; ++t) {
-        ownership[t] = userStalk[t] / totalStalk;
         const newBdv = beansPerSeason * ownership[t];
 
         userBdv_i[t] = userBdv[t] + newBdv;
         userStalk_i[t] = userStalk[t] + newBdv + GROWN_STALK_PER_BEAN * (userBdv[t] - 1) + GROWN_STALK_PER_TOKEN[t];
         userBdv[t] = userBdv_i[t];
         userStalk[t] = userStalk_i[t];
+        ownership[t] = userStalk_i[t] / totalStalk;
       }
     }
 
