@@ -104,8 +104,6 @@ class GaugeApyUtil {
     let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
     let largestLpGpPerBdv = Math.max(lpGpPerBdv);
 
-    // TODO: use options here for initial state
-    const startingGrownStalk = totalStalk / totalBdv - 1;
     const userBeans = [];
     const userLp = [];
     const userStalk = [];
@@ -114,7 +112,10 @@ class GaugeApyUtil {
       userBeans.push(tokens[i] === -1 ? 1 : 0);
       userLp.push(tokens[i] === -1 ? 0 : 1);
       // Initial stalk from deposit + avg grown stalk
-      userStalk.push(1 + startingGrownStalk);
+      userStalk.push(
+        options?.initUserValues?.[i]?.stalkPerBdv ??
+          (!options?.initType || options?.initType === 'AVERAGE' ? totalStalk / totalBdv : 1)
+      );
       userOwnership.push(userStalk[i] / totalStalk);
     }
 

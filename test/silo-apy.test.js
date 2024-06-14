@@ -123,10 +123,7 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, null, 0n],
-      {
-        initType: 'AVERAGE'
-      }
+      [null, null, 0n]
     );
 
     expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
@@ -159,8 +156,8 @@ describe('Gauge Silo APY', () => {
       [[toBigInt(500000, PRECISION.bdv), 0n]],
       [toBigInt(1000000, PRECISION.bdv), toBigInt(500000, PRECISION.bdv)],
       [null, null],
-      // User starts with a deposit
       {
+        // User starts with a specific deposit
         initUserValues: [
           {
             stalkPerBdv: 2.5
@@ -168,11 +165,19 @@ describe('Gauge Silo APY', () => {
           {
             stalkPerBdv: 3.25
           }
-        ]
+        ],
+        // 6 months only
+        duration: 720 * 6
       }
     );
 
-    console.log(apy);
+    expect(apy[BEAN].bean).toBeCloseTo(0.11574644595505745);
+    expect(apy[BEAN].stalk).toBeCloseTo(0.9200499992997202);
+    expect(apy[BEAN].ownership).toBeCloseTo(0.7002257956878088);
+
+    expect(apy[BEANWETH].bean).toBeCloseTo(0.17316920083743503);
+    expect(apy[BEANWETH].stalk).toBeCloseTo(1.3770764147879906);
+    expect(apy[BEANWETH].ownership).toBeCloseTo(1.104927809285005);
   });
 });
 
