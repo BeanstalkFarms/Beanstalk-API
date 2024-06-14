@@ -58,13 +58,13 @@ describe('Pre-Gauge Silo APY', () => {
       24942000280720n
     );
 
-    expect(apy[0].beanYield).toBeCloseTo(0.14346160171559408);
-    expect(apy[0].stalkYield).toBeCloseTo(2.929361317570831);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(2.041655409481871);
+    expect(apy['BEAN'].bean).toBeCloseTo(0.14346160171559408);
+    expect(apy['BEAN'].stalk).toBeCloseTo(2.929361317570831);
+    expect(apy['BEAN'].ownership).toBeCloseTo(2.041655409481871);
 
-    expect(apy[1].beanYield).toBeCloseTo(0.18299360215739835);
-    expect(apy[1].stalkYield).toBeCloseTo(4.318722210196328);
-    expect(apy[1].ownershipGrowth).toBeCloseTo(3.1169670763419854);
+    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.18299360215739835);
+    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(4.318722210196328);
+    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(3.1169670763419854);
   });
 
   it('should calculate with optional inputs', () => {
@@ -90,21 +90,21 @@ describe('Pre-Gauge Silo APY', () => {
       }
     );
 
-    expect(apy[0].beanYield).toBeCloseTo(0.24004075111638348);
-    expect(apy[0].stalkYield).toBeCloseTo(1.2621145577496613);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(0.7511709069463572);
+    expect(apy['BEAN'].bean).toBeCloseTo(0.24004075111638348);
+    expect(apy['BEAN'].stalk).toBeCloseTo(1.2621145577496613);
+    expect(apy['BEAN'].ownership).toBeCloseTo(0.7511709069463572);
 
-    expect(apy[1].beanYield).toBeCloseTo(0.28835009461615935);
-    expect(apy[1].stalkYield).toBeCloseTo(1.0058288057734435);
-    expect(apy[1].ownershipGrowth).toBeCloseTo(0.5527723991483761);
+    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.28835009461615935);
+    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(1.0058288057734435);
+    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(0.5527723991483761);
 
     apy = PreGaugeApyUtil.calcApy(1278000000n, ['BEAN'], [3000000n], 3000000n, 1636664801904743831n, 24942000280720n, {
       duration: 720 // 1 month
     });
 
-    expect(apy[0].beanYield).toBeCloseTo(0.006192371151397369);
-    expect(apy[0].stalkYield).toBeCloseTo(0.22283975910921727);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(0.20216140896555207);
+    expect(apy['BEAN'].bean).toBeCloseTo(0.006192371151397369);
+    expect(apy['BEAN'].stalk).toBeCloseTo(0.22283975910921727);
+    expect(apy['BEAN'].ownership).toBeCloseTo(0.20216140896555207);
   });
 });
 
@@ -128,17 +128,17 @@ describe('Gauge Silo APY', () => {
       [null, null, 0n]
     );
 
-    expect(apy[0].beanYield).toBeCloseTo(0.35084711071357977);
-    expect(apy[0].stalkYield).toBeCloseTo(1.6586973099708102);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(0.9537401121405971);
+    expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
+    expect(apy[BEAN].stalk).toBeCloseTo(1.6586973099708102);
+    expect(apy[BEAN].ownership).toBeCloseTo(0.9537401121405971);
 
-    expect(apy[1].beanYield).toBeCloseTo(0.4798080252579915);
-    expect(apy[1].stalkYield).toBeCloseTo(3.093009778951926);
-    expect(apy[1].ownershipGrowth).toBeCloseTo(2.007742684559264);
+    expect(apy[BEANWETH].bean).toBeCloseTo(0.4798080252579915);
+    expect(apy[BEANWETH].stalk).toBeCloseTo(3.093009778951926);
+    expect(apy[BEANWETH].ownership).toBeCloseTo(2.007742684559264);
 
-    expect(apy[2].beanYield).toBeCloseTo(0.221615077591919);
-    expect(apy[2].stalkYield).toBeCloseTo(0.22288696036564187);
-    expect(apy[2].ownershipGrowth).toBeCloseTo(-0.10136317582302204);
+    expect(apy[UNRIPE_BEAN].bean).toBeCloseTo(0.221615077591919);
+    expect(apy[UNRIPE_BEAN].stalk).toBeCloseTo(0.22288696036564187);
+    expect(apy[UNRIPE_BEAN].ownership).toBeCloseTo(-0.10136317582302204);
   });
 });
 
@@ -154,20 +154,18 @@ describe('SiloApyService Orchestration', () => {
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(preGaugeApyInputsResponse);
 
     const spy = jest.spyOn(PreGaugeApyUtil, 'calcApy');
-    spy.mockReturnValueOnce([
-      {
-        token: BEAN,
-        beanYield: 0.1,
-        stalkYield: 5,
-        ownershipGrowth: 1.5
+    spy.mockReturnValueOnce({
+      [BEAN]: {
+        bean: 0.1,
+        stalk: 5,
+        ownership: 1.5
       },
-      {
-        token: BEAN3CRV,
-        beanYield: 0.12,
-        stalkYield: 5.5,
-        ownershipGrowth: 1.7
+      [BEAN3CRV]: {
+        bean: 0.12,
+        stalk: 5.5,
+        ownership: 1.7
       }
-    ]);
+    });
 
     const result = await SiloApyService.calcApy(BEANSTALK, 19000, [720], [BEAN, BEAN3CRV]);
 
@@ -180,32 +178,41 @@ describe('SiloApyService Orchestration', () => {
       29993650158762n
     );
 
-    expect(result[0].season).toEqual(19000);
-    expect(result[0].apys[0].beanYield).toEqual(0.1);
-    expect(result[0].apys[1].stalkYield).toEqual(5.5);
+    expect(result.beanstalk).toEqual(BEANSTALK);
+    expect(result.season).toEqual(19000);
+    expect(result.yields[720][BEAN].bean).toEqual(0.1);
+    expect(result.yields[720][BEAN3CRV].stalk).toEqual(5.5);
   });
 
-  it.only('gauge should supply appropriate parameters', async () => {
+  it('gauge should supply appropriate parameters', async () => {
     const seasonBlockResponse = require('./mock-responses/subgraph/silo-apy/gaugeApyInputs_1.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(seasonBlockResponse);
     const preGaugeApyInputsResponse = require('./mock-responses/subgraph/silo-apy/gaugeApyInputs_2.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(preGaugeApyInputsResponse);
 
     const spy = jest.spyOn(GaugeApyUtil, 'calcApy');
-    spy.mockReturnValueOnce([
-      {
-        token: BEAN,
-        beanYield: 0.1,
-        stalkYield: 5,
-        ownershipGrowth: 1.5
+    spy.mockReturnValueOnce({
+      [BEAN]: {
+        bean: 0.1,
+        stalk: 5,
+        ownership: 1.5
       },
-      {
-        token: BEAN3CRV,
-        beanYield: 0.12,
-        stalkYield: 5.5,
-        ownershipGrowth: 1.7
+      [BEAN3CRV]: {
+        bean: 0.12,
+        stalk: 5.5,
+        ownership: 1.7
+      },
+      [BEANWETH]: {
+        bean: 0.19,
+        stalk: 8.5,
+        ownership: 3.7
+      },
+      [UNRIPE_BEAN]: {
+        bean: 0.02,
+        stalk: 1.5,
+        ownership: 0.7
       }
-    ]);
+    });
 
     const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
     // console.log('outer apy result', result);
@@ -228,8 +235,9 @@ describe('SiloApyService Orchestration', () => {
       [null, 1n, null, 1n]
     );
 
-    expect(result[0].season).toEqual(22096);
-    expect(result[0].apys[0].beanYield).toEqual(0.1);
-    expect(result[0].apys[1].stalkYield).toEqual(5.5);
+    expect(result.beanstalk).toEqual(BEANSTALK);
+    expect(result.season).toEqual(22096);
+    expect(result.yields[720][BEAN].bean).toEqual(0.1);
+    expect(result.yields[720][BEAN3CRV].stalk).toEqual(5.5);
   });
 });

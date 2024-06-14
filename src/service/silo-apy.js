@@ -8,7 +8,6 @@ const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 const { BEAN } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
-const { formatBigintDecimal } = require('../utils/bigint');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
@@ -22,20 +21,21 @@ class SiloApyService {
    * @param {number} season
    * @param {number[]} windows
    * @param {string[]} tokens
-   * @returns {Promise<CalcApysResult[]>}
+   * @returns {Promise<CalcApysResult>}
    */
   static async calcApy(beanstalk, season, windows, tokens) {
-    // TODO: refactor this method such that the majority of the logic can be provided by callbacks in the
-    // respective apy util. this will avoid redundant loop implementation
-
-    const retval = [];
+    const apyResults = {
+      beanstalk,
+      season,
+      yields: {}
+    };
     const windowEMAs = await SiloApyService.calcWindowEMA(beanstalk, season, windows);
     if (season < GAUGE_SEASON) {
       const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
       for (const ema of windowEMAs) {
-        const result = PreGaugeApyUtil.calcApy(
+        apyResults.yields[ema.window] = PreGaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokens,
           tokens.map((t) => sgResult.tokens[t].grownStalkPerSeason),
@@ -43,12 +43,6 @@ class SiloApyService {
           sgResult.silo.stalk + sgResult.silo.plantableStalk,
           sgResult.silo.seeds
         );
-        retval.push({
-          beanstalk: beanstalk,
-          season: season,
-          window: ema.window,
-          apys: result
-        });
       }
     } else {
       const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(beanstalk, season);
@@ -118,7 +112,7 @@ class SiloApyService {
       }
 
       for (const ema of windowEMAs) {
-        const result = GaugeApyUtil.calcApy(
+        apyResults.yields[ema.window] = GaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokens,
           tokensToCalc,
@@ -135,15 +129,9 @@ class SiloApyService {
           germinatingNonGaugeBdv,
           staticSeeds
         );
-        retval.push({
-          beanstalk: beanstalk,
-          season: season,
-          window: ema.window,
-          apys: result
-        });
       }
     }
-    return retval;
+    return apyResults;
   }
 
   /**

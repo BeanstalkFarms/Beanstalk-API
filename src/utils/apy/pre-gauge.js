@@ -1,17 +1,12 @@
 /**
  * @typedef {import('../../../types/types').CalcApyOptions} CalcApyOptions
- * @typedef {import('../../../types/types').DepositYield} DepositYield
+ * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
 const { PRECISION } = require('../../constants/constants');
 const { fromBigInt } = require('../number');
 
 class PreGaugeApyUtil {
-  /**
-   * Calculates the silo apy before seed gauge was implemented
-   * @param {CalcApysPreGaugeInputs} params
-   * @returns {DepositYield}
-   */
   /**
    * Calculates the silo apy before seed gauge was implemented
    * @param {BigInt} beansPerSeason - The provided EMA
@@ -21,7 +16,7 @@ class PreGaugeApyUtil {
    * @param {BigInt} totalStalk - Total outstanding stalk
    * @param {BigInt} totalSeeds - Total outstanding seeds
    * @param {CalcApyOptions} options - optional configuration
-   * @returns {DepositYield[]}
+   * @returns {DepositYieldMap}
    */
   static calcApy(beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds, options) {
     const duration = options?.duration ?? 8760;
@@ -71,14 +66,15 @@ class PreGaugeApyUtil {
         ownership[t] = userStalk_i[t] / totalStalk;
       }
     }
-
     // Return yields
-    return tokens.map((token, idx) => ({
-      token,
-      beanYield: (userBdv[idx] - bdvStart[idx]) / bdvStart[idx],
-      stalkYield: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
-      ownershipGrowth: (ownership[idx] - ownershipStart[idx]) / ownershipStart[idx]
-    }));
+    return tokens.reduce((result, token, idx) => {
+      result[token] = {
+        bean: (userBdv[idx] - bdvStart[idx]) / bdvStart[idx],
+        stalk: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
+        ownership: (ownership[idx] - ownershipStart[idx]) / ownershipStart[idx]
+      };
+      return result;
+    }, {});
   }
 }
 

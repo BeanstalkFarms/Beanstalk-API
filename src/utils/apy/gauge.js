@@ -1,6 +1,6 @@
 /**
  * @typedef {import('../../../types/types').CalcApyOptions} CalcApyOptions
- * @typedef {import('../../../types/types').DepositYield} DepositYield
+ * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
 const { toBigInt } = require('ethers');
@@ -46,7 +46,7 @@ class GaugeApyUtil {
    * including L2SR and debt level (temperature cases). Also can be improved by tracking an expected ratio of
    * seasons with mints to seasons without mints. This will allow for a more accurate simulation of its fluctuation.
    *
-   * @returns {DepositYield}
+   * @returns {DepositYieldMap}
    */
   static calcApy(
     beansPerSeason,
@@ -177,13 +177,15 @@ class GaugeApyUtil {
         userOwnership[j] = userStalk[j] / totalStalk;
       }
     }
-
-    return tokenNames.map((token, idx) => ({
-      token,
-      beanYield: (userBeans[idx] + userLp[idx] - bdvStart[idx]) / bdvStart[idx],
-      stalkYield: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
-      ownershipGrowth: (userOwnership[idx] - ownershipStart[idx]) / ownershipStart[idx]
-    }));
+    // Return yields
+    return tokenNames.reduce((result, token, idx) => {
+      result[token] = {
+        bean: (userBeans[idx] + userLp[idx] - bdvStart[idx]) / bdvStart[idx],
+        stalk: (userStalk[idx] - stalkStart[idx]) / stalkStart[idx],
+        ownership: (userOwnership[idx] - ownershipStart[idx]) / ownershipStart[idx]
+      };
+      return result;
+    }, {});
   }
 
   static #updateR(R, change) {

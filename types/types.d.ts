@@ -1,20 +1,24 @@
-// TODO: consider changing this to use a mapping rather than list
 export type DepositYield = {
-  // The token that these yields were calculated for
-  token: string;
-  // Percentage growth in depositor's bdv
-  beanYield: number;
-  // Percentage growth in depositor's stalk
-  stalkYield: number;
-  // Percentage growth in depositor's silo ownership
-  ownershipGrowth: number;
+  // Percentage growth in deposit's bdv
+  bean: number;
+  // Percentage growth in deposit's stalk
+  stalk: number;
+  // Percentage growth in the deposit's share of silo ownership
+  ownership: number;
+};
+
+export type DepositYieldMap = {
+  [asset: string]: DepositYield;
+};
+
+export type WindowYieldMap = {
+  [window: number]: DepositYieldMap;
 };
 
 export type CalcApysResult = {
   beanstalk: string;
   season: number;
-  window: number;
-  apys: DepositYield[];
+  yields: WindowYieldMap;
 };
 
 export type WindowEMAResult = {
