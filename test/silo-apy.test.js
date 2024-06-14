@@ -110,8 +110,8 @@ describe('Gauge Silo APY', () => {
   it('should calculate with required inputs', () => {
     const apy = GaugeApyUtil.calcApy(
       toBigInt(1278, PRECISION.bdv),
-      [BEAN, BEANWETH, UNRIPE_BEAN],
-      [-1, 0, -2],
+      [BEAN, BEANWETH, UNRIPE_BEAN, UNRIPE_LP],
+      [-1, 0, -2, -2],
       [toBigInt(100, PRECISION.gaugePoints)],
       [toBigInt(899088, PRECISION.bdv)],
       toBigInt(44139839, PRECISION.bdv),
@@ -123,7 +123,7 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, null, 0n]
+      [null, null, 0n, toBigInt(4, PRECISION.seeds)]
     );
 
     expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
@@ -137,6 +137,10 @@ describe('Gauge Silo APY', () => {
     expect(apy[UNRIPE_BEAN].bean).toBeCloseTo(0.221615077591919);
     expect(apy[UNRIPE_BEAN].stalk).toBeCloseTo(0.22288696036564187);
     expect(apy[UNRIPE_BEAN].ownership).toBeCloseTo(-0.10136317582302204);
+
+    expect(apy[UNRIPE_LP].bean).toBeCloseTo(0.3272446909167759);
+    expect(apy[UNRIPE_LP].stalk).toBeCloseTo(1.3440728289283832);
+    expect(apy[UNRIPE_LP].ownership).toBeCloseTo(0.7225387389836214);
   });
 
   it('should calculate with optional inputs', () => {
@@ -160,7 +164,9 @@ describe('Gauge Silo APY', () => {
         // User starts with a specific deposit
         initUserValues: [
           {
-            stalkPerBdv: 2.5
+            // Scenario: 40 stalk on a 15 bean deposit, with 30 beans germinating
+            stalkPerBdv: 40 / (15 + 30),
+            germinating: [30 / (15 + 30), 0]
           },
           {
             stalkPerBdv: 3.25
@@ -171,9 +177,9 @@ describe('Gauge Silo APY', () => {
       }
     );
 
-    expect(apy[BEAN].bean).toBeCloseTo(0.11574644595505745);
-    expect(apy[BEAN].stalk).toBeCloseTo(0.9200499992997202);
-    expect(apy[BEAN].ownership).toBeCloseTo(0.7002257956878088);
+    expect(apy[BEAN].bean).toBeCloseTo(0.08433852683524257);
+    expect(apy[BEAN].stalk).toBeCloseTo(1.4368925863369826);
+    expect(apy[BEAN].ownership).toBeCloseTo(1.157895699654514);
 
     expect(apy[BEANWETH].bean).toBeCloseTo(0.17316920083743503);
     expect(apy[BEANWETH].stalk).toBeCloseTo(1.3770764147879906);

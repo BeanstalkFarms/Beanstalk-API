@@ -27,8 +27,11 @@ export type WindowEMAResult = {
 };
 
 export type Deposit = {
+  // (user deposited stalk) / (user deposited bdv + user germinating bdv)
   stalkPerBdv: number;
-  germinatingSeasons?: number;
+  // [Even, Odd] germinating stalk ratio of this deposit type.
+  // Each entry should be computed as: (user germinating stalk) / (user deposited bdv + user germinating bdv)
+  germinating?: [number];
 };
 
 export enum ApyInitType {

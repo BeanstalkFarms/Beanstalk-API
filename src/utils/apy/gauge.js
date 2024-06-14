@@ -69,6 +69,10 @@ class GaugeApyUtil {
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
+    if (options?.initType && !['NEW', 'AVERAGE'].includes(option.initType)) {
+      throw new Error(`Unrecognized initType ${options.initType}`);
+    }
+
     // Current LP GP allocation per BDV
     const lpGpPerBdv = [];
     // Transform these inputs
@@ -107,21 +111,35 @@ class GaugeApyUtil {
     const userBeans = [];
     const userLp = [];
     const userStalk = [];
+    const userGerminating = [];
     const userOwnership = [];
     for (let i = 0; i < tokens.length; ++i) {
       userBeans.push(tokens[i] === -1 ? 1 : 0);
       userLp.push(tokens[i] === -1 ? 0 : 1);
-      // Initial stalk from deposit + avg grown stalk
       userStalk.push(
         options?.initUserValues?.[i]?.stalkPerBdv ??
-          (!options?.initType || options?.initType === 'AVERAGE' ? totalStalk / totalBdv : 1)
+          (!options?.initType || options?.initType === 'AVERAGE'
+            ? // AVERAGE is the default
+              totalStalk / totalBdv
+            : // New deposit starts with 0 stalk (all germinating)
+              0)
+      );
+      // These amounts will be added to user stalk as the germination period finishes
+      userGerminating.push(
+        options?.initUserValues?.[i]?.germinating ??
+          (!options?.initType || options?.initType === 'AVERAGE'
+            ? // AVERAGE will not have any germinating (default)
+              [0, 0]
+            : // Set germination to finish after 2 seasons
+              [season % 2 == 0 ? 1 : 0, season % 2 == 0 ? 0 : 1])
       );
       userOwnership.push(userStalk[i] / totalStalk);
     }
 
     let bdvStart = userBeans.map((_, idx) => Math.max(userBeans[idx], userLp[idx]));
-    let stalkStart = userStalk.map((s) => s);
-    let ownershipStart = userOwnership.map((o) => o);
+    // Include germinating stalk in initial stalk/ownership
+    let stalkStart = userStalk.map((s, idx) => s + userGerminating[idx][0] + userGerminating[idx][1]);
+    let ownershipStart = stalkStart.map((s) => s / totalStalk);
 
     for (let i = 0; i < duration; ++i) {
       r = GaugeApyUtil.#updateR(r, GaugeApyUtil.#deltaRFromState(beansPerSeason));
@@ -167,18 +185,19 @@ class GaugeApyUtil {
         let lpSeedsGs = 0;
         if (tokens[j] !== -1) {
           if (tokens[j] < 0) {
-            lpSeedsGs = fromBigInt(staticSeeds[j], PRECISION.seeds);
+            lpSeedsGs = fromBigInt(staticSeeds[j], PRECISION.seeds) / 10000;
           } else {
             lpSeedsGs = (gs / gpTotal) * lpGpPerBdv[tokens[j]];
           }
         }
 
-        // Handles germinating deposits not receiving seignorage for 2 seasons.
-        // TODO: need to determine based on inputs whether the user deposit is germinating
-        // const userBeanShare = i < 2 ? toBigInt(ZERO_BD, PRECISION) : siloReward.times(userStalk[j]).div(totalStalk);
         const userBeanShare = siloReward * userOwnership[j];
         userStalk[j] += userBeanShare + userBeans[j] * beanSeedsGs + userLp[j] * lpSeedsGs;
         userBeans[j] += userBeanShare;
+        if (i < 2) {
+          const index = (season + 1 + i) % 2 == 0 ? 1 : 0;
+          userStalk[j] += userGerminating[j][index];
+        }
         userOwnership[j] = userStalk[j] / totalStalk;
       }
     }
