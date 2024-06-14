@@ -77,14 +77,12 @@ describe('Pre-Gauge Silo APY', () => {
       24942000280720n,
       // User starts with a deposit
       {
-        initialUserValues: [
+        initUserValues: [
           {
-            bdv: 2000n * BigInt(10 ** 6),
-            stalk: 5000n * BigInt(10 ** 10)
+            stalkPerBdv: 2.5
           },
           {
-            bdv: 2000n * BigInt(10 ** 6),
-            stalk: 6500n * BigInt(10 ** 10)
+            stalkPerBdv: 3.25
           }
         ]
       }
@@ -125,7 +123,10 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, null, 0n]
+      [null, null, 0n],
+      {
+        initType: 'AVERAGE'
+      }
     );
 
     expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
@@ -157,7 +158,18 @@ describe('Gauge Silo APY', () => {
       [0n, toBigInt(1500000, PRECISION.bdv)],
       [[toBigInt(500000, PRECISION.bdv), 0n]],
       [toBigInt(1000000, PRECISION.bdv), toBigInt(500000, PRECISION.bdv)],
-      [null, null]
+      [null, null],
+      // User starts with a deposit
+      {
+        initUserValues: [
+          {
+            stalkPerBdv: 2.5
+          },
+          {
+            stalkPerBdv: 3.25
+          }
+        ]
+      }
     );
 
     console.log(apy);

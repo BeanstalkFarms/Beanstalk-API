@@ -26,14 +26,9 @@ class PreGaugeApyUtil {
     seedsPerBeanBdv = fromBigInt(seedsPerBeanBdv, PRECISION.bdv);
     totalSeeds = fromBigInt(totalSeeds, PRECISION.seeds, 2);
     totalStalk = fromBigInt(totalStalk, PRECISION.stalk, 0);
-    let userBdv = tokens.map((_, idx) =>
-      options?.initialUserValues ? fromBigInt(options.initialUserValues[idx].bdv, PRECISION.bdv, PRECISION.bdv / 2) : 1
-    );
-    let userStalk = tokens.map((_, idx) =>
-      options?.initialUserValues
-        ? fromBigInt(options.initialUserValues[idx].stalk, PRECISION.stalk, PRECISION.stalk / 2)
-        : 1
-    );
+    let userBdv = tokens.map((_) => 1);
+    // TODO: make options support initType.AVERAGE.
+    let userStalk = tokens.map((_, idx) => options?.initUserValues?.[idx]?.stalkPerBdv ?? 1);
     let ownership = userStalk.map((u) => u / totalStalk);
 
     let bdvStart = userBdv.map((b) => b);

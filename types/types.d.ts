@@ -27,16 +27,22 @@ export type WindowEMAResult = {
 };
 
 export type Deposit = {
-  bdv: number;
-  stalk: number;
+  stalkPerBdv: number;
   germinatingSeasons?: number;
 };
+
+export enum ApyInitType {
+  NEW,
+  AVERAGE
+}
 
 export type CalcApyOptions = {
   // Target number of hours for a deposit's grown stalk to catch up (for gauge only)
   catchUpRate?: number;
-  // Initial values of a deposit starting states
-  initialUserValues?: Deposit[];
+  // Whether to initialize apy calculation with a new deposit or an average deposit.
+  initType?: ApyInitType;
+  // Initial values of a deposit starting states. Takes precedence over initType
+  initUserValues?: Deposit[];
   // The duration for which to calculate the apy (if other than 1 year)
   duration?: number;
 };
