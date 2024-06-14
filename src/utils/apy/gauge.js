@@ -3,12 +3,12 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { toBigInt } = require('ethers');
 const { PRECISION } = require('../../constants/constants');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
 
 class GaugeApyUtil {
+  // TODO: refactor such that the tokens integer list is not needed. should be possible to use tokenNames and staticSeeds
   /**
    * Calculates silo Bean/Stalk vAPY when Seed Gauge is active.
    *
@@ -28,6 +28,7 @@ class GaugeApyUtil {
    * @param {BigInt} siloStalk - The total amount of stalk in the silo
    *
    * GERMINATING PARAMS - First index corresponds to Even germinating, second index is Odd.
+   * These germinating amounts will be subtracted from the above values initially, and re-inlcuded once germination completes.
    *
    * @param {number} season - The current season, required for germinating.
    * @param {BigInt[]} germinatingBeanBdv - Germinating beans bdv
@@ -36,7 +37,7 @@ class GaugeApyUtil {
    *
    * UNRIPE
    *
-   * @param {Array<BigInt | null>} staticSeeds - Provided when `token` does not have its seeds dynamically changed by gauge
+   * @param {Array<BigInt | null>} staticSeeds - Provided when `tokens[?]` does not have its seeds dynamically changed by gauge
    *
    * OTHER
    *
@@ -77,7 +78,9 @@ class GaugeApyUtil {
     const gaugeLpOptimalPercentBdvCopy = [];
     for (let i = 0; i < gaugeLpPoints.length; ++i) {
       const points = fromBigInt(gaugeLpPoints[i], PRECISION.gaugePoints, PRECISION.gaugePoints / 3);
-      const bdv = fromBigInt(gaugeLpDepositedBdv[i], PRECISION.bdv, PRECISION.bdv / 3);
+      const bdv =
+        fromBigInt(gaugeLpDepositedBdv[i], PRECISION.bdv, PRECISION.bdv / 3) -
+        sumGerminatingBdv(gaugeLpGerminatingBdv[i]);
       lpGpPerBdv.push(points / bdv);
       gaugeLpPointsCopy.push(points);
       gaugeLpDepositedBdvCopy.push(bdv);
@@ -93,10 +96,12 @@ class GaugeApyUtil {
 
     let r = fromBigInt(initialR, PRECISION.beanToMaxLpGpPerBdvRatio, PRECISION.beanToMaxLpGpPerBdvRatio / 2);
     const siloReward = fromBigInt(beansPerSeason, PRECISION.bdv, PRECISION.bdv);
-    let beanBdv = fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3);
+    let beanBdv =
+      fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(germinatingBeanBdv);
     let totalStalk = fromBigInt(siloStalk, PRECISION.stalk, 0);
     let gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
-    let nonGaugeDepositedBdv_ = fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3);
+    let nonGaugeDepositedBdv_ =
+      fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(nonGaugeGerminatingBdv);
     let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
     let largestLpGpPerBdv = Math.max(lpGpPerBdv);
 
@@ -124,7 +129,7 @@ class GaugeApyUtil {
 
       // Add germinating bdv to actual bdv in the first 2 simulated seasons
       if (i < 2) {
-        const index = season % 2 == 0 ? 1 : 0;
+        const index = (season + 1 + i) % 2 == 0 ? 1 : 0;
         beanBdv += fromBigInt(germinatingBeanBdv[index], PRECISION.bdv, PRECISION.bdv / 3);
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
           gaugeLpDepositedBdvCopy[j] += fromBigInt(gaugeLpGerminatingBdv[j][index], PRECISION.bdv, PRECISION.bdv / 3);
@@ -134,9 +139,9 @@ class GaugeApyUtil {
         totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
       }
 
-      // Handle multiple whitelisted gauge LP
-      if (gaugeLpPoints.length > 1) {
-        for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++i) {
+      // Handle multiple whitelisted gauge LP, or gauge points changing during germination
+      if (gaugeLpPoints.length > 1 || i < 2) {
+        for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
           gaugeLpPointsCopy[j] = GaugeApyUtil.#updateGaugePoints(
             gaugeLpPointsCopy[j],
             currentPercentLpBdv[j],
@@ -217,6 +222,17 @@ class GaugeApyUtil {
   static #updateGaugePoints(gaugePoints, currentPercent, optimalPercent) {
     return gaugePoints;
   }
+}
+
+/**
+ * Returns the sum of germinating bdvs as a number
+ * @param {BigInt[]} germinating - germinating bdv
+ */
+function sumGerminatingBdv(germinating) {
+  return (
+    fromBigInt(germinating[0], PRECISION.bdv, PRECISION.bdv / 3) +
+    fromBigInt(germinating[1], PRECISION.bdv, PRECISION.bdv / 3)
+  );
 }
 
 module.exports = GaugeApyUtil;

@@ -140,6 +140,28 @@ describe('Gauge Silo APY', () => {
     expect(apy[UNRIPE_BEAN].stalk).toBeCloseTo(0.22288696036564187);
     expect(apy[UNRIPE_BEAN].ownership).toBeCloseTo(-0.10136317582302204);
   });
+
+  it.only('should calculate with optional inputs', () => {
+    const apy = GaugeApyUtil.calcApy(
+      toBigInt(1278, PRECISION.bdv),
+      [BEAN, BEANWETH],
+      [-1, 0],
+      [toBigInt(100, PRECISION.gaugePoints)],
+      [toBigInt(899088, PRECISION.bdv)],
+      toBigInt(44139839, PRECISION.bdv),
+      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
+      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, PRECISION.bdv),
+      toBigInt(161540879, PRECISION.stalk),
+      0,
+      [0n, toBigInt(1500000, PRECISION.bdv)],
+      [[toBigInt(500000, PRECISION.bdv), 0n]],
+      [toBigInt(1000000, PRECISION.bdv), toBigInt(500000, PRECISION.bdv)],
+      [null, null]
+    );
+
+    console.log(apy);
+  });
 });
 
 describe('SiloApyService Orchestration', () => {
