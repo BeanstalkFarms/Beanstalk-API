@@ -262,7 +262,8 @@ describe('SiloApyService Orchestration', () => {
       3000000n,
       44103977396567n,
       1448607918287565335n,
-      29993650158762n
+      29993650158762n,
+      undefined
     );
 
     expect(result.beanstalk).toEqual(BEANSTALK);
@@ -319,7 +320,8 @@ describe('SiloApyService Orchestration', () => {
       [0n, 2059972416n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, 1n, null, 1n]
+      [null, 1n, null, 1n],
+      undefined
     );
 
     expect(result.beanstalk).toEqual(BEANSTALK);

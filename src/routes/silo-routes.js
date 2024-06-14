@@ -1,9 +1,37 @@
+/**
+ * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
+ */
+
+const SiloApyService = require('../service/silo-apy');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../service/silo-service');
 const RestParsingUtil = require('../utils/rest-parsing');
 
 const Router = require('koa-router');
 const router = new Router({
   prefix: '/silo'
+});
+
+/**
+ * Returns the calculated apy for the given request
+ */
+router.post('/yield', async (ctx) => {
+  /** @type {GetApyRequest} */
+  const body = ctx.request.body;
+
+  if (body.windows && (!Array.isArray(body.windows) || body.windows.length === 0)) {
+    ctx.body = { error: 'Invalid `windows` property was provided.' };
+    ctx.status = 400;
+    return;
+  }
+
+  if (body.tokens && (!Array.isArray(body.tokens) || body.tokens.length === 0)) {
+    ctx.body = { error: 'Invalid `tokens` property was provided.' };
+    ctx.status = 400;
+    return;
+  }
+
+  const results = await SiloApyService.getApy(body);
+  ctx.body = results;
 });
 
 /**

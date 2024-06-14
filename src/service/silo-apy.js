@@ -1,11 +1,12 @@
 /**
+ * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
  * @typedef {import('../../types/types').CalcApysResult} CalcApysResult
  * @typedef {import('../../types/types').WindowEMAResult} WindowEMAResult
  */
 
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 
-const { BEAN } = require('../constants/addresses');
+const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
 
@@ -16,6 +17,22 @@ const GAUGE_SEASON = 21798;
 
 class SiloApyService {
   /**
+   * Gets the requested vAPY, calculating if needed
+   * @param {GetApyRequest}
+   * @returns {Promise<CalcApysResult>}
+   */
+  static async getApy({ beanstalk, season, windows, tokens, options }) {
+    beanstalk = (beanstalk ?? BEANSTALK).toLowerCase();
+    windows = windows ?? [24, 168, 720];
+
+    // TODO: get default current values for seasons and tokens - get from subgraph
+    // season = season ??
+    tokens = tokens.map((t) => t.toLowerCase());
+
+    return await SiloApyService.calcApy(beanstalk, season, windows, tokens, options);
+  }
+
+  /**
    * Calculates vAPYs.
    * @param {string} beanstalk
    * @param {number} season
@@ -23,7 +40,7 @@ class SiloApyService {
    * @param {string[]} tokens
    * @returns {Promise<CalcApysResult>}
    */
-  static async calcApy(beanstalk, season, windows, tokens) {
+  static async calcApy(beanstalk, season, windows, tokens, options) {
     const apyResults = {
       beanstalk,
       season,
@@ -42,7 +59,8 @@ class SiloApyService {
           sgResult.tokens[BEAN].grownStalkPerSeason,
           sgResult.silo.depositedBDV,
           sgResult.silo.stalk + sgResult.silo.plantableStalk,
-          sgResult.silo.seeds
+          sgResult.silo.seeds,
+          options
         );
       }
     } else {
@@ -63,7 +81,6 @@ class SiloApyService {
       const staticSeeds = [];
 
       // Gather info on all tokens. Process requested tokens in the order received.
-      // This might not be necessary as other things get refactored
       const allTokens = [...new Set([...tokens, ...Object.keys(sgResult.tokens)])];
       for (const token of allTokens) {
         const tokenInfo = sgResult.tokens[token];
@@ -128,7 +145,8 @@ class SiloApyService {
           germinatingBeanBdv,
           germinatingGaugeLpBdv,
           germinatingNonGaugeBdv,
-          staticSeeds
+          staticSeeds,
+          options
         );
       }
     }

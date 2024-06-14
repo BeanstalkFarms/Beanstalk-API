@@ -10,12 +10,12 @@ const ALL_JOBS = {
   },
   alert: {
     cron: '*/10 * * * * *',
-    function: () => console.log('10 seconds Alert!!')
+    function: () => console.log('10 seconds testing Alert')
   },
   failing: {
     cron: '*/5 * * * * *',
     function: () => {
-      throw new Error('ERROR!');
+      throw new Error('Testing cron ERROR!');
     }
   }
 };

@@ -49,3 +49,11 @@ export type CalcApyOptions = {
   // The duration for which to calculate the apy (if other than 1 year)
   duration?: number;
 };
+
+export type GetApyRequest = {
+  beanstalk: string;
+  season: number;
+  windows: number[];
+  tokens: string[];
+  options?: CalcApyOptions;
+};
