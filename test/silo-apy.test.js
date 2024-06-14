@@ -54,17 +54,18 @@ describe('Pre-Gauge Silo APY', () => {
       ['BEAN', 'BEAN:WETH'],
       [3000000n, 4500000n],
       3000000n,
+      44103977396567n,
       1636664801904743831n,
       24942000280720n
     );
 
-    expect(apy['BEAN'].bean).toBeCloseTo(0.14346160171559408);
-    expect(apy['BEAN'].stalk).toBeCloseTo(2.929361317570831);
-    expect(apy['BEAN'].ownership).toBeCloseTo(2.041655409481871);
+    expect(apy['BEAN'].bean).toBeCloseTo(0.318007383109455);
+    expect(apy['BEAN'].stalk).toBeCloseTo(0.8994181156045856);
+    expect(apy['BEAN'].ownership).toBeCloseTo(0.4703966838366106);
 
-    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.18299360215739835);
-    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(4.318722210196328);
-    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(3.1169670763419854);
+    expect(apy['BEAN:WETH'].bean).toBeCloseTo(0.35754513429389356);
+    expect(apy['BEAN:WETH'].stalk).toBeCloseTo(1.2738188145791554);
+    expect(apy['BEAN:WETH'].ownership).toBeCloseTo(0.7602315241361547);
   });
 
   it('should calculate with optional inputs', () => {
@@ -73,6 +74,7 @@ describe('Pre-Gauge Silo APY', () => {
       ['BEAN', 'BEAN:WETH'],
       [3000000n, 4500000n],
       3000000n,
+      44103977396567n,
       1636664801904743831n,
       24942000280720n,
       // User starts with a deposit
@@ -96,9 +98,19 @@ describe('Pre-Gauge Silo APY', () => {
     expect(apy['BEAN:WETH'].stalk).toBeCloseTo(1.4331142254568838);
     expect(apy['BEAN:WETH'].ownership).toBeCloseTo(0.883546892132657);
 
-    apy = PreGaugeApyUtil.calcApy(1278000000n, ['BEAN'], [3000000n], 3000000n, 1636664801904743831n, 24942000280720n, {
-      duration: 720 // 1 month
-    });
+    apy = PreGaugeApyUtil.calcApy(
+      1278000000n,
+      ['BEAN'],
+      [3000000n],
+      3000000n,
+      44103977396567n,
+      1636664801904743831n,
+      24942000280720n,
+      {
+        initType: 'NEW',
+        duration: 720 // 1 month
+      }
+    );
 
     expect(apy['BEAN'].bean).toBeCloseTo(0.006192371151397369);
     expect(apy['BEAN'].stalk).toBeCloseTo(0.22283975910921727);
@@ -219,6 +231,7 @@ describe('SiloApyService Orchestration', () => {
       ['0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab', '0xc9c32cd16bf7efb85ff14e0c8603cc90f6f2ee49'],
       [3000000n, 3250000n],
       3000000n,
+      44103977396567n,
       1448607918287565335n,
       29993650158762n
     );

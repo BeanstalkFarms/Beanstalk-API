@@ -40,6 +40,7 @@ class SiloApyService {
           tokens,
           tokens.map((t) => sgResult.tokens[t].grownStalkPerSeason),
           sgResult.tokens[BEAN].grownStalkPerSeason,
+          sgResult.silo.depositedBDV,
           sgResult.silo.stalk + sgResult.silo.plantableStalk,
           sgResult.silo.seeds
         );

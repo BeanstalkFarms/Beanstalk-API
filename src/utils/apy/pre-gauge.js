@@ -13,12 +13,22 @@ class PreGaugeApyUtil {
    * @param {string[]} tokens (informational) - The token(s) calculating on
    * @param {BigInt[]} seedsPerTokenBdv - The amount of seeds awarded per bdv for the whitelisted token(s) being calculated
    * @param {BigInt} seedsPerBeanBdv - The amount of seeds awarded per bdv for bean deposits
+   * @param {BigInt} totalDepositedBdv - Total bdv deposited in the silo
    * @param {BigInt} totalStalk - Total outstanding stalk
    * @param {BigInt} totalSeeds - Total outstanding seeds
    * @param {CalcApyOptions} options - optional configuration
    * @returns {DepositYieldMap}
    */
-  static calcApy(beansPerSeason, tokens, seedsPerTokenBdv, seedsPerBeanBdv, totalStalk, totalSeeds, options) {
+  static calcApy(
+    beansPerSeason,
+    tokens,
+    seedsPerTokenBdv,
+    seedsPerBeanBdv,
+    totalDepositedBdv,
+    totalStalk,
+    totalSeeds,
+    options
+  ) {
     const duration = options?.duration ?? 8760;
 
     // Initialization
@@ -26,9 +36,17 @@ class PreGaugeApyUtil {
     seedsPerBeanBdv = fromBigInt(seedsPerBeanBdv, PRECISION.bdv);
     totalSeeds = fromBigInt(totalSeeds, PRECISION.seeds, 2);
     totalStalk = fromBigInt(totalStalk, PRECISION.stalk, 0);
+    totalDepositedBdv = fromBigInt(totalDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3);
     let userBdv = tokens.map((_) => 1);
-    // TODO: make options support initType.AVERAGE.
-    let userStalk = tokens.map((_, idx) => options?.initUserValues?.[idx]?.stalkPerBdv ?? 1);
+    let userStalk = tokens.map(
+      (_, idx) =>
+        options?.initUserValues?.[idx]?.stalkPerBdv ??
+        (!options?.initType || options?.initType === 'AVERAGE'
+          ? // AVERAGE is the default
+            totalStalk / totalDepositedBdv
+          : // New deposit starts with 1 stalk
+            1)
+    );
     let ownership = userStalk.map((u) => u / totalStalk);
 
     let bdvStart = userBdv.map((b) => b);
