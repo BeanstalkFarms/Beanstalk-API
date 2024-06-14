@@ -69,7 +69,7 @@ class GaugeApyUtil {
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
-    if (options?.initType && !['NEW', 'AVERAGE'].includes(option.initType)) {
+    if (options?.initType && !['NEW', 'AVERAGE'].includes(options.initType)) {
       throw new Error(`Unrecognized initType ${options.initType}`);
     }
 

@@ -196,6 +196,35 @@ describe('Gauge Silo APY', () => {
     expect(apy[BEANWETH].bean).toBeCloseTo(0.17316920083743503);
     expect(apy[BEANWETH].stalk).toBeCloseTo(1.3770764147879906);
     expect(apy[BEANWETH].ownership).toBeCloseTo(1.104927809285005);
+
+    const apyNew = GaugeApyUtil.calcApy(
+      toBigInt(1278, PRECISION.bdv),
+      [BEAN, BEANWETH],
+      [-1, 0],
+      [toBigInt(100, PRECISION.gaugePoints)],
+      [toBigInt(899088, PRECISION.bdv)],
+      toBigInt(44139839, PRECISION.bdv),
+      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
+      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, PRECISION.bdv),
+      toBigInt(161540879, PRECISION.stalk),
+      0,
+      [0n, 0n],
+      [[0n, 0n]],
+      [0n, 0n],
+      [null, null],
+      {
+        initType: 'NEW'
+      }
+    );
+
+    expect(apyNew[BEAN].bean).toBeCloseTo(0.19484986572790186);
+    expect(apyNew[BEAN].stalk).toBeCloseTo(5.071389671075412);
+    expect(apyNew[BEAN].ownership).toBeCloseTo(3.461552464934931);
+
+    expect(apyNew[BEANWETH].bean).toBeCloseTo(0.3238107802723085);
+    expect(apyNew[BEANWETH].stalk).toBeCloseTo(9.914882255462954);
+    expect(apyNew[BEANWETH].ownership).toBeCloseTo(7.020786421160418);
   });
 });
 
