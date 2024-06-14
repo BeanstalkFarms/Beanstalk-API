@@ -118,7 +118,6 @@ class GaugeApyUtil {
     let stalkStart = userStalk.map((s) => s);
     let ownershipStart = userOwnership.map((o) => o);
 
-    // TODO: seed precision?
     for (let i = 0; i < duration; ++i) {
       r = GaugeApyUtil.#updateR(r, GaugeApyUtil.#deltaRFromState(beansPerSeason));
       const rScaled = GaugeApyUtil.#scaleR(r);
@@ -152,7 +151,7 @@ class GaugeApyUtil {
       const gpTotal = NumberUtil.sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
       const avgGsPerBdv = totalStalk / totalBdv - 1;
       const gs = (avgGsPerBdv / catchUpRate) * gaugeBdv;
-      const beanSeeds = (gs / gpTotal) * beanGpPerBdv; //TODO *seedsprecision
+      const beanSeedsGs = (gs / gpTotal) * beanGpPerBdv;
 
       totalStalk += gs + siloReward;
       gaugeBdv += siloReward;
@@ -160,12 +159,12 @@ class GaugeApyUtil {
       beanBdv += siloReward;
 
       for (let j = 0; j < tokens.length; ++j) {
-        let lpSeeds = 0;
+        let lpSeedsGs = 0;
         if (tokens[j] !== -1) {
           if (tokens[j] < 0) {
-            lpSeeds = fromBigInt(staticSeeds[j], PRECISION.seeds);
+            lpSeedsGs = fromBigInt(staticSeeds[j], PRECISION.seeds);
           } else {
-            lpSeeds = (gs / gpTotal) * lpGpPerBdv[tokens[j]]; //TODO *seedsprecision
+            lpSeedsGs = (gs / gpTotal) * lpGpPerBdv[tokens[j]];
           }
         }
 
@@ -173,7 +172,7 @@ class GaugeApyUtil {
         // TODO: need to determine based on inputs whether the user deposit is germinating
         // const userBeanShare = i < 2 ? toBigInt(ZERO_BD, PRECISION) : siloReward.times(userStalk[j]).div(totalStalk);
         const userBeanShare = siloReward * userOwnership[j];
-        userStalk[j] += userBeanShare + userBeans[j] * beanSeeds + userLp[j] * lpSeeds; // TOOD all / seedsprecision
+        userStalk[j] += userBeanShare + userBeans[j] * beanSeedsGs + userLp[j] * lpSeedsGs;
         userBeans[j] += userBeanShare;
         userOwnership[j] = userStalk[j] / totalStalk;
       }

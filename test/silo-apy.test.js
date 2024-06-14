@@ -90,26 +90,26 @@ describe('Pre-Gauge Silo APY', () => {
       }
     );
 
-    expect(apy[0].beanYield).toBeCloseTo(0.24004075085759974);
-    expect(apy[0].stalkYield).toBeCloseTo(1.262114557519065);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(0.7511041890951874);
+    expect(apy[0].beanYield).toBeCloseTo(0.24004075111638348);
+    expect(apy[0].stalkYield).toBeCloseTo(1.2621145577496613);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(0.7511709069463572);
 
-    expect(apy[1].beanYield).toBeCloseTo(0.2883411617711251);
-    expect(apy[1].stalkYield).toBeCloseTo(1.0058229586659946);
-    expect(apy[1].ownershipGrowth).toBeCloseTo(0.5526664099665303);
+    expect(apy[1].beanYield).toBeCloseTo(0.28835009461615935);
+    expect(apy[1].stalkYield).toBeCloseTo(1.0058288057734435);
+    expect(apy[1].ownershipGrowth).toBeCloseTo(0.5527723991483761);
 
     apy = PreGaugeApyUtil.calcApy(1278000000n, ['BEAN'], [3000000n], 3000000n, 1636664801904743831n, 24942000280720n, {
       duration: 720 // 1 month
     });
 
-    expect(apy[0].beanYield).toBeCloseTo(0.006192371144229325);
-    expect(apy[0].stalkYield).toBeCloseTo(0.2228397591012936);
-    expect(apy[0].ownershipGrowth).toBeCloseTo(0.2018846550220293);
+    expect(apy[0].beanYield).toBeCloseTo(0.006192371151397369);
+    expect(apy[0].stalkYield).toBeCloseTo(0.22283975910921727);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(0.20216140896555207);
   });
 });
 
 describe('Gauge Silo APY', () => {
-  it.only('should calculate with required inputs', () => {
+  it('should calculate with required inputs', () => {
     const apy = GaugeApyUtil.calcApy(
       toBigInt(1278, PRECISION.bdv),
       [BEAN, BEANWETH, UNRIPE_BEAN],
@@ -127,7 +127,18 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [null, null, 0n]
     );
-    console.log(apy);
+
+    expect(apy[0].beanYield).toBeCloseTo(0.35084711071357977);
+    expect(apy[0].stalkYield).toBeCloseTo(1.6586973099708102);
+    expect(apy[0].ownershipGrowth).toBeCloseTo(0.9537401121405971);
+
+    expect(apy[1].beanYield).toBeCloseTo(0.4798080252579915);
+    expect(apy[1].stalkYield).toBeCloseTo(3.093009778951926);
+    expect(apy[1].ownershipGrowth).toBeCloseTo(2.007742684559264);
+
+    expect(apy[2].beanYield).toBeCloseTo(0.221615077591919);
+    expect(apy[2].stalkYield).toBeCloseTo(0.22288696036564187);
+    expect(apy[2].ownershipGrowth).toBeCloseTo(-0.10136317582302204);
   });
 });
 
