@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
-      message: 'Internal Server Error.',
+      message: err.showMessage ? err.message : 'Internal Server Error.',
       reference_id: Math.floor(Math.random() * 1000000)
     };
     // Include a reference number in the logs so it can be found easily

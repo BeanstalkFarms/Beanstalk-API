@@ -183,6 +183,39 @@ class BeanstalkSubgraphRepository {
       }`);
     return result.seasons[0]?.sunriseBlock;
   }
+
+  static async getLatestSeason(beanstalk) {
+    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+      {
+        seasons(
+          where: {beanstalk: "${beanstalk}"}
+          orderBy: season
+          orderDirection: desc
+          first: 1
+        ) {
+          season
+        }
+      }`);
+    return result.seasons[0].season;
+  }
+
+  // Returns all tokens that have been whitelisted prior to season.
+  static async getPreviouslyWhitelistedTokens(beanstalk, season) {
+    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+      {
+        silo(
+          id: "${beanstalk}"
+          block: {number: ${await this.getBlockForSeason(beanstalk, season)}}
+        ) {
+          whitelistedTokens
+          dewhitelistedTokens
+        }
+      }`);
+    return {
+      whitelisted: result.silo.whitelistedTokens,
+      all: [...result.silo.whitelistedTokens, ...result.silo.dewhitelistedTokens]
+    };
+  }
 }
 
 module.exports = BeanstalkSubgraphRepository;

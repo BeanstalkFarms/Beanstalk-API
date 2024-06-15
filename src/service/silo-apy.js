@@ -9,11 +9,14 @@ const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
+const InputError = require('../error/input-error');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
 // First sunrise after BIP-45 Seed Gauge was deployed. This is when the APY formula changes
 const GAUGE_SEASON = 21798;
+
+const DEFAULT_WINDOWS = [24, 168, 720];
 
 class SiloApyService {
   /**
@@ -21,15 +24,52 @@ class SiloApyService {
    * @param {GetApyRequest}
    * @returns {Promise<CalcApysResult>}
    */
-  static async getApy({ beanstalk, season, windows, tokens, options }) {
-    beanstalk = (beanstalk ?? BEANSTALK).toLowerCase();
-    windows = windows ?? [24, 168, 720];
+  static async getApy(request) {
+    // Check whether this request is suitable to be serviced from the database directly
+    if (!request.options && (!request.windows || request.windows.every((w) => DEFAULT_WINDOWS.includes(w)))) {
+      console.log('--------');
+      console.log('This info would be in the database!');
+      // Note that some of the requested tokens (i.e. dewhitelisted) might not be stored in the db, not sure yet
+    }
 
-    // TODO: get default current values for seasons and tokens - get from subgraph
-    // season = season ??
+    // Prepare to calculate
+    if (!request.options?.skipValidation) {
+      request = await this.validate(request);
+    }
+    let { beanstalk, season, windows, tokens, options } = request;
     tokens = tokens.map((t) => t.toLowerCase());
+    return await this.calcApy(beanstalk, season, windows, tokens, options);
+  }
 
-    return await SiloApyService.calcApy(beanstalk, season, windows, tokens, options);
+  /**
+   * Validates the get apy request. Validation can be skipped by specifying options.skipValidation.
+   * Skipping validation is more performant and is safe due to this involving readonly operations.
+   * @param {GetApyRequest}
+   * @returns {GetApyRequest}
+   */
+  static async validate({ beanstalk, season, windows, tokens, options }) {
+    beanstalk = (beanstalk ?? BEANSTALK).toLowerCase();
+    windows = windows ?? DEFAULT_WINDOWS;
+
+    // Check whether season/tokens are valid
+    const latestSeason = await BeanstalkSubgraphRepository.getLatestSeason(beanstalk);
+    season = season ?? latestSeason;
+    if (season > latestSeason) {
+      throw new InputError(`Requested season ${season} exceeds the latest on-chain season ${latestSeason}`);
+    }
+
+    const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(beanstalk, season);
+    if (!tokens) {
+      tokens = availableTokens.whitelisted;
+    } else {
+      tokens = tokens.map((t) => t.toLowerCase());
+      for (const token of tokens) {
+        if (!availableTokens.all.includes(token)) {
+          throw new InputError(`Token ${token} is not available for season ${season}`);
+        }
+      }
+    }
+    return { beanstalk, season, windows, tokens, options };
   }
 
   /**
@@ -46,7 +86,7 @@ class SiloApyService {
       season,
       yields: {}
     };
-    const windowEMAs = await SiloApyService.calcWindowEMA(beanstalk, season, windows);
+    const windowEMAs = await this.calcWindowEMA(beanstalk, season, windows);
     if (season < GAUGE_SEASON) {
       const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 
@@ -85,7 +125,7 @@ class SiloApyService {
       for (const token of allTokens) {
         const tokenInfo = sgResult.tokens[token];
         if (!tokenInfo) {
-          throw new Error(`Unrecognized token ${token}`);
+          throw new InputError(`Unrecognized token ${token}`);
         }
 
         if (!tokenInfo.isWhitelisted) {

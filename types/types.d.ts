@@ -48,6 +48,8 @@ export type CalcApyOptions = {
   initUserValues?: Deposit[];
   // The duration for which to calculate the apy (if other than 1 year)
   duration?: number;
+  // Indicates whether any parameter validation should be skipped
+  skipValidation?: number;
 };
 
 export type GetApyRequest = {
