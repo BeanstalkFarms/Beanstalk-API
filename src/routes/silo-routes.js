@@ -18,8 +18,8 @@ router.post('/yield', async (ctx) => {
   /** @type {GetApyRequest} */
   const body = ctx.request.body;
 
-  if (body.windows && (!Array.isArray(body.windows) || body.windows.length === 0)) {
-    ctx.body = { error: 'Invalid `windows` property was provided.' };
+  if (body.emaWindows && (!Array.isArray(body.emaWindows) || body.emaWindows.length === 0)) {
+    ctx.body = { error: 'Invalid `emaWindows` property was provided.' };
     ctx.status = 400;
     return;
   }

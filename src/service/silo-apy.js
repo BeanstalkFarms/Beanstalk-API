@@ -26,7 +26,7 @@ class SiloApyService {
    */
   static async getApy(request) {
     // Check whether this request is suitable to be serviced from the database directly
-    if (!request.options && (!request.windows || request.windows.every((w) => DEFAULT_WINDOWS.includes(w)))) {
+    if (!request.options && (!request.emaWindows || request.emaWindows.every((w) => DEFAULT_WINDOWS.includes(w)))) {
       console.log('--------');
       console.log('This info would be in the database!');
       // Note that some of the requested tokens (i.e. dewhitelisted) might not be stored in the db, not sure yet
@@ -36,9 +36,9 @@ class SiloApyService {
     if (!request.options?.skipValidation) {
       request = await this.validate(request);
     }
-    let { beanstalk, season, windows, tokens, options } = request;
+    let { beanstalk, season, emaWindows, tokens, options } = request;
     tokens = tokens.map((t) => t.toLowerCase());
-    return await this.calcApy(beanstalk, season, windows, tokens, options);
+    return await this.calcApy(beanstalk, season, emaWindows, tokens, options);
   }
 
   /**
@@ -47,9 +47,9 @@ class SiloApyService {
    * @param {GetApyRequest}
    * @returns {GetApyRequest}
    */
-  static async validate({ beanstalk, season, windows, tokens, options }) {
+  static async validate({ beanstalk, season, emaWindows, tokens, options }) {
     beanstalk = (beanstalk ?? BEANSTALK).toLowerCase();
-    windows = windows ?? DEFAULT_WINDOWS;
+    emaWindows = emaWindows ?? DEFAULT_WINDOWS;
 
     // Check whether season/tokens are valid
     const latestSeason = await BeanstalkSubgraphRepository.getLatestSeason(beanstalk);
@@ -69,7 +69,7 @@ class SiloApyService {
         }
       }
     }
-    return { beanstalk, season, windows, tokens, options };
+    return { beanstalk, season, emaWindows, tokens, options };
   }
 
   /**

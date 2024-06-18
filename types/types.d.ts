@@ -55,7 +55,7 @@ export type CalcApyOptions = {
 export type GetApyRequest = {
   beanstalk: string;
   season: number;
-  windows: number[];
+  emaWindows: number[];
   tokens: string[];
   options?: CalcApyOptions;
 };
