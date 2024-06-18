@@ -33,11 +33,6 @@ async function errorWrapper(fn) {
 
 // Activates the requested cron jobs. If a job isn't included in ALL_JOBS, nothing happens
 function activateJobs(jobNames) {
-  if (!jobNames) {
-    console.log('Skipping cron job activation');
-    return;
-  }
-
   let activated = [];
   let failed = [];
 

@@ -10,7 +10,10 @@ const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 
 // Activate whichever cron jobs are configured, if any
-activateJobs(process.env.ENABLED_CRON_JOBS?.split(','));
+const cronJobs = process.env.ENABLED_CRON_JOBS?.split(',');
+if (cronJobs && (cronJobs.length > 1 || cronJobs[0] != '')) {
+  activateJobs(cronJobs);
+}
 
 const app = new Koa();
 
