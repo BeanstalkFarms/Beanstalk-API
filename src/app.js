@@ -1,3 +1,4 @@
+require('dotenv').config();
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
