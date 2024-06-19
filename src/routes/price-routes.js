@@ -11,7 +11,7 @@ const router = new Router({
  * ?blockNumber: gets the price at the specified block number
  * ?timestamp: gets the price at the specified timestamp
  */
-router.get('/', async ctx => {
+router.get('/', async (ctx) => {
   const options = RestParsingUtil.parseQuery(ctx.query);
   const price = await getBeanPrice(options);
   ctx.body = price;

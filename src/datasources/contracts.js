@@ -20,5 +20,5 @@ async function getContractAsync(address, blockNumber) {
 module.exports = {
   asyncBeanstalkContractGetter: async (blockNumber = 0) => getContractAsync(BEANSTALK, blockNumber),
   asyncPriceV1ContractGetter: async (blockNumber = 0) => getContractAsync(BEANSTALK_PRICE, blockNumber),
-  asyncUsdOracleContractGetter: async (blockNumber = 0) => getContractAsync(USD_ORACLE, blockNumber),
-}
+  asyncUsdOracleContractGetter: async (blockNumber = 0) => getContractAsync(USD_ORACLE, blockNumber)
+};

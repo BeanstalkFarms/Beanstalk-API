@@ -10,7 +10,7 @@ const router = new Router({
  * Gets basin tickers according to the coingecko api integration specification
  * https://docs.google.com/document/d/1v27QFoQq1SKT3Priq3aqPgB70Xd_PnDzbOCiuoCyixw/edit
  */
-router.get('/tickers', async ctx => {
+router.get('/tickers', async (ctx) => {
   const options = RestParsingUtil.parseQuery(ctx.query);
   const tickers = await getTickers(options);
   ctx.body = tickers;
@@ -20,10 +20,10 @@ router.get('/tickers', async ctx => {
  * Gets basin historical trades according to the coingecko api integration specification
  * https://docs.google.com/document/d/1v27QFoQq1SKT3Priq3aqPgB70Xd_PnDzbOCiuoCyixw/edit
  */
-router.get('/historical_trades', async ctx => {
+router.get('/historical_trades', async (ctx) => {
   const options = RestParsingUtil.parseQuery(ctx.query);
   if (!options.ticker_id) {
-    ctx.body = { error: "Required parameter not provided" };
+    ctx.body = { error: 'Required parameter not provided' };
     ctx.status = 400;
     return;
   }
@@ -31,7 +31,9 @@ router.get('/historical_trades', async ctx => {
   // Defaults for optional variables
   options.limit = options.limit ?? 500;
   options.end_time = Math.floor((options.end_time ?? new Date()).getTime() / 1000);
-  options.start_time = Math.floor((options.start_time?.getTime() ?? options.end_time * 1000 - (7 * 24 * 60 * 60 * 1000)) / 1000);
+  options.start_time = Math.floor(
+    (options.start_time?.getTime() ?? options.end_time * 1000 - 7 * 24 * 60 * 60 * 1000) / 1000
+  );
 
   const trades = await getTrades(options);
   ctx.body = trades;

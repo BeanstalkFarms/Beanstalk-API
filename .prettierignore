@@ -1,0 +1,8 @@
+node_modules/
+.github
+docker
+
+*.json
+api-spec.yaml
+.gitignore
+README.md

@@ -8,8 +8,8 @@ const router = new Router({
  * Gets the current status of the requested subgraphs
  * ?env=(prod | dev | testing | decentralized). Comma separated for multiple. Defaults to "prod,decentralized"
  */
-router.get('/status', async ctx => {
-  const env = (ctx.query.env ?? 'prod,decentralized').split(',').map(item => item.trim());
+router.get('/status', async (ctx) => {
+  const env = (ctx.query.env ?? 'prod,decentralized').split(',').map((item) => item.trim());
 
   const statuses = await SubgraphService.getStatuses(env);
   ctx.body = statuses;

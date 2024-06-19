@@ -1,3 +1,4 @@
+require('dotenv').config();
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
@@ -7,17 +8,26 @@ const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
+const { activateJobs } = require('./scheduled/cron-schedule.js');
+
+// Activate whichever cron jobs are configured, if any
+const cronJobs = process.env.ENABLED_CRON_JOBS?.split(',');
+if (cronJobs && (cronJobs.length > 1 || cronJobs[0] != '')) {
+  activateJobs(cronJobs);
+}
 
 const app = new Koa();
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: '*'
+  })
+);
 
 app.use(bodyParser());
 
 app.use(async (ctx, next) => {
-  if (!ctx.originalUrl.includes("healthcheck")) {
+  if (!ctx.originalUrl.includes('healthcheck')) {
     const requestInfo = `${new Date().toISOString()} [request] ${ctx.method} ${ctx.originalUrl}`;
     const requestBody = `${Array.isArray(ctx.request.body) ? 'array' : 'object'} ${JSON.stringify(ctx.request.body)}`;
     console.log(`${requestInfo} - Request Body: ${requestBody}`);
@@ -25,13 +35,15 @@ app.use(async (ctx, next) => {
   try {
     await next(); // pass control to the next function specified in .use()
     const responseBody = JSON.stringify(ctx.body);
-    if (!ctx.originalUrl.includes("healthcheck")) {
-      console.log(`${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`);
+    if (!ctx.originalUrl.includes('healthcheck')) {
+      console.log(
+        `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`
+      );
     }
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
-      message: 'Internal Server Error.',
+      message: err.showMessage ? err.message : 'Internal Server Error.',
       reference_id: Math.floor(Math.random() * 1000000)
     };
     // Include a reference number in the logs so it can be found easily
@@ -52,8 +64,8 @@ app.use(subgraphRoutes.routes());
 app.use(subgraphRoutes.allowedMethods());
 
 const router = new Router();
-router.get('/healthcheck', async ctx => {
-  ctx.body = "healthy";
+router.get('/healthcheck', async (ctx) => {
+  ctx.body = 'healthy';
 });
 
 app.use(router.routes());
