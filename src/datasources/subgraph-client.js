@@ -5,10 +5,10 @@ const fs = require('fs');
 const BASE_URL = 'https://graph.node.bean.money/subgraphs/name/';
 const STATUS_URL = 'http://graph.node.bean.money:8030/graphql';
 const SLUGS = [
-  process.env.SG_BEANSTALK ?? 'beanstalk',
-  process.env.SG_BEAN ?? 'bean',
-  process.env.SG_BASIN ?? 'basin',
-  process.env.SG_BEANFT ?? 'beanft'
+  (process.env.SG_BEANSTALK ?? '') !== '' ? process.env.SG_BEANSTALK : 'beanstalk',
+  (process.env.SG_BEAN ?? '') !== '' ? process.env.SG_BEAN : 'bean',
+  (process.env.SG_BASIN ?? '') !== '' ? process.env.SG_BASIN : 'basin',
+  (process.env.SG_BEANFT ?? '') !== '' ? process.env.SG_BEANFT : 'beanft'
 ];
 
 const DECENTRALIZED_BEANSTALK = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/CQgB9aDyd13X6rUtJcCWr8KtFpGGRMifu1mM6k4xQ9YA`;

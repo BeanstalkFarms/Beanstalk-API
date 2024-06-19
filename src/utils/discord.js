@@ -5,7 +5,7 @@ const axios = require('axios');
 async function sendWebhookMessage(message) {
   const webhookUrls = process.env.DISCORD_NOTIFICATION_WEBHOOKS?.split(',');
   if (webhookUrls) {
-    let prefix = process.env.DISCORD_NOTIFICATION_TAGS ? process.env.DISCORD_NOTIFICATION_TAGS + '\n' : '';
+    let prefix = process.env.DISCORD_NOTIFICATION_PREFIX ? process.env.DISCORD_NOTIFICATION_PREFIX + '\n' : '';
     await Promise.all(
       webhookUrls.map(async (url) => {
         await axios.post(url, {
