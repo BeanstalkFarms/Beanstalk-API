@@ -1,5 +1,5 @@
 const contracts = {
-  BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, require('../datasources/abi/Beanstalk-BIP44.json')],
+  BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, require('../datasources/abi/Beanstalk-BIP45.json')],
   BEANSTALK_PRICE: [
     '0xb01CE0008CaD90104651d6A84b6B11e182a9B62A',
     null,
