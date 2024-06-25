@@ -1,6 +1,5 @@
 const { BigNumber } = require('alchemy-sdk');
 const SubgraphClients = require('../datasources/subgraph-client');
-const { getConstantProductPrice } = require('../utils/pool/constant-product');
 const BlockUtil = require('../utils/block');
 const { calcPoolLiquidityUSD } = require('../utils/pool/liquidity');
 const { createNumberSpread } = require('../utils/number');
@@ -25,7 +24,7 @@ class CoingeckoService {
       const token0 = well.tokens[0].id;
       const token1 = well.tokens[1].id;
 
-      const poolPrice = getConstantProductPrice(
+      const poolPrice = ConstantProductUtil.getConstantProductPrice(
         well.reserves,
         well.tokens.map((t) => t.decimals)
       );
@@ -76,7 +75,7 @@ class CoingeckoService {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: getConstantProductPrice(
+        price: ConstantProductUtil.getConstantProductPrice(
           [swap.amountIn, swap.amountOut],
           [swap.fromToken.decimals, swap.toToken.decimals]
         ).float[0],
