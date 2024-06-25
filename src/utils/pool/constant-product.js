@@ -1,11 +1,15 @@
 const { BigNumber } = require('alchemy-sdk');
 const NumberUtil = require('../number');
-const { TEN_BN } = require('../../constants/constants');
+const { TEN_BN, ZERO_BN } = require('../../constants/constants');
 
 class ConstantProductUtil {
   // Given the reserves, returns the current price of each token in a constant product pool
   // The prices returned are in terms of the other token
   static getConstantProductPrice(reserves, decimals) {
+    if (ZERO_BN.eq(reserves[0]) || ZERO_BN.eq(reserves[1])) {
+      return NumberUtil.createNumberSpread([ZERO_BN, ZERO_BN], [decimals[1], decimals[0]]);
+    }
+
     const precision = decimals.map((d) => TEN_BN.pow(d));
 
     const token0Price = reserves[1].mul(precision[0]).div(reserves[0]);
