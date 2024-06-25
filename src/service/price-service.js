@@ -53,7 +53,11 @@ class PriceService {
     } else if (token === WETH) {
       return PriceService.getEthPrice;
     }
-    throw new Error('Price not implemented for the requested token.');
+    return () => ({
+      token: token,
+      usdPrice: 0
+    });
+    // throw new Error('Price not implemented for the requested token.');
   }
 }
 
