@@ -1,13 +1,16 @@
-jest.mock('../src/datasources/contracts', () => ({
-  ...jest.requireActual('../src/datasources/contracts'),
+jest.mock('../../src/datasources/contracts/contracts', () => ({
+  ...jest.requireActual('../../src/datasources/contracts/contracts'),
   asyncPriceV1ContractGetter: jest.fn(),
   asyncUsdOracleContractGetter: jest.fn()
 }));
-const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require('../src/datasources/contracts');
+const {
+  asyncPriceV1ContractGetter,
+  asyncUsdOracleContractGetter
+} = require('../../src/datasources/contracts/contracts');
 
-const BlockUtil = require('../src/utils/block');
+const BlockUtil = require('../../src/utils/block');
 
-const { getBeanPrice, getEthPrice } = require('../src/service/price-service');
+const { getBeanPrice, getEthPrice } = require('../../src/service/price-service');
 const { BigNumber } = require('alchemy-sdk');
 
 const defaultOptions = { blockNumber: 19000000 };

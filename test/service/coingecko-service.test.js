@@ -1,6 +1,6 @@
-const SubgraphClients = require('../src/datasources/subgraph-client');
+const SubgraphClients = require('../../src/datasources/subgraph-client');
 
-const BlockUtil = require('../src/utils/block');
+const BlockUtil = require('../../src/utils/block');
 jest.spyOn(BlockUtil, 'blockForSubgraphFromOptions').mockResolvedValue({ number: 19000000, timestamp: 1705173443 });
 
 const {
@@ -9,10 +9,10 @@ const {
   getWellPriceRange,
   getTrades,
   get24hVolume
-} = require('../src/service/coingecko-service');
-const { BEANWETH, WETH, BEAN } = require('../src/constants/addresses');
+} = require('../../src/service/coingecko-service');
+const { BEANWETH, WETH, BEAN } = require('../../src/constants/addresses');
 const { BigNumber } = require('alchemy-sdk');
-const SubgraphQueryUtil = require('../src/utils/subgraph-query');
+const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {

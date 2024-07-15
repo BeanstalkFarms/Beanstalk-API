@@ -1,5 +1,4 @@
-const { BigNumber } = require('alchemy-sdk');
-const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require('../datasources/contracts');
+const Contracts = require('../datasources/contracts/contracts');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const { BEAN, WETH } = require('../constants/addresses');
@@ -15,7 +14,7 @@ class PriceService {
   // Gets the price of bean as returned by the canonical price contract.
   static async getBeanPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const priceContract = await asyncPriceV1ContractGetter();
+    const priceContract = await Contracts.asyncPriceV1ContractGetter();
     const priceResult = await priceContract.callStatic.price({ blockTag: block.number });
 
     // Convert from hex to a readable format. For now the pool prices are omitted
@@ -33,7 +32,7 @@ class PriceService {
   // In practice, current implementation of getUsdPrice can only get the eth price
   static async getEthPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const usdOracle = await asyncUsdOracleContractGetter();
+    const usdOracle = await Contracts.asyncUsdOracleContractGetter();
     const result = await usdOracle.callStatic.getUsdPrice(WETH, { blockTag: block.number });
     // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion
     const instPrice = TEN_BN.pow(24).div(result);

@@ -1,14 +1,10 @@
-jest.mock('../src/datasources/contracts', () => ({
-  ...jest.requireActual('../src/datasources/contracts'),
-  asyncBeanstalkContractGetter: jest.fn()
-}));
 const { BigNumber } = require('alchemy-sdk');
-const { asyncBeanstalkContractGetter } = require('../src/datasources/contracts');
-const { TEN_BN, MILESTONE, ZERO_BN } = require('../src/constants/constants');
-const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../src/service/silo-service');
-const BlockUtil = require('../src/utils/block');
-const subgraphClient = require('../src/datasources/subgraph-client');
-const { BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP } = require('../src/constants/addresses');
+const Contracts = require('../../src/datasources/contracts/contracts');
+const { TEN_BN, MILESTONE, ZERO_BN } = require('../../src/constants/constants');
+const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../../src/service/silo-service');
+const BlockUtil = require('../../src/utils/block');
+const subgraphClient = require('../../src/datasources/subgraph-client');
+const { BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP } = require('../../src/constants/addresses');
 
 const defaultOptions = { blockNumber: 19000000 };
 
@@ -35,7 +31,7 @@ describe('SiloService', () => {
       }
     };
 
-    asyncBeanstalkContractGetter.mockResolvedValue(mockBeanstalk);
+    jest.spyOn(Contracts, 'asyncBeanstalkContractGetter').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
     // console.log(grownStalk);
@@ -72,7 +68,7 @@ describe('SiloService', () => {
       }
     };
 
-    asyncBeanstalkContractGetter.mockResolvedValue(mockBeanstalk);
+    jest.spyOn(Contracts, 'asyncBeanstalkContractGetter').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getUnmigratedGrownStalk(accounts, defaultOptions);
     // console.log(JSON.stringify(grownStalk));

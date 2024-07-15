@@ -1,6 +1,6 @@
 const { BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
 const { MILESTONE } = require('../constants/constants');
-const { asyncBeanstalkContractGetter } = require('../datasources/contracts');
+const Contracts = require('../datasources/contracts/contracts');
 const subgraphClient = require('../datasources/subgraph-client');
 const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
@@ -9,7 +9,7 @@ const { createNumberSpread } = require('../utils/number');
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await asyncBeanstalkContractGetter(block.number);
+    const beanstalk = await Contracts.asyncBeanstalkContractGetter(block.number);
 
     // TODO: when subgraph-beanstalk2.2.0 is deployed, get whitelisted + dewhitelisted from there instead
     const siloAssets = [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP];
@@ -49,7 +49,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await asyncBeanstalkContractGetter(block.number);
+    const beanstalk = await Contracts.asyncBeanstalkContractGetter(block.number);
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
