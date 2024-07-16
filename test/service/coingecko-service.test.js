@@ -16,9 +16,9 @@ const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
-    const wellsResponse = require('./mock-responses/subgraph/coingecko/tickers_1.json');
+    const wellsResponse = require('../mock-responses/subgraph/coingecko/tickers_1.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
-    const wellVolumeResponse = require('./mock-responses/subgraph/coingecko/tickers_2.json');
+    const wellVolumeResponse = require('../mock-responses/subgraph/coingecko/tickers_2.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
     const tickers = await getTickers({ blockNumber: 19000000 });
@@ -40,7 +40,7 @@ describe('CoingeckoService', () => {
   });
 
   it('should get 24h token volume from subgraph calculation', async () => {
-    const wellVolumeResponse = require('./mock-responses/subgraph/coingecko/tickers_2.json');
+    const wellVolumeResponse = require('../mock-responses/subgraph/coingecko/tickers_2.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
     const volume = await get24hVolume(BEANWETH, 19000000);
@@ -49,7 +49,7 @@ describe('CoingeckoService', () => {
   });
 
   it('should calculate token volume in the well (calculated directly from swaps only)', async () => {
-    const wellsResponse = require('./mock-responses/subgraph/coingecko/swapVolume.json');
+    const wellsResponse = require('../mock-responses/subgraph/coingecko/swapVolume.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
 
     const volume = await calcWellSwapVolume(BEANWETH, 1715020584);
@@ -58,11 +58,11 @@ describe('CoingeckoService', () => {
   });
 
   it('should calculate high/low prices over the given period', async () => {
-    const swapsResponse = require('./mock-responses/subgraph/coingecko/swaps.json');
+    const swapsResponse = require('../mock-responses/subgraph/coingecko/swaps.json');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(swapsResponse);
-    const depositResponse = require('./mock-responses/subgraph/coingecko/deposits.json');
+    const depositResponse = require('../mock-responses/subgraph/coingecko/deposits.json');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(depositResponse);
-    const withdrawResponse = require('./mock-responses/subgraph/coingecko/withdrawals.json');
+    const withdrawResponse = require('../mock-responses/subgraph/coingecko/withdrawals.json');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(withdrawResponse);
 
     const tokens = [
@@ -88,10 +88,10 @@ describe('CoingeckoService', () => {
   it('should return swap history', async () => {
     jest
       .spyOn(SubgraphClients, 'basinSG')
-      .mockResolvedValueOnce(require('./mock-responses/subgraph/coingecko/wells.json'));
+      .mockResolvedValueOnce(require('../mock-responses/subgraph/coingecko/wells.json'));
     jest
       .spyOn(SubgraphClients, 'basinSG')
-      .mockResolvedValueOnce(require('./mock-responses/subgraph/coingecko/swapHistory.json'));
+      .mockResolvedValueOnce(require('../mock-responses/subgraph/coingecko/swapHistory.json'));
 
     const options = {
       ticker_id: `${BEAN}_${WETH}`,
