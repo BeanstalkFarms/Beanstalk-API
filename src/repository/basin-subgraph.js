@@ -14,6 +14,7 @@ class BasinSubgraphRepository {
             id
             decimals
           }
+          tokenOrder
           reserves
           symbol
         }
@@ -24,6 +25,7 @@ class BasinSubgraphRepository {
       [' '],
       'asc'
     );
+    allWells.forEach(this.orderTokens);
     allWells.map((well) => (well.reserves = well.reserves.map(BigNumber.from)));
     return allWells;
   }
@@ -36,8 +38,10 @@ class BasinSubgraphRepository {
           tokens {
             id
           }
+          tokenOrder
         }
       }`);
+    pairWells.wells.forEach(this.orderTokens);
     return pairWells.wells;
   }
 
@@ -165,13 +169,27 @@ class BasinSubgraphRepository {
           tokens {
             decimals
           }
+          tokenOrder
           rollingDailyBiTradeVolumeReserves
         }
       }`);
+    result.wells.forEach(this.orderTokens);
     return result.wells[0].tokens.map((t, idx) => ({
       bn: BigNumber.from(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
       decimals: t.decimals
     }));
+  }
+
+  // Orders the tokens within the provided well. Minimal fields required are `tokens` and `tokenOrder`.
+  static orderTokens(well) {
+    if (!well.tokens || !well.tokenOrder) {
+      throw new Error(`Can't order tokens with the provided fields.`);
+    }
+    const tokenOrderMap = well.tokenOrder.reduce((a, next, idx) => {
+      a[next] = idx;
+      return a;
+    }, {});
+    well.tokens.sort((a, b) => tokenOrderMap[a.id] - tokenOrderMap[b.id]);
   }
 }
 
