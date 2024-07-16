@@ -1,4 +1,4 @@
-const { BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
+const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
 const { MILESTONE } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const subgraphClient = require('../datasources/subgraph-client');
@@ -11,8 +11,11 @@ class SiloService {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
     const beanstalk = await ContractGetters.asyncBeanstalkContractGetter(block.number);
 
-    // TODO: when subgraph-beanstalk2.2.0 is deployed, get whitelisted + dewhitelisted from there instead
-    const siloAssets = [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP];
+    const siloAssets = (
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+        block: block.number
+      })
+    ).all;
     const retval = {
       total: 0,
       accounts: []
@@ -54,7 +57,11 @@ class SiloService {
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
     const depositedBdvs = await BeanstalkSubgraphRepository.getDepositedBdvs(accounts, block.number);
-    const siloAssets = [BEAN, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP].map((s) => s.toLowerCase());
+    const siloAssets = (
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+        block: block.number
+      })
+    ).all;
 
     const stemDeltas = [];
     for (const asset of siloAssets) {
