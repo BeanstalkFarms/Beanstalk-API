@@ -6,6 +6,7 @@ const { createNumberSpread } = require('../utils/number');
 const { ZERO_BN } = require('../constants/constants');
 const ConstantProductUtil = require('../utils/pool/constant-product');
 const BasinSubgraphRepository = require('../repository/basin-subgraph');
+const { runBatchPromises } = require('../utils/batch-promise');
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -17,39 +18,41 @@ class CoingeckoService {
     // Retrieve results from Basin subgraph
     const allWells = await BasinSubgraphRepository.getAllWells(block.number);
 
-    const allTickers = [];
-
     // For each well in the subgraph, construct a formatted response
+    const batchPromiseGenerators = [];
     for (const well of allWells) {
-      const token0 = well.tokens[0].id;
-      const token1 = well.tokens[1].id;
+      batchPromiseGenerators.push(async () => {
+        const token0 = well.tokens[0].id;
+        const token1 = well.tokens[1].id;
 
-      const poolPrice = ConstantProductUtil.getConstantProductPrice(
-        well.reserves,
-        well.tokens.map((t) => t.decimals)
-      );
-      const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
-        calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
-        CoingeckoService.get24hVolume(well.id, block.number),
-        CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
-      ]);
+        const poolPrice = ConstantProductUtil.getConstantProductPrice(
+          well.reserves,
+          well.tokens.map((t) => t.decimals)
+        );
+        const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
+          calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
+          CoingeckoService.get24hVolume(well.id, block.number),
+          CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
+        ]);
 
-      const ticker = {
-        ticker_id: `${token0}_${token1}`,
-        base_currency: token0,
-        target_currency: token1,
-        pool_id: well.id,
-        last_price: poolPrice.float[0],
-        base_volume: pool24hVolume.float[0],
-        target_volume: pool24hVolume.float[1],
-        liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
-        high: priceRange.high.float[0],
-        low: priceRange.low.float[0]
-      };
-
-      allTickers.push(ticker);
+        const ticker = {
+          ticker_id: `${token0}_${token1}`,
+          base_currency: token0,
+          target_currency: token1,
+          pool_id: well.id,
+          last_price: poolPrice.float[0],
+          base_volume: pool24hVolume.float[0],
+          target_volume: pool24hVolume.float[1],
+          liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
+          high: priceRange.high.float[0],
+          low: priceRange.low.float[0]
+        };
+        return ticker;
+      });
     }
-    return allTickers;
+
+    // Execute the above promises
+    return await runBatchPromises(batchPromiseGenerators, 50);
   }
 
   static async getTrades(options) {
