@@ -17,11 +17,11 @@ const SubgraphQueryUtil = require('../src/utils/subgraph-query');
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
     const wellsResponse = JSON.parse(
-      '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18}],"reserves":["13776890377201","5362472327552046319200"],"symbol":"BEANWETHCP2w"}]}'
+      '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","decimals":6},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","decimals":18}],"tokenOrder":["0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],"reserves":["13776890377201","5362472327552046319200"],"symbol":"BEANWETHCP2w"}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
     const wellVolumeResponse = JSON.parse(
-      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
+      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"tokenOrder":["0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
@@ -45,7 +45,7 @@ describe('CoingeckoService', () => {
 
   it('should get 24h token volume from subgraph calculation', async () => {
     const wellVolumeResponse = JSON.parse(
-      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
+      '{"wells":[{"tokens":[{"decimals":6},{"decimals":18}],"tokenOrder":["0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],"rollingDailyBiTradeVolumeReserves":["362621652657","141018008931221259484"]}]}'
     );
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
@@ -104,7 +104,7 @@ describe('CoingeckoService', () => {
       .spyOn(SubgraphClients, 'basinSG')
       .mockResolvedValueOnce(
         JSON.parse(
-          '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}]}]}'
+          '{"wells":[{"id":"0xbea0e11282e2bb5893bece110cf199501e872bad","tokens":[{"id":"0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}],"tokenOrder":["0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]}]}'
         )
       );
     jest
