@@ -1,17 +1,8 @@
-jest.mock('../../src/datasources/contracts/contracts', () => ({
-  ...jest.requireActual('../../src/datasources/contracts/contracts'),
-  asyncPriceV1ContractGetter: jest.fn(),
-  asyncUsdOracleContractGetter: jest.fn()
-}));
-const {
-  asyncPriceV1ContractGetter,
-  asyncUsdOracleContractGetter
-} = require('../../src/datasources/contracts/contracts');
-
 const BlockUtil = require('../../src/utils/block');
 
 const { getBeanPrice, getEthPrice } = require('../../src/service/price-service');
 const { BigNumber } = require('alchemy-sdk');
+const ContractGetters = require('../../src/datasources/contracts/contract-getters');
 
 const defaultOptions = { blockNumber: 19000000 };
 
@@ -34,7 +25,7 @@ describe('PriceService', () => {
         })
       }
     };
-    asyncPriceV1ContractGetter.mockResolvedValue(mockPrice);
+    jest.spyOn(ContractGetters, 'asyncPriceContractGetter').mockResolvedValue(mockPrice);
 
     const price = await getBeanPrice(defaultOptions);
     expect(price.usdPrice).toEqual(0.9977);
@@ -48,7 +39,7 @@ describe('PriceService', () => {
         getUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('390100082091451'))
       }
     };
-    asyncUsdOracleContractGetter.mockResolvedValue(mockPrice);
+    jest.spyOn(ContractGetters, 'asyncUsdOracleContractGetter').mockResolvedValue(mockPrice);
 
     const price = await getEthPrice(defaultOptions);
     expect(price.usdPrice).toBeCloseTo(2563.44);

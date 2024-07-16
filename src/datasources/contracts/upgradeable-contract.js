@@ -14,7 +14,15 @@ class UpgradeableContract {
     this.__defaultBlock = defaultBlock;
 
     const proxyHandler = {
-      get: (target, property) => {
+      get: (target, property, receiver) => {
+        if (property === 'then') {
+          return undefined;
+        }
+        if (property === 'callStatic') {
+          // Allows legacy invocations to not require being updated to remove callStatic property
+          return receiver;
+        }
+
         if (!target.__block) {
           // A block has not been selected yet
           const isLeadingNumeric = property.charCodeAt(0) >= 48 && property.charCodeAt(0) <= 57;
