@@ -1,6 +1,6 @@
 const BlockUtil = require('../../src/utils/block');
 
-const { getBeanPrice, getEthPrice } = require('../../src/service/price-service');
+const { getBeanPrice, getUsdOracleTokenPrice } = require('../../src/service/price-service');
 const { BigNumber } = require('alchemy-sdk');
 const ContractGetters = require('../../src/datasources/contracts/contract-getters');
 
@@ -33,15 +33,21 @@ describe('PriceService', () => {
     expect(price.deltaB).toEqual(-16781);
   });
 
-  it('should fetch and format WETH price correctly', async () => {
-    mockPrice = {
+  it('should fetch and format USDOracle price correctly', async () => {
+    mockUsdOracle = {
       callStatic: {
-        getUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('390100082091451'))
-      }
+        getUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('390100082091451')),
+        getTokenUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('3403121673'))
+      },
+      __version: jest.fn().mockReturnValue(1)
     };
-    jest.spyOn(ContractGetters, 'asyncUsdOracleContractGetter').mockResolvedValue(mockPrice);
+    jest.spyOn(ContractGetters, 'asyncUsdOracleContractGetter').mockResolvedValue(mockUsdOracle);
 
-    const price = await getEthPrice(defaultOptions);
+    const price = await getUsdOracleTokenPrice(defaultOptions);
     expect(price.usdPrice).toBeCloseTo(2563.44);
+
+    mockUsdOracle.__version.mockReturnValue(2);
+    const price2 = await getUsdOracleTokenPrice({ blockNumber: 20334285 });
+    expect(price2.usdPrice).toBeCloseTo(3403.12);
   });
 });

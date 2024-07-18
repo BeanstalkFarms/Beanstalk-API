@@ -13,6 +13,22 @@ const priceMapping = [
   }
 ];
 
+const usdOracleMapping = [
+  {
+    start: 18466741,
+    end: 20334284,
+    address: '0x1aa19ed7dfc555e4644c9353ad383c33024855f7',
+    abi: require('../abi/UsdOracle1.json')
+  },
+  {
+    start: 20334284,
+    end: 'latest',
+    address: '0xb24a70b71e4cca41eb114c2f61346982aa774180',
+    abi: require('../abi/UsdOracle2.json')
+  }
+];
+
 module.exports = {
-  priceMapping
+  priceMapping,
+  usdOracleMapping
 };

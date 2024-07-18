@@ -1,8 +1,8 @@
-const { BEANSTALK, USD_ORACLE } = require('../../constants/addresses.js');
+const { BEANSTALK } = require('../../constants/addresses.js');
 const { providerThenable } = require('../alchemy.js');
 const Contracts = require('./contracts.js');
 const UpgradeableContract = require('./upgradeable-contract.js');
-const { priceMapping } = require('./upgradeable-mappings.js');
+const { priceMapping, usdOracleMapping } = require('./upgradeable-mappings.js');
 
 class ContractGetters {
   /// Regular Contracts
@@ -10,11 +10,11 @@ class ContractGetters {
     return Contracts.getContractAsync(BEANSTALK, blockNumber, await providerTh);
   }
 
-  static async asyncUsdOracleContractGetter(blockNumber = 0, providerTh = providerThenable) {
-    return Contracts.getContractAsync(USD_ORACLE, blockNumber, await providerTh);
+  /// Upgradeable Contracts
+  static async asyncUsdOracleContractGetter(blockNumber = 'latest', providerTh = providerThenable) {
+    return new UpgradeableContract(usdOracleMapping, await providerTh, blockNumber);
   }
 
-  /// Upgradeable Contracts
   static async asyncPriceContractGetter(blockNumber = 'latest', providerTh = providerThenable) {
     return new UpgradeableContract(priceMapping, await providerTh, blockNumber);
   }

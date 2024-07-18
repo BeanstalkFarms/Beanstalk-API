@@ -12,6 +12,7 @@ class UpgradeableContract {
    */
   constructor(mapping, provider, defaultBlock = 'latest') {
     this.__defaultBlock = defaultBlock;
+    this.__mapping = mapping;
 
     const proxyHandler = {
       get: (target, property, receiver) => {
@@ -21,6 +22,10 @@ class UpgradeableContract {
         if (property === 'callStatic') {
           // Allows legacy invocations to not require being updated to remove callStatic property
           return receiver;
+        }
+        if (['__mapping', '__defaultBlock', '__version'].includes(property)) {
+          // Don't proxy explicitly defined members on this class
+          return target[property];
         }
 
         if (!target.__block) {
@@ -54,6 +59,16 @@ class UpgradeableContract {
     };
 
     return new Proxy(this, proxyHandler);
+  }
+
+  // Returns a version number for this contract at the requested block
+  __version(block = this.__defaultBlock) {
+    for (let i = 0; i < this.__mapping.length; ++i) {
+      if (this.__mapping[i].start <= block && (this.__mapping[i].end > block || this.__mapping[i].end === 'latest')) {
+        return i + 1;
+      }
+    }
+    return -1;
   }
 }
 
