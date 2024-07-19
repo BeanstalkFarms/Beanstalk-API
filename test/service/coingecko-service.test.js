@@ -112,9 +112,4 @@ describe('CoingeckoService', () => {
     expect(trades.buy[0].trade_timestamp).toEqual(1714613735000);
     expect(trades.buy[0].type).toEqual('buy');
   });
-
-  it('should omit wells with < 1k liquidity', async () => {
-    // TODO
-    throw new Error('Not Implemented');
-  });
 });
