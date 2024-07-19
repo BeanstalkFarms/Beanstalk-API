@@ -39,16 +39,16 @@ class ConstantProductUtil {
     const token1AfterSold = reserves[1].mul(sqrtPrecision).div(negSqrt);
     const token1AfterBought = reserves[1].mul(sqrtPrecision).div(posSqrt);
 
-    return [
-      {
-        buy: NumberUtil.createNumberSpread(reserves[0].sub(token0AfterBought), decimals[0]),
-        sell: NumberUtil.createNumberSpread(token0AfterSold.sub(reserves[0]), decimals[0])
-      },
-      {
-        buy: NumberUtil.createNumberSpread(reserves[1].sub(token1AfterBought), decimals[1]),
-        sell: NumberUtil.createNumberSpread(token1AfterSold.sub(reserves[1]), decimals[1])
-      }
-    ];
+    return {
+      buy: NumberUtil.createNumberSpread(
+        [reserves[0].sub(token0AfterBought), reserves[1].sub(token1AfterBought)],
+        decimals
+      ),
+      sell: NumberUtil.createNumberSpread(
+        [token0AfterSold.sub(reserves[0]), token1AfterSold.sub(reserves[1])],
+        decimals
+      )
+    };
   }
 
   static calcMissingReserve(originalReserves, knownReserve) {

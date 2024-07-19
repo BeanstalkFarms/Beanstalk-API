@@ -29,6 +29,11 @@ class CoingeckoService {
           well.reserves,
           well.tokens.map((t) => t.decimals)
         );
+        const depth2 = ConstantProductUtil.calcDepth(
+          well.reserves,
+          well.tokens.map((t) => t.decimals),
+          2
+        );
         const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
           calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
           CoingeckoService.get24hVolume(well.id, block.number),
@@ -44,6 +49,10 @@ class CoingeckoService {
           base_volume: pool24hVolume.float[0],
           target_volume: pool24hVolume.float[1],
           liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
+          depth2: {
+            buy: [depth2.buy.float[0], depth2.buy.float[1]],
+            sell: [depth2.sell.float[0], depth2.sell.float[1]]
+          },
           high: priceRange.high.float[0],
           low: priceRange.low.float[0]
         };

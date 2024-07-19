@@ -82,15 +82,15 @@ describe('Utils', () => {
 
     const priceAfterBuy0 = ConstantProductUtil.calcPrice(
       [
-        reserves[0].sub(depth[0].buy.bn),
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[0].sub(depth[0].buy.bn))
+        reserves[0].sub(depth.buy.bn[0]),
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[0].sub(depth.buy.bn[0]))
       ],
       decimals
     );
     const priceAfterSell1 = ConstantProductUtil.calcPrice(
       [
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[1].add(depth[1].sell.bn)),
-        reserves[1].add(depth[1].sell.bn)
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[1].add(depth.sell.bn[1])),
+        reserves[1].add(depth.sell.bn[1])
       ],
       decimals
     );
