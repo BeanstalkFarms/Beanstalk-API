@@ -25,15 +25,19 @@ class ConstantProductUtil {
   // x2/y2 = (1 +/- percent)x1/y1
   static calcDepth(reserves, decimals, percent = 2) {
     const sqrtPrecision = TEN_BN.pow(15);
-    const buy0Sqrt = BigNumber.from(Math.round(Math.sqrt((100 - percent) / 100) * Math.pow(10, 15)));
-    const sell0Sqrt = BigNumber.from(Math.round(Math.sqrt((100 + percent) / 100) * Math.pow(10, 15)));
+    // For negative/positive depths
+    const negSqrt = BigNumber.from(Math.round(Math.sqrt((100 - percent) / 100) * Math.pow(10, 15)));
+    const posSqrt = BigNumber.from(Math.round(Math.sqrt((100 + percent) / 100) * Math.pow(10, 15)));
 
-    // Determine amount of tokens in the pool after would-be transactions of the given percent
-    const token0AfterBought = reserves[0].mul(buy0Sqrt).div(sqrtPrecision);
-    const token0AfterSold = reserves[0].mul(sell0Sqrt).div(sqrtPrecision);
+    // Determine amount of tokens in the pool after would-be transactions of the given percent.
+    // Note that the answers for token0 and token1 are not related in the sense that they do not
+    // represent valid simultaneous pool reserves. Only the amount of that reserve that would need to
+    // be transacted to move its own token price by x%
+    const token0AfterSold = reserves[0].mul(sqrtPrecision).div(negSqrt);
+    const token0AfterBought = reserves[0].mul(sqrtPrecision).div(posSqrt);
 
-    const token1AfterSold = reserves[1].mul(sqrtPrecision).div(buy0Sqrt);
-    const token1AfterBought = reserves[1].mul(sqrtPrecision).div(sell0Sqrt);
+    const token1AfterSold = reserves[1].mul(sqrtPrecision).div(negSqrt);
+    const token1AfterBought = reserves[1].mul(sqrtPrecision).div(posSqrt);
 
     return [
       {
@@ -45,6 +49,10 @@ class ConstantProductUtil {
         sell: NumberUtil.createNumberSpread(token1AfterSold.sub(reserves[1]), decimals[1])
       }
     ];
+  }
+
+  static calcMissingReserve(originalReserves, knownReserve) {
+    return originalReserves[0].mul(originalReserves[1]).div(knownReserve);
   }
 }
 

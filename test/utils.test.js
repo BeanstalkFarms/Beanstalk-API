@@ -81,20 +81,22 @@ describe('Utils', () => {
     const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
 
     const priceAfterBuy0 = ConstantProductUtil.calcPrice(
-      [reserves[0].sub(depth[0].buy.bn), reserves[1].add(depth[1].sell.bn)],
+      [
+        reserves[0].sub(depth[0].buy.bn),
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[0].sub(depth[0].buy.bn))
+      ],
       decimals
     );
-    const priceAfterBuy1 = ConstantProductUtil.calcPrice(
-      [reserves[0].add(depth[0].sell.bn), reserves[1].sub(depth[1].buy.bn)],
+    const priceAfterSell1 = ConstantProductUtil.calcPrice(
+      [
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[1].add(depth[1].sell.bn)),
+        reserves[1].add(depth[1].sell.bn)
+      ],
       decimals
     );
-    // console.log(priceBefore, priceAfterBuy0, priceAfterBuy1);
 
-    expect(priceBefore.float[0] * (1 / sellMultiple)).toBeCloseTo(priceAfterBuy0.float[0], 10);
-    expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterBuy0.float[1]);
-
-    expect(priceBefore.float[0] * (1 / buyMultiple)).toBeCloseTo(priceAfterBuy1.float[0], 10);
-    expect(priceBefore.float[1] * buyMultiple).toBeCloseTo(priceAfterBuy1.float[1]);
+    expect(priceBefore.float[0] * buyMultiple).toBeCloseTo(priceAfterBuy0.float[0], 10);
+    expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterSell1.float[1]);
   });
 
   it('should find block number for a requested season', async () => {
