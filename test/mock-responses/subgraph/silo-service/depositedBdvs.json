@@ -1,0 +1,48 @@
+{
+  "silos": [
+    {
+      "id": "0xabcd",
+      "stalk": "10",
+      "assets": [
+        {
+          "token": "0x1bea0050e63e05fbb5d8ba2f10cf5800b6224449",
+          "depositedBDV": "50000000"
+        },
+        {
+          "token": "0x1bea3ccd22f4ebd3d37d731ba31eeca95713716d",
+          "depositedBDV": "80000000"
+        },
+        {
+          "token": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+          "depositedBDV": "50000000"
+        },
+        {
+          "token": "0xc9c32cd16bf7efb85ff14e0c8603cc90f6f2ee49",
+          "depositedBDV": "85000000"
+        }
+      ]
+    },
+    {
+      "id": "0x1234",
+      "stalk": "10",
+      "assets": [
+        {
+          "token": "0x1bea0050e63e05fbb5d8ba2f10cf5800b6224449",
+          "depositedBDV": "0"
+        },
+        {
+          "token": "0x1bea3ccd22f4ebd3d37d731ba31eeca95713716d",
+          "depositedBDV": "0"
+        },
+        {
+          "token": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+          "depositedBDV": "500000000"
+        },
+        {
+          "token": "0xc9c32cd16bf7efb85ff14e0c8603cc90f6f2ee49",
+          "depositedBDV": "5000000"
+        }
+      ]
+    }
+  ]
+}

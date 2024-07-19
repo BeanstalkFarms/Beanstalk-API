@@ -58,7 +58,7 @@ class SiloApyService {
       throw new InputError(`Requested season ${season} exceeds the latest on-chain season ${latestSeason}`);
     }
 
-    const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(beanstalk, season);
+    const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(beanstalk, { season });
     if (!tokens) {
       tokens = availableTokens.whitelisted;
     } else {

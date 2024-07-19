@@ -188,7 +188,7 @@ class BeanstalkSubgraphRepository {
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
         seasons(
-          where: {beanstalk: "${beanstalk}"}
+          where: {beanstalk: "${beanstalk.toLowerCase()}"}
           orderBy: season
           orderDirection: desc
           first: 1
@@ -199,13 +199,14 @@ class BeanstalkSubgraphRepository {
     return result.seasons[0].season;
   }
 
-  // Returns all tokens that have been whitelisted prior to season.
-  static async getPreviouslyWhitelistedTokens(beanstalk, season) {
+  // Returns all tokens that have been whitelisted prior to the given block or season.
+  static async getPreviouslyWhitelistedTokens(beanstalk, { block, season }) {
+    const blockNumber = block ?? (await this.getBlockForSeason(beanstalk, season));
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
         silo(
-          id: "${beanstalk}"
-          block: {number: ${await this.getBlockForSeason(beanstalk, season)}}
+          id: "${beanstalk.toLowerCase()}"
+          block: {number: ${blockNumber}}
         ) {
           whitelistedTokens
           dewhitelistedTokens

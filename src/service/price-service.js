@@ -1,9 +1,8 @@
-const { BigNumber } = require('alchemy-sdk');
-const { asyncPriceV1ContractGetter, asyncUsdOracleContractGetter } = require('../datasources/contracts');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
-const { BEAN, WETH } = require('../constants/addresses');
+const { BEAN, WETH, WSTETH } = require('../constants/addresses');
 const { TEN_BN } = require('../constants/constants');
+const ContractGetters = require('../datasources/contracts/contract-getters');
 
 class PriceService {
   // Gets the price of the requested token
@@ -15,8 +14,8 @@ class PriceService {
   // Gets the price of bean as returned by the canonical price contract.
   static async getBeanPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const priceContract = await asyncPriceV1ContractGetter();
-    const priceResult = await priceContract.callStatic.price({ blockTag: block.number });
+    const priceContract = await ContractGetters.asyncPriceContractGetter(block.number);
+    const priceResult = await priceContract.callStatic.price();
 
     // Convert from hex to a readable format. For now the pool prices are omitted
     const readable = {
@@ -30,18 +29,20 @@ class PriceService {
     return readable;
   }
 
-  // In practice, current implementation of getUsdPrice can only get the eth price
-  static async getEthPrice(options = {}) {
+  // In practice, current implementation of getUsdPrice can only get the wsteth/eth price
+  static async getUsdOracleTokenPrice(token, options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const usdOracle = await asyncUsdOracleContractGetter();
-    const result = await usdOracle.callStatic.getUsdPrice(WETH, { blockTag: block.number });
-    // getUsdPrice returns a twa price, but with no lookback. Its already instantaneous but needs conversion
-    const instPrice = TEN_BN.pow(24).div(result);
+    const usdOracle = await ContractGetters.asyncUsdOracleContractGetter(block.number);
+    const result = await (usdOracle.__version() === 1
+      ? usdOracle.callStatic.getUsdPrice(token)
+      : usdOracle.callStatic.getTokenUsdPrice(token));
+    // Version 1 returned a twa price, but with no lookback. Its already instantaneous but needs conversion
+    const instPrice = usdOracle.__version() === 1 ? TEN_BN.pow(24).div(result) : result;
 
     const readable = {
       block: block.number,
       timestamp: block.timestamp,
-      token: WETH,
+      token,
       usdPrice: createNumberSpread(instPrice, 6, 2).float
     };
     return readable;
@@ -50,8 +51,8 @@ class PriceService {
   static #getPriceFunction(token) {
     if (token === BEAN) {
       return PriceService.getBeanPrice;
-    } else if (token === WETH) {
-      return PriceService.getEthPrice;
+    } else if ([WETH, WSTETH].includes(token)) {
+      return (options) => PriceService.getUsdOracleTokenPrice(token, options);
     }
     return () => ({
       token: token,
