@@ -13,11 +13,11 @@ jest.mock('../src/datasources/alchemy', () => ({
 const alchemy = require('../src/datasources/alchemy');
 
 const { BigNumber } = require('alchemy-sdk');
-const { getConstantProductPrice } = require('../src/utils/pool/constant-product');
+const ConstantProductUtil = require('../src/utils/pool/constant-product');
 const { parseQuery } = require('../src/utils/rest-parsing');
 const SubgraphClients = require('../src/datasources/subgraph-client');
 const { BEANSTALK } = require('../src/constants/addresses');
-const { convertStringsallToBigInt, allToBigInt, fromBigInt } = require('../src/utils/number');
+const { allToBigInt, fromBigInt } = require('../src/utils/number');
 
 describe('Utils', () => {
   it('should format query parameters correctly', async () => {
@@ -59,12 +59,42 @@ describe('Utils', () => {
   });
 
   it('should calculate correct token prices in constant product pool', async () => {
-    const prices = getConstantProductPrice(['13834969782037', '4519904117717436850412'].map(BigNumber.from), [6, 18]);
+    const prices = ConstantProductUtil.calcPrice(
+      ['13834969782037', '4519904117717436850412'].map(BigNumber.from),
+      [6, 18]
+    );
 
     expect(prices.bn[0]).toEqual(BigNumber.from(326701408743658));
     expect(prices.bn[1]).toEqual(BigNumber.from(3060898953));
     expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
     expect(prices.float[1]).toBeCloseTo(3060.898953);
+  });
+
+  it('should calculate liquidity depth in constant product pool', async () => {
+    const reserves = ['14327543308971', '3915916427871363595968'].map(BigNumber.from);
+    const decimals = [6, 18];
+    const percent = 40;
+    const buyMultiple = (100 + percent) / 100;
+    const sellMultiple = (100 - percent) / 100;
+
+    const priceBefore = ConstantProductUtil.calcPrice(reserves, decimals);
+    const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
+
+    const priceAfterBuy0 = ConstantProductUtil.calcPrice(
+      [reserves[0].sub(depth[0].buy.bn), reserves[1].add(depth[1].sell.bn)],
+      decimals
+    );
+    const priceAfterBuy1 = ConstantProductUtil.calcPrice(
+      [reserves[0].add(depth[0].sell.bn), reserves[1].sub(depth[1].buy.bn)],
+      decimals
+    );
+    // console.log(priceBefore, priceAfterBuy0, priceAfterBuy1);
+
+    expect(priceBefore.float[0] * (1 / sellMultiple)).toBeCloseTo(priceAfterBuy0.float[0], 10);
+    expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterBuy0.float[1]);
+
+    expect(priceBefore.float[0] * (1 / buyMultiple)).toBeCloseTo(priceAfterBuy1.float[0], 10);
+    expect(priceBefore.float[1] * buyMultiple).toBeCloseTo(priceAfterBuy1.float[1]);
   });
 
   it('should find block number for a requested season', async () => {

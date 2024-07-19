@@ -35,6 +35,8 @@ describe('CoingeckoService', () => {
     expect(tickers[0].base_volume).toBeCloseTo(362621.652657);
     expect(tickers[0].target_volume).toBeCloseTo(141.01800893122126);
     expect(tickers[0].liquidity_in_usd).toEqual(27491580);
+    expect(tickers[0].depth2.buy).toEqual(12); //TODO
+    expect(tickers[0].depth2.sell).toEqual(12);
     expect(tickers[0].high).toBeCloseTo(0.000392979136931714);
     expect(tickers[0].low).toBeCloseTo(0.000383640247389837);
   });
@@ -109,5 +111,10 @@ describe('CoingeckoService', () => {
     expect(trades.buy[0].target_volume).toBeCloseTo(1412.728161);
     expect(trades.buy[0].trade_timestamp).toEqual(1714613735000);
     expect(trades.buy[0].type).toEqual('buy');
+  });
+
+  it('should omit wells with < 1k liquidity', async () => {
+    // TODO
+    throw new Error('Not Implemented');
   });
 });
