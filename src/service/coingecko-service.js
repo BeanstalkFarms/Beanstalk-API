@@ -50,8 +50,8 @@ class CoingeckoService {
           target_volume: pool24hVolume.float[1],
           liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
           depth2: {
-            buy: [depth2.buy.float[0], depth2.buy.float[1]],
-            sell: [depth2.sell.float[0], depth2.sell.float[1]]
+            buy: depth2.buy.float,
+            sell: depth2.sell.float
           },
           high: priceRange.high.float[0],
           low: priceRange.low.float[0]
