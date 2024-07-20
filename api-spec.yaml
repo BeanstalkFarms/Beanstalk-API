@@ -108,6 +108,24 @@ paths:
                       type: integer
                       description: Liquidity in USD
                       example: 27491580
+                    depth2:
+                      type: object
+                      description: Amount of tokens that can be bought or sold to move the price by 2% in either direction
+                      properties:
+                        buy:
+                          type: array
+                          description: +2% depth
+                          items:
+                            type: number
+                            format: float
+                          example: [141161.504702, 38.581398312538454]
+                        sell:
+                          type: array
+                          description: -2% depth
+                          items:
+                            type: number
+                            format: float
+                          example: [145461.021768, 39.75651599669613]
                     high:
                       type: number
                       format: float

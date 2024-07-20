@@ -25,9 +25,14 @@ class CoingeckoService {
         const token0 = well.tokens[0].id;
         const token1 = well.tokens[1].id;
 
-        const poolPrice = ConstantProductUtil.getConstantProductPrice(
+        const poolPrice = ConstantProductUtil.calcPrice(
           well.reserves,
           well.tokens.map((t) => t.decimals)
+        );
+        const depth2 = ConstantProductUtil.calcDepth(
+          well.reserves,
+          well.tokens.map((t) => t.decimals),
+          2
         );
         const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
           calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
@@ -44,6 +49,10 @@ class CoingeckoService {
           base_volume: pool24hVolume.float[0],
           target_volume: pool24hVolume.float[1],
           liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
+          depth2: {
+            buy: depth2.buy.float,
+            sell: depth2.sell.float
+          },
           high: priceRange.high.float[0],
           low: priceRange.low.float[0]
         };
@@ -78,7 +87,7 @@ class CoingeckoService {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: ConstantProductUtil.getConstantProductPrice(
+        price: ConstantProductUtil.calcPrice(
           [swap.amountIn, swap.amountOut],
           [swap.fromToken.decimals, swap.toToken.decimals]
         ).float[0],
@@ -198,7 +207,7 @@ class CoingeckoService {
         runningReserves[i] = runningReserves[i].sub(event[i.toString()]);
       }
       // Calculate current price
-      const price = ConstantProductUtil.getConstantProductPrice(
+      const price = ConstantProductUtil.calcPrice(
         runningReserves,
         wellTokens.map((t) => t.decimals)
       );
