@@ -1,7 +1,7 @@
 const { BEANSTALK } = require('../constants/addresses');
 const { providerThenable } = require('../datasources/alchemy');
 const { gql } = require('../datasources/subgraph-client');
-const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 
 class BlockUtil {
   // Returns the block data to use for the given options.

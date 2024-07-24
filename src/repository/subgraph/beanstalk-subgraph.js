@@ -1,7 +1,7 @@
 const { BigNumber } = require('alchemy-sdk');
-const SubgraphClients = require('../datasources/subgraph-client');
-const SubgraphQueryUtil = require('../utils/subgraph-query');
-const { allToBigInt } = require('../utils/number');
+const SubgraphClients = require('../../datasources/subgraph-client');
+const SubgraphQueryUtil = require('../../utils/subgraph-query');
+const { allToBigInt } = require('../../utils/number');
 
 class BeanstalkSubgraphRepository {
   static async getDepositedBdvs(accounts, blockNumber) {

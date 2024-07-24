@@ -1,6 +1,6 @@
 const { BigNumber } = require('alchemy-sdk');
-const SubgraphClients = require('../datasources/subgraph-client');
-const SubgraphQueryUtil = require('../utils/subgraph-query');
+const SubgraphClients = require('../../datasources/subgraph-client');
+const SubgraphQueryUtil = require('../../utils/subgraph-query');
 
 class BasinSubgraphRepository {
   static async getAllWells(blockNumber) {

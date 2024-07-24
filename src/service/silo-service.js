@@ -2,7 +2,7 @@ const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require(
 const { MILESTONE } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const subgraphClient = require('../datasources/subgraph-client');
-const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 

@@ -1,7 +1,9 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 DOCKER_ENV=$1
-if [ "$#" -ne 1 ]; then
+if [ -z "$DOCKER_ENV" ]; then
   DOCKER_ENV="dev"
 fi
 

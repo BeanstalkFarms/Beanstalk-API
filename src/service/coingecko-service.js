@@ -5,7 +5,7 @@ const { calcPoolLiquidityUSD } = require('../utils/pool/liquidity');
 const { createNumberSpread } = require('../utils/number');
 const { ZERO_BN } = require('../constants/constants');
 const ConstantProductUtil = require('../utils/pool/constant-product');
-const BasinSubgraphRepository = require('../repository/basin-subgraph');
+const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
 
 const ONE_DAY = 60 * 60 * 24;

@@ -4,7 +4,7 @@
  * @typedef {import('../../types/types').WindowEMAResult} WindowEMAResult
  */
 
-const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 
 const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
