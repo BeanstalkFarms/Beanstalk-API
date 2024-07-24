@@ -5,3 +5,5 @@ tests
 .git
 docker
 .DS_Store
+
+!docker/wait-for-services.sh

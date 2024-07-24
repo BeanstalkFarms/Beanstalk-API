@@ -8,6 +8,7 @@ services:
       - "${KOAJS_PORT}:3000"
     env_file:
       - .env
+    entrypoint: ["./wait-for-services.sh", "postgres", "5432", "npm", "start"]
     restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
@@ -17,10 +18,10 @@ services:
   postgres:
     image: postgres:16
     ports:
-      - 5432:5432
+      - "${POSTGRES_PORT}:5432"
     environment:
       POSTGRES_DB: beanstalk_api
       POSTGRES_USER: api_user
       POSTGRES_PASSWORD: beanstalk
     volumes:
-      - ./.data/postgres:/var/lib/postgresql/data
+      - ./.data/${DOCKER_ENV}/postgres:/var/lib/postgresql/data

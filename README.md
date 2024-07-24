@@ -13,3 +13,4 @@ You will need to have Docker installed on your system to start the application, 
 3. To run the application, `npm start`
 
 TODO: Update this readme with instructions on the different docker scripts.
+For faster development, I recommend using the `npm run docker:postgres` command to start the postgres service in docker, and then running the main application outside of docker with `npm start`. This is faster as it does not require rebuilding the api image each time.
