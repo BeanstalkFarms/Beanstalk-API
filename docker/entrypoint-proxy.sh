@@ -16,5 +16,9 @@ until pg_isready -h "$host" -p "$port"; do
   sleep 1
 done
 
-echo "Postgres is up - proceeding to start container"
+echo "Postgres is up - running any sequelize migrations/seeders..."
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
+
+echo "Postgres is up - proceeding to api entrypoint"
 exec $cmd

@@ -18,13 +18,6 @@ async function appStartup() {
     activateJobs(cronJobs);
   }
 
-  // Update database schema. Note that this is unsafe for production use, as Migrations
-  // should be used instead, but this may be sufficient for the purposes of this program.
-  // (revisit this)
-  console.log('Calling sequelize.sync({ alter: true })...');
-  await sequelize.sync({ alter: true });
-  console.log('Database schema synchronized with model definitions.');
-
   const app = new Koa();
 
   app.use(

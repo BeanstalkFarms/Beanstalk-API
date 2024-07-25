@@ -6,4 +6,4 @@ tests
 docker
 .DS_Store
 
-!docker/wait-for-services.sh
+!docker/entrypoint-proxy.sh

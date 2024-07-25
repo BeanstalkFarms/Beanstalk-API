@@ -15,7 +15,7 @@ const storageLayout = require('../../../datasources/storage/beanstalk/StorageBIP
 const { providerThenable } = require('../../../datasources/alchemy');
 const db = require('../models');
 
-const tokens = [BEAN, BEANWETH, BEANWSTETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP];
+const tokens = [BEAN, BEANWETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP]; // TODO: add wsteth
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -39,21 +39,28 @@ module.exports = {
       const rows = [];
       for (const token of newTokens) {
         const erc20 = await getERC20Contract(token);
-        const [name, symbol, decimals, stalkEarnedPerSeason, stemTip] = await Promise.all([
-          erc20.callStatic.name(),
-          erc20.callStatic.symbol(),
-          (async () => BigInt(await erc20.callStatic.decimals()))(),
-          bs.s.ss[token].stalkEarnedPerSeason,
-          (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))()
-        ]);
+        const [name, symbol, decimals, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] =
+          await Promise.all([
+            erc20.callStatic.name(),
+            erc20.callStatic.symbol(),
+            (async () => Number(await erc20.callStatic.decimals()))(),
+            bs.s.ss[token].stalkEarnedPerSeason,
+            (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
+            (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
+            (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
+          ]);
+        const bdv = BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** decimals)));
         rows.push({
           token,
           name,
           symbol,
           decimals,
           isWhitelisted: true,
+          bdv,
           stalkEarnedPerSeason,
           stemTip,
+          totalDeposited,
+          totalDepositedBdv,
           createdAt: new Date(),
           updatedAt: new Date()
         });

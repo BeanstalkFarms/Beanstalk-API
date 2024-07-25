@@ -1,3 +1,5 @@
+const { bigintStringColumn } = require('../util/sequelize-util');
+
 module.exports = (sequelize, DataTypes) => {
   const Token = sequelize.define(
     'Token',
@@ -28,12 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
-      stalkEarnedPerSeason: {
-        type: DataTypes.BIGINT
-      },
-      stemTip: {
-        type: DataTypes.BIGINT
-      }
+      ...bigintStringColumn('bdv', DataTypes),
+      ...bigintStringColumn('stalkEarnedPerSeason', DataTypes),
+      ...bigintStringColumn('stemTip', DataTypes),
+      ...bigintStringColumn('totalDeposited', DataTypes),
+      ...bigintStringColumn('totalDepositedBdv', DataTypes)
     },
     {
       tableName: 'token'

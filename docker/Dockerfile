@@ -10,8 +10,8 @@ WORKDIR /app
 COPY --from=builder /usr/src/app .
 
 # For running the whole stack via compose
-COPY ./docker/wait-for-services.sh .
-RUN chmod +x ./wait-for-services.sh
+COPY ./docker/entrypoint-proxy.sh .
+RUN chmod +x ./entrypoint-proxy.sh
 
 # Install postgresql-client for pg_isready, curl for healthcheck
 RUN apt-get update && apt-get install -y curl postgresql-client && rm -rf /var/lib/apt/lists/*
