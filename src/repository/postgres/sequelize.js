@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const { TestModelConfig } = require('./models/test-model');
+const { TokenModelConfig } = require('./models/token-model');
 
 // Configure database connection
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
@@ -9,9 +9,9 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 });
 
 // Define models
-const TestModel = sequelize.define(TestModelConfig.name, TestModelConfig.attributes, TestModelConfig.options);
+const TokenModel = sequelize.define(TokenModelConfig.name, TokenModelConfig.attributes, TokenModelConfig.options);
 
 module.exports = {
   sequelize,
-  TestModel
+  TokenModel
 };
