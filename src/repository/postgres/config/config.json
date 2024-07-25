@@ -1,0 +1,16 @@
+{
+  "local": {
+    "username": "api_user",
+    "password": "beanstalk",
+    "database": "beanstalk_api",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "local-docker": {
+    "username": "api_user",
+    "password": "beanstalk",
+    "database": "beanstalk_api",
+    "host": "postgres",
+    "dialect": "postgres"
+  }
+}

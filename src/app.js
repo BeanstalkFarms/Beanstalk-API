@@ -9,7 +9,7 @@ const bodyParser = require('koa-bodyparser');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
-const { sequelize } = require('./repository/postgres/sequelize.js');
+const { sequelize } = require('./repository/postgres/models/index.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
