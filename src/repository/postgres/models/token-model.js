@@ -36,8 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      tableName: 'token',
-      underscored: true
+      tableName: 'token'
     }
   );
 

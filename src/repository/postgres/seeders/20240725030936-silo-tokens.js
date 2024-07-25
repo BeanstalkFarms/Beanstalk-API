@@ -51,11 +51,11 @@ module.exports = {
           name,
           symbol,
           decimals,
-          is_whitelisted: true,
-          stalk_earned_per_season: stalkEarnedPerSeason,
-          stem_tip: stemTip,
-          created_at: new Date(),
-          updated_at: new Date()
+          isWhitelisted: true,
+          stalkEarnedPerSeason,
+          stemTip,
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
       }
 
