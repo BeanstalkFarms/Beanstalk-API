@@ -2,15 +2,24 @@
 
 REST API for getting information as to the current and historical state of Beanstalk and related protocols.
 
-The impetus of this project is for integrating with CoinGecko, however this will be expanded with more features.
+Currently this project is used for integrating with CoinGecko and DefiLlama at the below endpoints:
+- `/basin/tickers`
+- `/silo/yield`
 
 ## Getting Started
 
-You will need to have Docker installed on your system to start the application, as this will contain the database.
+You will need to have Docker installed on your system to start the application, as this is required for the database. You may also need to give execute permission to the docker helper scripts (`chmod +x ./docker/*.sh`).
+
+To run everything inside of Docker:
+
+1. Run `cp .env.example ./docker/.env`, and supply the appropriate values in the created `.env` file.
+2. Run `npm run docker`. This will start both the API and postgres database
+3. Stop with `npm run docker:stop`.
+
+To run the databse inside Docker and the API on the host machine (faster for testing locally as it doesn't build an image)
 
 1. Run `npm install`
-2. Run `cp .env.example .env`, and supply the appropriate values in `.env` file.
-3. To run the application, `npm start`
-
-TODO: Update this readme with instructions on the different docker scripts.
-For faster development, I recommend using the `npm run docker:postgres` command to start the postgres service in docker, and then running the main application outside of docker with `npm start`. This is faster as it does not require rebuilding the api image each time.
+2. Run `cp .env.example .env`, and supply the appropriate values in the created `.env` file.
+3. Start the postgres container with `npm run docker:postgres`.
+4. To run the application, `npm start`
+5. The database can be stopped with `npm run docker:stop`.

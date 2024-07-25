@@ -1,4 +1,4 @@
-1. From this directory, run `./build.sh` to build the image.
+1. From this directory, run `./build.sh` to build the api image.
 2. Supply environment variables in a `.env` file in this directory, modeled after the example (in the parent directory). The compose will pull from here at runtime, the environemnt variables are not built into the image.
 3. Back in the docker directory, run `./start.sh` to start the server.
 
