@@ -6,16 +6,20 @@ const { priceMapping, usdOracleMapping } = require('./upgradeable-mappings.js');
 
 class ContractGetters {
   /// Regular Contracts
-  static async asyncBeanstalkContractGetter(blockNumber = 0, providerTh = providerThenable) {
+  static async getBeanstalkContract(blockNumber = 0, providerTh = providerThenable) {
     return Contracts.getContractAsync(BEANSTALK, blockNumber, await providerTh);
   }
 
+  static async getERC20Contract(token, blockNumber = 0, providerTh = providerThenable) {
+    return Contracts.getContractAsync(token, blockNumber, await providerTh);
+  }
+
   /// Upgradeable Contracts
-  static async asyncUsdOracleContractGetter(blockNumber = 'latest', providerTh = providerThenable) {
+  static async getUsdOracleContract(blockNumber = 'latest', providerTh = providerThenable) {
     return new UpgradeableContract(usdOracleMapping, await providerTh, blockNumber);
   }
 
-  static async asyncPriceContractGetter(blockNumber = 'latest', providerTh = providerThenable) {
+  static async getPriceContract(blockNumber = 'latest', providerTh = providerThenable) {
     return new UpgradeableContract(priceMapping, await providerTh, blockNumber);
   }
 }
