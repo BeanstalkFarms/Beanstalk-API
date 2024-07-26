@@ -6,4 +6,4 @@ tests
 docker
 .DS_Store
 
-!docker/entrypoint-proxy.sh
+!docker/inbuilt

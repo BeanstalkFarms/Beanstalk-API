@@ -9,8 +9,11 @@ FROM node:22-slim
 WORKDIR /app
 COPY --from=builder /usr/src/app .
 
-# For running the whole stack via compose
-COPY ./docker/entrypoint-proxy.sh .
+# Copy the sequelize config
+COPY ./docker/inbuilt/sequelize-config.js ./src/repository/postgres/config/config.js
+
+# Needed when running the whole stack via compose
+COPY ./docker/inbuilt/entrypoint-proxy.sh .
 RUN chmod +x ./entrypoint-proxy.sh
 
 # Install postgresql-client for pg_isready, curl for healthcheck
