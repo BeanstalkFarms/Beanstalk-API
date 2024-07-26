@@ -13,7 +13,7 @@ const { getERC20Contract } = require('../../../datasources/contracts/contract-ge
 const db = require('../models');
 const EVM = require('../../../datasources/evm');
 
-const tokens = [BEAN, BEANWETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP]; // TODO: add wsteth
+const tokens = [BEAN, BEANWETH, BEANWSTETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP];
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
