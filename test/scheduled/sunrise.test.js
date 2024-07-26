@@ -72,11 +72,3 @@ describe('OnSunrise', () => {
     await expect(waitPromise).rejects.toBeUndefined();
   });
 });
-
-describe('CRON Job: Sunrise - update tokens', () => {
-  it.only('updates token data', async () => {
-    jest.spyOn(OnSunriseUtil, 'waitForSunrise').mockResolvedValueOnce(undefined);
-    await SunriseTask.handleSunrise();
-    // TODO: proper sequelize test
-  });
-});

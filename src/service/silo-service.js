@@ -131,7 +131,7 @@ class SiloService {
           (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
           (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
         ]);
-        const retval = await sequelize.models.Token.update(
+        await sequelize.models.Token.update(
           {
             bdv,
             stalkEarnedPerSeason,
