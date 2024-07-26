@@ -1,9 +1,13 @@
-const { BigNumber } = require('alchemy-sdk');
 const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
+const SubgraphRepository = require('./common-subgraph');
 
 class BeanstalkSubgraphRepository {
+  static async getMeta() {
+    return await SubgraphRepository.getMeta(SubgraphClients.beanstalkSG);
+  }
+
   static async getDepositedBdvs(accounts, blockNumber) {
     const silos = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.beanstalkSG,
@@ -194,9 +198,11 @@ class BeanstalkSubgraphRepository {
           first: 1
         ) {
           season
+          sunriseBlock
+          createdAt
         }
       }`);
-    return result.seasons[0].season;
+    return result.seasons[0];
   }
 
   // Returns all tokens that have been whitelisted prior to the given block or season.

@@ -1,6 +1,7 @@
 const { providerThenable } = require('../datasources/alchemy');
 const SubgraphClient = require('../datasources/subgraph-client');
 const { slugSG, SLUGS } = require('../datasources/subgraph-client');
+const SubgraphRepository = require('../repository/subgraph/common-subgraph');
 
 // For retrieving current statuses of our subgraphs.
 class SubgraphService {
@@ -25,14 +26,7 @@ class SubgraphService {
       for (const slug of SLUGS) {
         const name = slug + suffixForEnv(env);
         names.push(name);
-        metaPromises.push(
-          slugSG(name)(SubgraphClient.gql`
-            {
-              _meta {
-                deployment
-              }
-            }`)
-        );
+        metaPromises.push(SubgraphRepository.getMeta(slugSG(name)));
       }
     }
 

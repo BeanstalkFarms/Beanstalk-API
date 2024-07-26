@@ -1,12 +1,13 @@
 const cron = require('node-cron');
 const { sendWebhookMessage } = require('../utils/discord');
-const { calcNewSeasonApy } = require('./apy');
+const { calcNewSeasonApy } = require('./tasks/apy');
+const { handleSunrise } = require('./tasks/sunrise');
 
 // All cron jobs which could be activated are configured here
 const ALL_JOBS = {
-  'silo-apy': {
+  sunrise: {
     cron: '0 * * * *',
-    function: calcNewSeasonApy
+    function: handleSunrise
   },
   alert: {
     cron: '*/10 * * * * *',
