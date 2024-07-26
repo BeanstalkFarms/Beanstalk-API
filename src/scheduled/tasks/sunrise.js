@@ -1,10 +1,14 @@
-const { waitForSunrise } = require('../util/on-sunrise');
+const { sequelize, Sequelize } = require('../../repository/postgres/models');
+const SiloService = require('../../service/silo-service');
+const OnSunriseUtil = require('../util/on-sunrise');
 
-async function handleSunrise() {
-  await waitForSunrise();
-  console.log('sunrise was processed by the subgraphs');
+class SunriseTask {
+  static async handleSunrise() {
+    await OnSunriseUtil.waitForSunrise();
+    console.log('[handleSunrise] Sunrise was processed by the subgraphs, proceeding.');
+
+    await SiloService.updateWhitelistedTokenInfo();
+  }
 }
 
-module.exports = {
-  handleSunrise
-};
+module.exports = SunriseTask;

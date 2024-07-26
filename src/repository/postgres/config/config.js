@@ -4,8 +4,8 @@ module.exports = {
     password: 'beanstalk',
     database: 'beanstalk_api',
     host: 'localhost',
-    dialect: 'postgres'
-    // logging: console.log
+    dialect: 'postgres',
+    logging: false
   },
   'local-docker': {
     username: 'api_user',
@@ -13,6 +13,6 @@ module.exports = {
     database: 'beanstalk_api',
     host: 'postgres',
     dialect: 'postgres'
-    // logging: console.log
+    // logging: false
   }
 };

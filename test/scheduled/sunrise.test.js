@@ -1,4 +1,5 @@
 const subgraphClient = require('../../src/datasources/subgraph-client');
+const SunriseTask = require('../../src/scheduled/tasks/sunrise');
 const OnSunriseUtil = require('../../src/scheduled/util/on-sunrise');
 
 async function checkLastPromiseResult(spy, expected) {
@@ -6,7 +7,7 @@ async function checkLastPromiseResult(spy, expected) {
   expect(lastCallResult).toBe(expected);
 }
 
-describe('CRON Job: Sunrise', () => {
+describe('OnSunrise', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(1700938811 * 1000));
@@ -50,7 +51,7 @@ describe('CRON Job: Sunrise', () => {
     await expect(waitPromise).resolves.toBeUndefined();
   });
 
-  test.only('fails to identify a new season within the time limit', async () => {
+  test('fails to identify a new season within the time limit', async () => {
     const seasonResponse = require('../mock-responses/subgraph/scheduled/sunrise/beanstalkSeason_1.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValue(seasonResponse);
 
@@ -69,5 +70,13 @@ describe('CRON Job: Sunrise', () => {
     await checkLastPromiseResult(checkSpy, false);
 
     await expect(waitPromise).rejects.toBeUndefined();
+  });
+});
+
+describe('CRON Job: Sunrise - update tokens', () => {
+  it.only('updates token data', async () => {
+    jest.spyOn(OnSunriseUtil, 'waitForSunrise').mockResolvedValueOnce(undefined);
+    await SunriseTask.handleSunrise();
+    // TODO: proper sequelize test
   });
 });

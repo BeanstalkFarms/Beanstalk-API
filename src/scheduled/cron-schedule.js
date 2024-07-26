@@ -1,13 +1,12 @@
 const cron = require('node-cron');
 const { sendWebhookMessage } = require('../utils/discord');
-const { calcNewSeasonApy } = require('./tasks/apy');
-const { handleSunrise } = require('./tasks/sunrise');
+const SunriseTask = require('./tasks/sunrise');
 
 // All cron jobs which could be activated are configured here
 const ALL_JOBS = {
   sunrise: {
     cron: '0 * * * *',
-    function: handleSunrise
+    function: SunriseTask.handleSunrise
   },
   alert: {
     cron: '*/10 * * * * *',

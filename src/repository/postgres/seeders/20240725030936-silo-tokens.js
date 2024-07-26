@@ -9,19 +9,16 @@ const {
   UNRIPE_BEAN,
   UNRIPE_LP
 } = require('../../../constants/addresses');
-const { getBeanstalkContract, getERC20Contract } = require('../../../datasources/contracts/contract-getters');
-const ContractStorage = require('@beanstalk/contract-storage');
-const storageLayout = require('../../../datasources/storage/beanstalk/StorageBIP47.json');
-const { providerThenable } = require('../../../datasources/alchemy');
+const { getERC20Contract } = require('../../../datasources/contracts/contract-getters');
 const db = require('../models');
+const EVM = require('../../../datasources/evm');
 
 const tokens = [BEAN, BEANWETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP]; // TODO: add wsteth
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const beanstalk = await getBeanstalkContract();
-    const bs = new ContractStorage(await providerThenable, BEANSTALK, storageLayout);
+    const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
 
     // Gets tokens that have already been populated
     const existingTokens = await db.sequelize.models.Token.findAll({

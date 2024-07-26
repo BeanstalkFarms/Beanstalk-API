@@ -17,7 +17,8 @@ const bigintStringColumn = (column, Sequelize, attributes = {}) => {
       type: Sequelize.STRING,
       ...attributes,
       get() {
-        return bigintFrom(this.getDataValue(column));
+        const value = this.getDataValue(column);
+        return value ? bigintFrom(value) : undefined;
       },
       set(bigintValue) {
         this.setDataValue(column, bigintToDecStr(bigintValue));
