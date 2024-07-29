@@ -35,8 +35,8 @@ class SubgraphService {
     for (let i = 0; i < metas.length; ++i) {
       // Rejected promise will occur when the subgraph does not exist
       if (metas[i].status === 'fulfilled') {
-        deploymentStatuses[names[i]] = { deployment: metas[i].value._meta.deployment };
-        deploymentToName[metas[i].value._meta.deployment] = names[i];
+        deploymentStatuses[names[i]] = { deployment: metas[i].value.deployment };
+        deploymentToName[metas[i].value.deployment] = names[i];
       } else {
         const errorMessage = metas[i].reason.response.errors[0].message;
         deploymentStatuses[names[i]] = { error: errorMessage };
@@ -106,18 +106,7 @@ class SubgraphService {
     const clients = [SubgraphClient.graphBeanstalk, SubgraphClient.graphBean];
 
     for (const client of clients) {
-      metaPromises.push(
-        client(SubgraphClient.gql`
-        {
-          _meta {
-            deployment
-            hasIndexingErrors
-            block {
-              number
-            }
-          }
-        }`)
-      );
+      metaPromises.push(SubgraphRepository.getMeta(client));
     }
 
     const deploymentStatuses = {};
@@ -129,10 +118,10 @@ class SubgraphService {
       // Rejected promise will occur when the subgraph does not exist
       if (metas[i].status === 'fulfilled') {
         deploymentStatuses[names[i]] = {
-          deployment: metas[i].value._meta.deployment,
-          hasIndexingErrors: metas[i].value._meta.hasIndexingErrors,
-          indexedBlock: metas[i].value._meta.block.number,
-          blocksBehind: currentBlock - metas[i].value._meta.block.number
+          deployment: metas[i].value.deployment,
+          hasIndexingErrors: metas[i].value.hasIndexingErrors,
+          indexedBlock: metas[i].value.block.number,
+          blocksBehind: currentBlock - metas[i].value.block.number
         };
       } else {
         const errorMessage = metas[i].reason.response.errors[0].message;
