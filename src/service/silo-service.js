@@ -1,15 +1,17 @@
-const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
+const { BEANSTALK } = require('../constants/addresses');
 const { MILESTONE } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
+const EVM = require('../datasources/evm');
 const subgraphClient = require('../datasources/subgraph-client');
-const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const { sequelize, Sequelize } = require('../repository/postgres/models');
+const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await ContractGetters.asyncBeanstalkContractGetter(block.number);
+    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
 
     const siloAssets = (
       await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
@@ -52,7 +54,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await ContractGetters.asyncBeanstalkContractGetter(block.number);
+    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
@@ -105,6 +107,47 @@ class SiloService {
     // Sort the largest grown stalk amounts first
     retval.accounts.sort((a, b) => b.total - a.total);
     return retval;
+  }
+
+  // Updates all whitelisted tokens in the database
+  static async updateWhitelistedTokenInfo() {
+    const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
+    const rows = await sequelize.models.Token.findAll({
+      where: {
+        isWhitelisted: {
+          [Sequelize.Op.eq]: true
+        }
+      },
+      attributes: ['token', 'decimals']
+    });
+
+    await sequelize.transaction(async (transaction) => {
+      for (const row of rows) {
+        const token = row.token;
+        const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
+          (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** row.decimals))))(),
+          bs.s.ss[token].stalkEarnedPerSeason,
+          (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
+          (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
+          (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
+        ]);
+        await sequelize.models.Token.update(
+          {
+            bdv,
+            stalkEarnedPerSeason,
+            stemTip,
+            totalDeposited,
+            totalDepositedBdv
+          },
+          {
+            where: {
+              token
+            },
+            transaction
+          }
+        );
+      }
+    });
   }
 }
 

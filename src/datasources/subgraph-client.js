@@ -29,7 +29,7 @@ function clientBuilder(url) {
     const client = getClient(url);
     const response = await client.request(query);
 
-    // if (process.env.ENV === 'local') {
+    // if (process.env.NODE_ENV === 'local') {
     //   // Use this to assist in mocking. Should be commented in/out as needed.
     //   await fs.promises.writeFile(
     //     `${__dirname}/../../test/mock-responses/subgraph/silo-apy/gaugeApyInputs_${callNumber++}.json`,

@@ -4,7 +4,7 @@
  * @typedef {import('../../types/types').WindowEMAResult} WindowEMAResult
  */
 
-const BeanstalkSubgraphRepository = require('../repository/beanstalk-subgraph');
+const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 
 const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
@@ -52,7 +52,7 @@ class SiloApyService {
     emaWindows = emaWindows ?? DEFAULT_WINDOWS;
 
     // Check whether season/tokens are valid
-    const latestSeason = await BeanstalkSubgraphRepository.getLatestSeason(beanstalk);
+    const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason(beanstalk)).season;
     season = season ?? latestSeason;
     if (season > latestSeason) {
       throw new InputError(`Requested season ${season} exceeds the latest on-chain season ${latestSeason}`);

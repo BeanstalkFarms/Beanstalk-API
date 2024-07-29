@@ -25,7 +25,7 @@ describe('PriceService', () => {
         })
       }
     };
-    jest.spyOn(ContractGetters, 'asyncPriceContractGetter').mockResolvedValue(mockPrice);
+    jest.spyOn(ContractGetters, 'getPriceContract').mockResolvedValue(mockPrice);
 
     const price = await getBeanPrice(defaultOptions);
     expect(price.usdPrice).toEqual(0.9977);
@@ -41,7 +41,7 @@ describe('PriceService', () => {
       },
       __version: jest.fn().mockReturnValue(1)
     };
-    jest.spyOn(ContractGetters, 'asyncUsdOracleContractGetter').mockResolvedValue(mockUsdOracle);
+    jest.spyOn(ContractGetters, 'getUsdOracleContract').mockResolvedValue(mockUsdOracle);
 
     const price = await getUsdOracleTokenPrice(defaultOptions);
     expect(price.usdPrice).toBeCloseTo(2563.44);

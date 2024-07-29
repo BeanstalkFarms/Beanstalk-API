@@ -11,7 +11,7 @@ async function sendWebhookMessage(message) {
         await axios.post(url, {
           // avatar_url: '',
           username: 'Beanstalk API',
-          content: `${prefix}[${process.env.ENV}] - ${message}`
+          content: `${prefix}[${process.env.NODE_ENV}] - ${message}`
         });
       })
     );
