@@ -95,7 +95,7 @@ class GaugeApyUtil {
     const currentPercentLpBdv = [];
     const sumLpBdv = NumberUtil.sum(gaugeLpDepositedBdvCopy);
     for (let i = 0; i < gaugeLpDepositedBdvCopy.length; ++i) {
-      currentPercentLpBdv.push(gaugeLpDepositedBdvCopy[i] / sumLpBdv);
+      currentPercentLpBdv.push((gaugeLpDepositedBdvCopy[i] / sumLpBdv) * 100);
     }
 
     let r = fromBigInt(initialR, PRECISION.beanToMaxLpGpPerBdvRatio, PRECISION.beanToMaxLpGpPerBdvRatio / 2);
