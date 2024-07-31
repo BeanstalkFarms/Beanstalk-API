@@ -1,4 +1,3 @@
-const { sequelize, Sequelize } = require('../../repository/postgres/models');
 const SiloService = require('../../service/silo-service');
 const OnSunriseUtil = require('../util/on-sunrise');
 

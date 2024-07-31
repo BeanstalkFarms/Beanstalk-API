@@ -1,7 +1,7 @@
 const { providerThenable } = require('../datasources/alchemy');
 const SubgraphClient = require('../datasources/subgraph-client');
 const { slugSG, SLUGS } = require('../datasources/subgraph-client');
-const SubgraphRepository = require('../repository/subgraph/common-subgraph');
+const CommonSubgraphRepository = require('../repository/subgraph/common-subgraph');
 
 // For retrieving current statuses of our subgraphs.
 class SubgraphService {
@@ -26,7 +26,7 @@ class SubgraphService {
       for (const slug of SLUGS) {
         const name = slug + suffixForEnv(env);
         names.push(name);
-        metaPromises.push(SubgraphRepository.getMeta(slugSG(name)));
+        metaPromises.push(CommonSubgraphRepository.getMeta(slugSG(name)));
       }
     }
 
@@ -106,7 +106,7 @@ class SubgraphService {
     const clients = [SubgraphClient.graphBeanstalk, SubgraphClient.graphBean];
 
     for (const client of clients) {
-      metaPromises.push(SubgraphRepository.getMeta(client));
+      metaPromises.push(CommonSubgraphRepository.getMeta(client));
     }
 
     const deploymentStatuses = {};
@@ -124,7 +124,8 @@ class SubgraphService {
           blocksBehind: currentBlock - metas[i].value.block.number
         };
       } else {
-        const errorMessage = metas[i].reason.response.errors[0].message;
+        console.log(metas[i]);
+        const errorMessage = metas[i].reason?.response?.errors?.[0]?.message || 'failed to obtain meta';
         deploymentStatuses[names[i]] = { error: errorMessage };
       }
     }

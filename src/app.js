@@ -78,3 +78,9 @@ async function appStartup() {
   });
 }
 appStartup();
+
+// Unhandled promise rejection handler prevents api restart under those circumstances.
+// Ideally potential promise rejections are handled locally but that may not be the case.
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+});
