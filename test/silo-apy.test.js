@@ -1,4 +1,12 @@
-const { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN, UNRIPE_LP } = require('../src/constants/addresses');
+const {
+  BEANSTALK,
+  BEAN,
+  BEAN3CRV,
+  BEANWETH,
+  BEANWSTETH,
+  UNRIPE_BEAN,
+  UNRIPE_LP
+} = require('../src/constants/addresses');
 const { PRECISION } = require('../src/constants/constants');
 const subgraphClient = require('../src/datasources/subgraph-client');
 const SiloApyService = require('../src/service/silo-apy');
@@ -225,6 +233,36 @@ describe('Gauge Silo APY', () => {
     expect(apyNew[BEANWETH].bean).toBeCloseTo(0.3238107802723085);
     expect(apyNew[BEANWETH].stalk).toBeCloseTo(9.914882255462954);
     expect(apyNew[BEANWETH].ownership).toBeCloseTo(7.020786421160418);
+  });
+
+  it('should calculate with multiple gauge lp', () => {
+    const apy = GaugeApyUtil.calcApy(
+      toBigInt(1278, PRECISION.bdv),
+      [BEAN, BEANWETH, BEANWSTETH, UNRIPE_LP],
+      [-1, 0, 1, -2],
+      [toBigInt(100, PRECISION.gaugePoints), toBigInt(400, PRECISION.gaugePoints)],
+      [toBigInt(152986, PRECISION.bdv), toBigInt(2917, PRECISION.bdv)],
+      toBigInt(45236258, PRECISION.bdv),
+      [toBigInt(20, PRECISION.optimalPercentDepositedBdv), toBigInt(80, PRECISION.optimalPercentDepositedBdv)],
+      toBigInt(1, PRECISION.beanToMaxLpGpPerBdvRatio),
+      toBigInt(5588356, PRECISION.bdv),
+      toBigInt(172360290, PRECISION.stalk),
+      0,
+      [0n, 0n],
+      [
+        [0n, 25000n],
+        [5000n, 0n]
+      ],
+      [0n, 0n],
+      [null, null, null, 0n]
+    );
+
+    expect(apy[BEANWETH].bean).toBeCloseTo(0.204566395461806);
+    expect(apy[BEANWETH].stalk).toBeCloseTo(0.22876485266753824);
+    expect(apy[BEANWETH].ownership).toBeCloseTo(-0.1306736178082944);
+    expect(apy[BEANWSTETH].bean).toBeCloseTo(0.4834466031616589);
+    expect(apy[BEANWSTETH].stalk).toBeCloseTo(3.577499710034183);
+    expect(apy[BEANWSTETH].ownership).toBeCloseTo(2.2384888400484484);
   });
 });
 

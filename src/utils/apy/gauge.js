@@ -108,7 +108,7 @@ class GaugeApyUtil {
     let nonGaugeDepositedBdv_ =
       fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(nonGaugeGerminatingBdv);
     let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
-    let largestLpGpPerBdv = Math.max(lpGpPerBdv);
+    let largestLpGpPerBdv = Math.max(...lpGpPerBdv);
 
     const userBeans = [];
     const userLp = [];
@@ -168,7 +168,7 @@ class GaugeApyUtil {
           );
           lpGpPerBdv[j] = gaugeLpPointsCopy[j] / gaugeLpDepositedBdvCopy[j];
         }
-        largestLpGpPerBdv = Math.max(lpGpPerBdv);
+        largestLpGpPerBdv = Math.max(...lpGpPerBdv);
       }
 
       const beanGpPerBdv = largestLpGpPerBdv * rScaled;
