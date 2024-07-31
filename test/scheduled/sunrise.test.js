@@ -69,6 +69,6 @@ describe('OnSunrise', () => {
     jest.runAllTimers();
     await checkLastPromiseResult(checkSpy, false);
 
-    await expect(waitPromise).rejects.toBeUndefined();
+    await expect(waitPromise).rejects.toBeDefined();
   });
 });

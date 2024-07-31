@@ -16,20 +16,27 @@ class OnSunriseUtil {
   static async waitForSunrise(maxWait = DEFAULT_WAIT) {
     return new Promise((resolve, reject) => {
       const startTime = Date.now();
-      const checkSunrise = async () => {
-        const isSunriseProcessed = await OnSunriseUtil.checkSubgraphsForSunrise();
-        const elapsedTime = Date.now() - startTime;
+      const checkSunrise = () => {
+        // Separate async check function so error handling can be attached
+        const check = async () => {
+          const isSunriseProcessed = await OnSunriseUtil.checkSubgraphsForSunrise();
+          const elapsedTime = Date.now() - startTime;
 
-        if (isSunriseProcessed) {
-          resolve();
-        } else if (elapsedTime >= maxWait) {
-          OnSunriseUtil.failureCallback(elapsedTime);
-          reject();
-        } else {
-          setTimeout(checkSunrise, INTERVAL);
-        }
+          if (isSunriseProcessed) {
+            resolve();
+          } else if (elapsedTime >= maxWait) {
+            OnSunriseUtil.failureCallback(elapsedTime);
+            reject(
+              `One or more subgraphs didn't process sunrise within the expected time, or it didn't occur on-chain.`
+            );
+          } else {
+            setTimeout(checkSunrise, INTERVAL);
+          }
+        };
+        check().catch((e) => {
+          reject(`Error while checking for sunrise: ${e}`);
+        });
       };
-
       checkSunrise();
     });
   }
