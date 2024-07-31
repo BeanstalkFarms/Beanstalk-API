@@ -38,7 +38,7 @@ class SubgraphService {
         deploymentStatuses[names[i]] = { deployment: metas[i].value.deployment };
         deploymentToName[metas[i].value.deployment] = names[i];
       } else {
-        const errorMessage = metas[i].reason.response.errors[0].message;
+        const errorMessage = metas[i].reason?.response?.errors?.[0]?.message || 'failed to obtain meta';
         deploymentStatuses[names[i]] = { error: errorMessage };
         // Consider an undeployed subgraph `healthy`
         deploymentStatuses[names[i]].healthy = errorMessage !== 'indexing_error';
@@ -101,19 +101,14 @@ class SubgraphService {
   }
 
   static async getDecentralizedStatuses() {
-    const metaPromises = [];
     const names = ['graph-beanstalk', 'graph-bean'];
     const clients = [SubgraphClient.graphBeanstalk, SubgraphClient.graphBean];
-
-    for (const client of clients) {
-      metaPromises.push(CommonSubgraphRepository.getMeta(client));
-    }
 
     const deploymentStatuses = {};
 
     const currentBlock = (await (await providerThenable).getBlock()).number;
 
-    const metas = await Promise.allSettled(metaPromises);
+    const metas = await Promise.allSettled(clients.map(CommonSubgraphRepository.getMeta));
     for (let i = 0; i < metas.length; ++i) {
       // Rejected promise will occur when the subgraph does not exist
       if (metas[i].status === 'fulfilled') {
@@ -124,7 +119,6 @@ class SubgraphService {
           blocksBehind: currentBlock - metas[i].value.block.number
         };
       } else {
-        console.log(metas[i]);
         const errorMessage = metas[i].reason?.response?.errors?.[0]?.message || 'failed to obtain meta';
         deploymentStatuses[names[i]] = { error: errorMessage };
       }
