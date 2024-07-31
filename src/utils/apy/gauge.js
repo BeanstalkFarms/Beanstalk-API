@@ -6,6 +6,7 @@
 const { PRECISION } = require('../../constants/constants');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
+const GaugePointFunctions = require('./gauge-point-functions');
 
 class GaugeApyUtil {
   /**
@@ -98,6 +99,7 @@ class GaugeApyUtil {
     }
 
     let r = fromBigInt(initialR, PRECISION.beanToMaxLpGpPerBdvRatio, PRECISION.beanToMaxLpGpPerBdvRatio / 2);
+    let rScaled;
     const siloReward = fromBigInt(beansPerSeason, PRECISION.bdv, PRECISION.bdv);
     let beanBdv =
       fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(germinatingBeanBdv);
@@ -142,8 +144,7 @@ class GaugeApyUtil {
     let ownershipStart = stalkStart.map((s) => s / totalStalk);
 
     for (let i = 0; i < duration; ++i) {
-      r = GaugeApyUtil.#updateR(r, GaugeApyUtil.#deltaRFromState(beansPerSeason));
-      const rScaled = GaugeApyUtil.#scaleR(r);
+      [r, rScaled] = GaugeApyUtil.#updateR(r, beansPerSeason);
 
       // Add germinating bdv to actual bdv in the first 2 simulated seasons
       if (i < 2) {
@@ -160,10 +161,10 @@ class GaugeApyUtil {
       // Handle multiple whitelisted gauge LP, or gauge points changing during germination
       if (gaugeLpPoints.length > 1 || i < 2) {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
-          gaugeLpPointsCopy[j] = GaugeApyUtil.#updateGaugePoints(
+          gaugeLpPointsCopy[j] = GaugePointFunctions.defaultGaugePointFunction(
             gaugeLpPointsCopy[j],
-            currentPercentLpBdv[j],
-            gaugeLpOptimalPercentBdvCopy[j]
+            gaugeLpOptimalPercentBdvCopy[j],
+            currentPercentLpBdv[j]
           );
           lpGpPerBdv[j] = gaugeLpPointsCopy[j] / gaugeLpDepositedBdvCopy[j];
         }
@@ -212,34 +213,17 @@ class GaugeApyUtil {
     }, {});
   }
 
-  static #updateR(R, change) {
-    const newR = R + change;
+  static #updateR(R, earnedBeans) {
+    // For now we return an increasing R value only when there are no beans minted over the period.
+    // In the future this needs to take into account beanstalk state and the frequency of how many seasons have mints
+    const change = earnedBeans == 0 ? 0.01 : -0.01;
+    let newR = R + change;
     if (newR > 1) {
-      return 1;
+      newR = 1;
     } else if (newR < 0) {
-      return 0;
+      newR = 0;
     }
-    return newR;
-  }
-
-  static #scaleR(R) {
-    return 0.5 + 0.5 * R;
-  }
-
-  // For now we return an increasing R value only when there are no beans minted over the period.
-  // In the future this needs to take into account beanstalk state and the frequency of how many seasons have mints
-  static #deltaRFromState(earnedBeans) {
-    if (earnedBeans == 0) {
-      return 0.01;
-    }
-    return -0.01;
-  }
-
-  // TODO: implement the various gauge point functions and choose which one to call based on the stored selector
-  // see {GaugePointFacet.defaultGaugePointFunction} for implementation.
-  // This will become relevant once there are multiple functions implemented in the contract.
-  static #updateGaugePoints(gaugePoints, currentPercent, optimalPercent) {
-    return gaugePoints;
+    return [newR, 0.5 + 0.5 * newR];
   }
 }
 
