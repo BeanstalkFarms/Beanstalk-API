@@ -4,6 +4,7 @@
  */
 
 const { PRECISION } = require('../../constants/constants');
+const { ApyInitType } = require('../../repository/postgres/models/types');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
 const GaugePointFunctions = require('./gauge-point-functions');
@@ -70,7 +71,7 @@ class GaugeApyUtil {
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
-    if (options?.initType && !['NEW', 'AVERAGE'].includes(options.initType)) {
+    if (options?.initType && ![ApyInitType.NEW, ApyInitType.AVERAGE].includes(options.initType)) {
       throw new Error(`Unrecognized initType ${options.initType}`);
     }
 
@@ -120,7 +121,7 @@ class GaugeApyUtil {
       userLp.push(tokens[i] === -1 ? 0 : 1);
       userStalk.push(
         options?.initUserValues?.[i]?.stalkPerBdv ??
-          (!options?.initType || options?.initType === 'AVERAGE'
+          (!options?.initType || options?.initType === ApyInitType.AVERAGE
             ? // AVERAGE is the default
               totalStalk / totalBdv
             : // New deposit starts with 0 stalk (all germinating)
@@ -129,7 +130,7 @@ class GaugeApyUtil {
       // These amounts will be added to user stalk as the germination period finishes
       userGerminating.push(
         options?.initUserValues?.[i]?.germinating ??
-          (!options?.initType || options?.initType === 'AVERAGE'
+          (!options?.initType || options?.initType === ApyInitType.AVERAGE
             ? // AVERAGE will not have any germinating (default)
               [0, 0]
             : // Set germination to finish after 2 seasons

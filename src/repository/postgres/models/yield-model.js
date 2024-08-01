@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       ...bigintStringColumn('emaBeans', DataTypes, { allowNull: false }),
       initType: {
         type: DataTypes.ENUM,
-        values: ['NEW', 'AVERAGE'],
+        values: Object.values(ApyInitType),
         allowNull: false
       },
       beanYield: {

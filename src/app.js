@@ -10,6 +10,7 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
+const { formatBigintHex } = require('./utils/bigint.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -39,10 +40,10 @@ async function appStartup() {
     }
     try {
       await next(); // pass control to the next function specified in .use()
-      const responseBody = JSON.stringify(ctx.body);
+      ctx.body = JSON.stringify(ctx.body, formatBigintHex);
       if (!ctx.originalUrl.includes('healthcheck')) {
         console.log(
-          `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`
+          `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`
         );
       }
     } catch (err) {

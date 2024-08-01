@@ -87,6 +87,10 @@ class SiloApyService {
       yields: {}
     };
     const windowEMAs = await this.calcWindowEMA(beanstalk, season, windows);
+    apyResults.emaBeans = windowEMAs.reduce((a, c) => {
+      a[c.window] = c.beansPerSeason;
+      return a;
+    }, {});
     if (season < GAUGE_SEASON) {
       const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
 

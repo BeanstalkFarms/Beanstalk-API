@@ -3,7 +3,7 @@ const { MILESTONE } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const EVM = require('../datasources/evm');
 const subgraphClient = require('../datasources/subgraph-client');
-const { sequelize, Sequelize } = require('../repository/postgres/models');
+const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
@@ -112,26 +112,21 @@ class SiloService {
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
     const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
-    const rows = await sequelize.models.Token.findAll({
-      where: {
-        isWhitelisted: {
-          [Sequelize.Op.eq]: true
-        }
-      },
-      attributes: ['token', 'decimals']
-    });
+    const tokenModels = await TokenRepository.findWhitelistedTokens();
 
     await sequelize.transaction(async (transaction) => {
-      for (const row of rows) {
-        const token = row.token;
+      for (const tokenModel of tokenModels) {
+        const token = tokenModel.token;
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** row.decimals))))(),
+          (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
           bs.s.ss[token].stalkEarnedPerSeason,
           (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
           (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
           (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
         ]);
-        await sequelize.models.Token.update(
+
+        TokenRepository.updateToken(
+          token,
           {
             bdv,
             stalkEarnedPerSeason,
@@ -140,9 +135,6 @@ class SiloService {
             totalDepositedBdv
           },
           {
-            where: {
-              token
-            },
             transaction
           }
         );

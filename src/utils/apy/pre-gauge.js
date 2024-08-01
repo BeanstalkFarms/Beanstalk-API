@@ -4,6 +4,7 @@
  */
 
 const { PRECISION } = require('../../constants/constants');
+const { ApyInitType } = require('../../repository/postgres/models/types');
 const { fromBigInt } = require('../number');
 
 class PreGaugeApyUtil {
@@ -41,7 +42,7 @@ class PreGaugeApyUtil {
     let userStalk = tokens.map(
       (_, idx) =>
         options?.initUserValues?.[idx]?.stalkPerBdv ??
-        (!options?.initType || options?.initType === 'AVERAGE'
+        (!options?.initType || options?.initType === ApyInitType.AVERAGE
           ? // AVERAGE is the default
             totalStalk / totalDepositedBdv
           : // New deposit starts with 1 stalk
