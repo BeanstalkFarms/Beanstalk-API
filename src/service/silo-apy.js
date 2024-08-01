@@ -21,7 +21,7 @@ const DEFAULT_WINDOWS = [24, 168, 720];
 class SiloApyService {
   /**
    * Gets the requested vAPY, calculating if needed
-   * @param {GetApyRequest}
+   * @param {GetApyRequest} request
    * @returns {Promise<CalcApysResult>}
    */
   static async getApy(request) {
@@ -55,7 +55,7 @@ class SiloApyService {
     const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason(beanstalk)).season;
     season = season ?? latestSeason;
     if (season > latestSeason) {
-      throw new InputError(`Requested season ${season} exceeds the latest on-chain season ${latestSeason}`);
+      throw new InputError(`Requested season ${season} exceeds the latest available season ${latestSeason}`);
     }
 
     const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(beanstalk, { season });

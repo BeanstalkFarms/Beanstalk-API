@@ -1,54 +1,64 @@
 'use strict';
 
-const { ApyInitType } = require('../models/types');
+const { ApyInitType } = require('../models/types/types');
 const { bigintStringColumn, timestamps } = require('../util/sequelize-util');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('yield', {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-      },
-      tokenId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'token',
-          key: 'id'
+    await queryInterface.createTable(
+      'yield',
+      {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true
         },
-        onDelete: 'RESTRICT',
-        allowNull: false
+        tokenId: {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'token',
+            key: 'id'
+          },
+          onDelete: 'RESTRICT',
+          allowNull: false
+        },
+        season: {
+          type: Sequelize.INTEGER,
+          allowNull: false
+        },
+        emaWindow: {
+          type: Sequelize.INTEGER,
+          allowNull: false
+        },
+        ...bigintStringColumn('emaBeans', Sequelize, { allowNull: false }),
+        initType: {
+          type: Sequelize.ENUM,
+          values: Object.values(ApyInitType),
+          allowNull: false
+        },
+        beanYield: {
+          type: Sequelize.FLOAT,
+          allowNull: false
+        },
+        stalkYield: {
+          type: Sequelize.FLOAT,
+          allowNull: false
+        },
+        ownershipYield: {
+          type: Sequelize.FLOAT,
+          allowNull: false
+        },
+        ...timestamps(Sequelize)
       },
-      season: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      emaWindow: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      ...bigintStringColumn('emaBeans', Sequelize, { allowNull: false }),
-      initType: {
-        type: Sequelize.ENUM,
-        values: Object.values(ApyInitType),
-        allowNull: false
-      },
-      beanYield: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      stalkYield: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      ownershipYield: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      ...timestamps(Sequelize)
-    });
+      {
+        uniqueKeys: {
+          seasonEntry: {
+            fields: ['tokenId', 'season', 'emaWindow', 'initType']
+          }
+        }
+      }
+    );
   },
 
   async down(queryInterface, Sequelize) {

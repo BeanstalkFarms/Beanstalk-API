@@ -1,4 +1,5 @@
 const { bigintStringColumn } = require('../util/sequelize-util');
+const { ApyInitType } = require('./types/types');
 
 module.exports = (sequelize, DataTypes) => {
   const Yield = sequelize.define(
@@ -37,7 +38,13 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      tableName: 'yield'
+      tableName: 'yield',
+      indexes: [
+        {
+          unique: true,
+          fields: ['tokenId', 'season', 'emaWindow', 'initType']
+        }
+      ]
     }
   );
 

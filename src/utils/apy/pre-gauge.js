@@ -4,7 +4,7 @@
  */
 
 const { PRECISION } = require('../../constants/constants');
-const { ApyInitType } = require('../../repository/postgres/models/types');
+const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 
 class PreGaugeApyUtil {

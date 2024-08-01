@@ -3,6 +3,7 @@ const { MILESTONE } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const EVM = require('../datasources/evm');
 const subgraphClient = require('../datasources/subgraph-client');
+const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
@@ -114,6 +115,7 @@ class SiloService {
     const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
     const tokenModels = await TokenRepository.findWhitelistedTokens();
 
+    const updatedTokens = [];
     await sequelize.transaction(async (transaction) => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.token;
@@ -125,21 +127,24 @@ class SiloService {
           (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
         ]);
 
-        TokenRepository.updateToken(
-          token,
-          {
-            bdv,
-            stalkEarnedPerSeason,
-            stemTip,
-            totalDeposited,
-            totalDepositedBdv
-          },
-          {
-            transaction
-          }
+        updatedTokens.push(
+          ...(await TokenRepository.updateToken(
+            token,
+            {
+              bdv,
+              stalkEarnedPerSeason,
+              stemTip,
+              totalDeposited,
+              totalDepositedBdv
+            },
+            {
+              transaction
+            }
+          ))
         );
       }
     });
+    return updatedTokens;
   }
 }
 
