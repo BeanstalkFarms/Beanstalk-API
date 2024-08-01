@@ -20,6 +20,9 @@ async function appStartup() {
 
   const app = new Koa();
 
+  // This can be useful for local development, though migrations should be used instead
+  // sequelize.sync();
+
   app.use(
     cors({
       origin: '*'

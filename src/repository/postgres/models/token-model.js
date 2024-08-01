@@ -42,6 +42,9 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // Associations here
+  Token.associate = (models) => {
+    Token.hasMany(models.Yield, { foreignKey: 'tokenId' });
+  };
 
   return Token;
 };
