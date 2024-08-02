@@ -5,7 +5,7 @@ class YieldModelAssembler {
     const yieldModels = [];
     for (const window in yieldResults.yields) {
       for (const tokenAddr in yieldResults.yields[window]) {
-        yieldRows.push({
+        yieldModels.push({
           tokenId: tokenModels.find((t) => t.token.toLowerCase() === tokenAddr).id,
           season: yieldResults.season,
           emaWindow: parseInt(window),
