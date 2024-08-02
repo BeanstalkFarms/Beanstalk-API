@@ -10,6 +10,10 @@ const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
 const InputError = require('../error/input-error');
+const YieldRepository = require('../repository/postgres/queries/yield-repository');
+const { ApyInitType } = require('../repository/postgres/models/types/types');
+const YieldModelAssembler = require('../repository/postgres/models/assemblers/yield-assembler');
+const RestParsingUtil = require('../utils/rest-parsing');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
@@ -26,10 +30,18 @@ class SiloApyService {
    */
   static async getApy(request) {
     // Check whether this request is suitable to be serviced from the database directly
-    if (!request.options && (!request.emaWindows || request.emaWindows.every((w) => DEFAULT_WINDOWS.includes(w)))) {
-      console.log('--------');
-      console.log('This info would be in the database!');
-      // Note that some of the requested tokens (i.e. dewhitelisted) might not be stored in the db, not sure yet
+    if (
+      (!request.options || RestParsingUtil.onlyHasProperties(request.options, ['initType'])) &&
+      (!request.emaWindows || request.emaWindows.every((w) => DEFAULT_WINDOWS.includes(w)))
+    ) {
+      const season = request.season ?? (await BeanstalkSubgraphRepository.getLatestSeason(BEANSTALK)).season;
+      const yields = await YieldRepository.findSeasonYields(season, {
+        emaWindows: request.emaWindows ?? DEFAULT_WINDOWS,
+        initType: request.options?.initType ?? ApyInitType.AVERAGE
+      });
+      if (yields.length > 0) {
+        return YieldModelAssembler.fromModels(yields);
+      }
     }
 
     // Prepare to calculate

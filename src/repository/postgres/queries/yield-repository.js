@@ -1,8 +1,8 @@
-const { sequelize } = require('../models');
+const { sequelize, Sequelize } = require('../models');
 const { ApyInitType } = require('../models/types/types');
 
 const DEFAULT_OPTIONS = {
-  emaWindow: 720,
+  emaWindows: [24, 168, 720],
   initType: ApyInitType.AVERAGE
 };
 
@@ -15,6 +15,27 @@ class YieldRepository {
   // Returns the yields for the requested season
   static async findSeasonYields(season, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
+    const rows = await sequelize.models.Yield.findAll({
+      include: [
+        {
+          model: sequelize.models.Token,
+          attributes: ['token']
+        }
+      ],
+      where: {
+        season: {
+          [Sequelize.Op.eq]: season
+        },
+        emaWindow: {
+          [Sequelize.Op.in]: options.emaWindows
+        },
+        initType: {
+          [Sequelize.Op.eq]: options.initType
+        }
+      },
+      transaction: options.transaction
+    });
+    return rows;
   }
 
   // Returns yields within the requested season range

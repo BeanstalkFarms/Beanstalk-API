@@ -21,6 +21,12 @@ class RestParsingUtil {
     }
     return retval;
   }
+
+  // Returns true if the only defined properties on object are the given properties.
+  static onlyHasProperties(object, properties) {
+    const definedProperties = Object.keys(object);
+    return definedProperties.length === properties.length && definedProperties.every((op) => properties.includes(op));
+  }
 }
 
 module.exports = RestParsingUtil;

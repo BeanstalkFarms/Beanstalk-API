@@ -1,4 +1,5 @@
 const { sequelize } = require('../../repository/postgres/models');
+const YieldModelAssembler = require('../../repository/postgres/models/assemblers/yield-assembler');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const YieldRepository = require('../../repository/postgres/queries/yield-repository');
 const SiloApyService = require('../../service/silo-apy');
@@ -32,25 +33,10 @@ class SunriseTask {
     ]);
 
     // Prepare rows
-    const addYieldRows = (results, initType) => {
-      for (const window in results.yields) {
-        for (const tokenAddr in results.yields[window]) {
-          yieldRows.push({
-            tokenId: tokens.find((t) => t.token.toLowerCase() === tokenAddr).id,
-            season: results.season,
-            emaWindow: parseInt(window),
-            emaBeans: BigInt(results.emaBeans[window]),
-            initType: initType,
-            beanYield: results.yields[window][tokenAddr].bean,
-            stalkYield: results.yields[window][tokenAddr].stalk,
-            ownershipYield: results.yields[window][tokenAddr].ownership
-          });
-        }
-      }
-    };
-    const yieldRows = [];
-    addYieldRows(latestAvgApy, ApyInitType.AVERAGE);
-    addYieldRows(latestNewApy, ApyInitType.NEW);
+    const yieldRows = [
+      ...YieldModelAssembler.toModels(latestAvgApy, ApyInitType.AVERAGE, tokens),
+      ...YieldModelAssembler.toModels(latestNewApy, ApyInitType.NEW, tokens)
+    ];
 
     // Save new yields
     await sequelize.transaction(async (transaction) => {
