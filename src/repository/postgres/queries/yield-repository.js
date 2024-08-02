@@ -19,7 +19,7 @@ class YieldRepository {
       include: [
         {
           model: sequelize.models.Token,
-          attributes: ['token']
+          attributes: ['address']
         }
       ],
       where: {

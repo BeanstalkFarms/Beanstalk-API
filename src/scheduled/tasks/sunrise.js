@@ -14,7 +14,7 @@ class SunriseTask {
 
     // Update whitelisted token info
     const tokens = await SiloService.updateWhitelistedTokenInfo();
-    const tokenAddrs = tokens.map((t) => t.token.toLowerCase());
+    const tokenAddrs = tokens.map((t) => t.address.toLowerCase());
 
     // Calculate latest yields
     const [latestAvgApy, latestNewApy] = await Promise.all([

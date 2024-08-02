@@ -6,19 +6,19 @@ describe('Yield Assembler', () => {
   test('Yield model transform - round trip', async () => {
     const yieldDto = require('./dtos/yield.json');
     const tokenIdMapping = [
-      { id: 1, token: BEAN },
-      { id: 2, token: BEAN3CRV },
-      { id: 3, token: BEANWETH },
-      { id: 4, token: BEANWSTETH },
-      { id: 5, token: UNRIPE_BEAN },
-      { id: 6, token: UNRIPE_LP }
+      { id: 1, address: BEAN },
+      { id: 2, address: BEAN3CRV },
+      { id: 3, address: BEANWETH },
+      { id: 4, address: BEANWSTETH },
+      { id: 5, address: UNRIPE_BEAN },
+      { id: 6, address: UNRIPE_LP }
     ];
     const models = YieldModelAssembler.toModels(yieldDto, ApyInitType.AVERAGE, tokenIdMapping);
 
     // Modify such that Token is present with the required info
     models.forEach((m) => {
       m.Token = {
-        token: tokenIdMapping.find((t) => t.id === m.tokenId).token
+        address: tokenIdMapping.find((t) => t.id === m.tokenId).address
       };
     });
 

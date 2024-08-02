@@ -18,11 +18,11 @@ class TokenRepository {
   }
 
   // Updates the given token with new column values
-  static async updateToken(token, fieldsToUpdate, options) {
+  static async updateToken(address, fieldsToUpdate, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
     const [_, updatedTokens] = await sequelize.models.Token.update(fieldsToUpdate, {
       where: {
-        token
+        address
       },
       transaction: options.transaction,
       returning: true

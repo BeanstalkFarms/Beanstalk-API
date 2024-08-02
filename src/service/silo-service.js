@@ -118,7 +118,7 @@ class SiloService {
     const updatedTokens = [];
     await sequelize.transaction(async (transaction) => {
       for (const tokenModel of tokenModels) {
-        const token = tokenModel.token;
+        const token = tokenModel.address;
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
           (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
           bs.s.ss[token].stalkEarnedPerSeason,

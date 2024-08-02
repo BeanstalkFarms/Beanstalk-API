@@ -6,7 +6,7 @@ class YieldModelAssembler {
     for (const window in yieldResults.yields) {
       for (const tokenAddr in yieldResults.yields[window]) {
         yieldModels.push({
-          tokenId: tokenModels.find((t) => t.token.toLowerCase() === tokenAddr).id,
+          tokenId: tokenModels.find((t) => t.address.toLowerCase() === tokenAddr).id,
           season: yieldResults.season,
           emaWindow: parseInt(window),
           emaBeans: BigInt(yieldResults.emaBeans[window]),
@@ -33,7 +33,7 @@ class YieldModelAssembler {
         yieldResult.yields[model.emaWindow] = {};
         yieldResult.emaBeans[model.emaWindow] = model.emaBeans;
       }
-      yieldResult.yields[model.emaWindow][model.Token.token] = {
+      yieldResult.yields[model.emaWindow][model.Token.address] = {
         bean: model.beanYield,
         stalk: model.stalkYield,
         ownership: model.ownershipYield
