@@ -1,6 +1,6 @@
 const { providerThenable } = require('../datasources/alchemy');
 const SubgraphClient = require('../datasources/subgraph-client');
-const { slugSG, SLUGS } = require('../datasources/subgraph-client');
+const { slugSG, slugStatus, SLUGS } = require('../datasources/subgraph-client');
 const CommonSubgraphRepository = require('../repository/subgraph/common-subgraph');
 
 // For retrieving current statuses of our subgraphs.
@@ -31,6 +31,7 @@ class SubgraphService {
     }
 
     const metas = await Promise.allSettled(metaPromises);
+
     const deploymentToName = {};
     for (let i = 0; i < metas.length; ++i) {
       // Rejected promise will occur when the subgraph does not exist
@@ -46,32 +47,22 @@ class SubgraphService {
     }
 
     // Get more detailed information about all subgraphs, which can be matched against the deployment identified above
-    const allStatuses = await SubgraphClient.statusGql(SubgraphClient.gql`
-      {
-        indexingStatuses {
-          subgraph
-          synced
-          health
-          fatalError {
-            message
-          }
-          chains {
-            chainHeadBlock {
-              number
-            }
-            earliestBlock {
-              number
-            }
-            latestBlock {
-              number
-            }
-          }
-        }
-      }`);
+    const statusPromises = [];
+    for (const name of names) {
+      statusPromises.push(CommonSubgraphRepository.getAlchemyStatus(slugStatus(name)));
+    }
+    const statuses = await Promise.allSettled(statusPromises);
+    const allStatuses = [];
+    for (let i = 0; i < statuses.length; ++i) {
+      // Rejected promise will occur when the subgraph does not exist
+      if (statuses[i].status === 'fulfilled') {
+        allStatuses.push(statuses[i].value);
+      }
+    }
 
     const currentBlock = (await (await providerThenable).getBlock()).number;
 
-    for (const status of allStatuses.indexingStatuses) {
+    for (const status of allStatuses) {
       const deployedNames = namesForDeployment(deploymentStatuses, status.subgraph).filter(
         (n) => !n.startsWith('graph-')
       );
@@ -81,10 +72,7 @@ class SubgraphService {
 
         // Block information
         deploymentStatuses[name].indexedBlock = parseInt(status.chains[0].latestBlock.number);
-        const totalBlocks = currentBlock - status.chains[0].earliestBlock.number;
-        const blocksIndexed = status.chains[0].latestBlock.number - status.chains[0].earliestBlock.number;
-        deploymentStatuses[name].blocksBehind = totalBlocks - blocksIndexed;
-        deploymentStatuses[name].progress = parseFloat((blocksIndexed / totalBlocks).toFixed(4));
+        deploymentStatuses[name].blocksBehind = currentBlock - status.chains[0].latestBlock.number;
         deploymentStatuses[name].chainHeadBlockLag = currentBlock - status.chains[0].chainHeadBlock.number;
       }
 
