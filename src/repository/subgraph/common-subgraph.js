@@ -15,7 +15,7 @@ class CommonSubgraphRepository {
     return meta._meta;
   }
 
-  static async getStatus(statusClient) {
+  static async getNodeStatus(statusClient) {
     const status = await statusClient(SubgraphClient.gql`
       {
         indexingStatuses {

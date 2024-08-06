@@ -4,13 +4,14 @@ const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const YieldRepository = require('../../repository/postgres/queries/yield-repository');
 const SiloApyService = require('../../service/silo-apy');
 const SiloService = require('../../service/silo-service');
+const Log = require('../../utils/logging');
 const OnSunriseUtil = require('../util/on-sunrise');
 
 class SunriseTask {
   static async handleSunrise() {
-    console.log('[handleSunrise] Waiting for sunrise to be processed by subgraphs...');
+    Log.info('Waiting for sunrise to be processed by subgraphs...');
     await OnSunriseUtil.waitForSunrise();
-    console.log('[handleSunrise] Sunrise was processed by the subgraphs, proceeding.');
+    Log.info('Sunrise was processed by the subgraphs, proceeding.');
 
     // Update whitelisted token info
     const tokens = await SiloService.updateWhitelistedTokenInfo();

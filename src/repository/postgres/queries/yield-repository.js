@@ -10,6 +10,7 @@ class YieldRepository {
   // Returns the latest available yield entries
   static async findLatestYields(options) {
     options = { ...DEFAULT_OPTIONS, ...options };
+    throw new Error('Not Implemented');
   }
 
   // Returns the yields for the requested season
@@ -41,6 +42,7 @@ class YieldRepository {
   // Returns yields within the requested season range
   static async findHistoricalYields(fromSeason, toSeason, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
+    throw new Error('Not Implemented');
   }
 
   // Inserts the given yield entries
