@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const { sendWebhookMessage } = require('../utils/discord');
 const SunriseTask = require('./tasks/sunrise');
+const Log = require('../utils/logging');
 
 // All cron jobs which could be activated are configured here
 const ALL_JOBS = {
@@ -10,7 +11,7 @@ const ALL_JOBS = {
   },
   alert: {
     cron: '*/10 * * * * *',
-    function: () => console.log('10 seconds testing Alert')
+    function: () => Log.info('10 seconds testing Alert')
   },
   failing: {
     cron: '*/5 * * * * *',
@@ -25,7 +26,7 @@ async function errorWrapper(fn) {
   try {
     fn();
   } catch (e) {
-    console.log(e);
+    Log.info(e);
     // Send message only without the stack trace
     sendWebhookMessage(e.message);
   }
@@ -45,10 +46,10 @@ function activateJobs(jobNames) {
       failed.push(jobName);
     }
   }
-  console.log(`Activated ${activated.length} jobs: ${activated.join(', ')}`);
+  Log.info(`Activated ${activated.length} jobs: ${activated.join(', ')}`);
   if (failed.length > 0) {
     sendWebhookMessage(`Failed to activate jobs: ${failed.join(', ')}`);
-    console.log(`Failed to activate jobs: ${failed.join(', ')}`);
+    Log.info(`Failed to activate jobs: ${failed.join(', ')}`);
   }
 }
 

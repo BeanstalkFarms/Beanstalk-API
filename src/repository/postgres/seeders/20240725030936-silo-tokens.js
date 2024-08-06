@@ -23,15 +23,15 @@ module.exports = {
     // Gets tokens that have already been populated
     const existingTokens = await db.sequelize.models.Token.findAll({
       where: {
-        token: {
+        address: {
           [Sequelize.Op.in]: tokens
         }
       },
-      attributes: ['token']
+      attributes: ['address']
     });
 
     // Add new tokens only
-    const newTokens = tokens.filter((token) => !existingTokens.some((t) => t.token === token));
+    const newTokens = tokens.filter((token) => !existingTokens.some((t) => t.address === token));
     if (newTokens.length > 0) {
       const rows = [];
       for (const token of newTokens) {
@@ -48,7 +48,7 @@ module.exports = {
           ]);
         const bdv = BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** decimals)));
         rows.push({
-          token,
+          address: token,
           name,
           symbol,
           decimals,

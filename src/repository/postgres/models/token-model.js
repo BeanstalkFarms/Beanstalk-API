@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true
       },
-      token: {
+      address: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
@@ -42,6 +42,9 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   // Associations here
+  Token.associate = (models) => {
+    Token.hasMany(models.Yield, { foreignKey: 'tokenId' });
+  };
 
   return Token;
 };

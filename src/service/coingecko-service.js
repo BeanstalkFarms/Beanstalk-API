@@ -22,6 +22,12 @@ class CoingeckoService {
     const batchPromiseGenerators = [];
     for (const well of allWells) {
       batchPromiseGenerators.push(async () => {
+        // Filter pools having < 1k liquidity
+        const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, well.reserves, block.number);
+        if (poolLiquidity < 1000) {
+          return;
+        }
+
         const token0 = well.tokens[0].id;
         const token1 = well.tokens[1].id;
 
@@ -34,8 +40,7 @@ class CoingeckoService {
           well.tokens.map((t) => t.decimals),
           2
         );
-        const [poolLiquidity, pool24hVolume, priceRange] = await Promise.all([
-          calcPoolLiquidityUSD(well.tokens, well.reserves, block.number),
+        const [pool24hVolume, priceRange] = await Promise.all([
           CoingeckoService.get24hVolume(well.id, block.number),
           CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
         ]);
@@ -60,8 +65,10 @@ class CoingeckoService {
       });
     }
 
-    // Execute the above promises
-    return await runBatchPromises(batchPromiseGenerators, 50);
+    // Execute the above promises. Note that subgraph rate limit can become an issue as more whitelisted pools exist.
+    // This can be improved by combining many of the separated queries together, or caching results in a database
+    const results = await runBatchPromises(batchPromiseGenerators, 50);
+    return results.filter((ticker) => ticker != null);
   }
 
   static async getTrades(options) {

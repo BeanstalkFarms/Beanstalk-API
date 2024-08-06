@@ -34,10 +34,11 @@ export type Deposit = {
   germinating?: [number];
 };
 
-export enum ApyInitType {
-  NEW,
-  AVERAGE
-}
+export const ApyInitType: {
+  NEW: 'NEW';
+  AVERAGE: 'AVERAGE';
+};
+export type ApyInitType = (typeof ApyInitType)[keyof typeof ApyInitType];
 
 export type CalcApyOptions = {
   // Target number of hours for a deposit's grown stalk to catch up (for gauge only)

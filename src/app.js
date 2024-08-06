@@ -10,6 +10,7 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
+const { formatBigintHex } = require('./utils/bigint.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -19,6 +20,9 @@ async function appStartup() {
   }
 
   const app = new Koa();
+
+  // This can be useful for local development, though migrations should be used instead
+  // sequelize.sync();
 
   app.use(
     cors({
@@ -36,13 +40,16 @@ async function appStartup() {
     }
     try {
       await next(); // pass control to the next function specified in .use()
-      const responseBody = JSON.stringify(ctx.body);
+      ctx.body = JSON.stringify(ctx.body, formatBigintHex);
       if (!ctx.originalUrl.includes('healthcheck')) {
         console.log(
-          `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${responseBody}`
+          `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`
         );
       }
     } catch (err) {
+      if (!(err instanceof Error)) {
+        err = new Error(err);
+      }
       ctx.status = err.statusCode || err.status || 500;
       ctx.body = {
         message: err.showMessage ? err.message : 'Internal Server Error.',
@@ -78,3 +85,9 @@ async function appStartup() {
   });
 }
 appStartup();
+
+// Unhandled promise rejection handler prevents api restart under those circumstances.
+// Ideally potential promise rejections are handled locally but that may not be the case.
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+});

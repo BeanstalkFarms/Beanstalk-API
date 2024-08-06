@@ -1,8 +1,8 @@
-const SubgraphClients = require('../../datasources/subgraph-client');
+const SubgraphClient = require('../../datasources/subgraph-client');
 
 class CommonSubgraphRepository {
   static async getMeta(client) {
-    const meta = await client(SubgraphClients.gql`
+    const meta = await client(SubgraphClient.gql`
       {
         _meta {
           deployment
@@ -13,6 +13,55 @@ class CommonSubgraphRepository {
         }
       }`);
     return meta._meta;
+  }
+
+  static async getNodeStatus(statusClient) {
+    const status = await statusClient(SubgraphClient.gql`
+      {
+        indexingStatuses {
+          subgraph
+          synced
+          health
+          fatalError {
+            message
+          }
+          chains {
+            chainHeadBlock {
+              number
+            }
+            earliestBlock {
+              number
+            }
+            latestBlock {
+              number
+            }
+          }
+        }
+      }`);
+    return status.indexingStatuses;
+  }
+
+  static async getAlchemyStatus(alchemyStatusClient) {
+    const status = await alchemyStatusClient(SubgraphClient.gql`
+      {
+        indexingStatusForCurrentVersion {
+          subgraph
+          synced
+          health
+          fatalError {
+            message
+          }
+          chains {
+            chainHeadBlock {
+              number
+            }
+            latestBlock {
+              number
+            }
+          }
+        }
+      }`);
+    return status.indexingStatusForCurrentVersion;
   }
 }
 
