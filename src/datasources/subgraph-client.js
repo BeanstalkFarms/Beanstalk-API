@@ -2,8 +2,10 @@ require('dotenv').config();
 const { GraphQLClient, gql } = require('graphql-request');
 const fs = require('fs');
 
-const BASE_URL = 'https://graph.bean.money/';
-const STATUS_URL = 'https://graph.bean.money/status/';
+// const BASE_URL = 'https://graph.bean.money/';
+// const STATUS_URL = 'https://graph.bean.money/status/';
+const BASE_URL = 'https://graph.node.bean.money/subgraphs/name/';
+const STATUS_URL = 'http://graph.node.bean.money:8030/graphql';
 const SLUGS = [
   (process.env.SG_BEANSTALK ?? '') !== '' ? process.env.SG_BEANSTALK : 'beanstalk',
   (process.env.SG_BEAN ?? '') !== '' ? process.env.SG_BEAN : 'bean',
