@@ -51,7 +51,7 @@ class BeanstalkSubgraphRepository {
       }`,
       '',
       `silo: "${beanstalk}", season_lte: ${toSeason}`,
-      // Lower bound seson is applied here
+      // Lower bound season is applied here
       ['season'],
       [fromSeason],
       'asc'
