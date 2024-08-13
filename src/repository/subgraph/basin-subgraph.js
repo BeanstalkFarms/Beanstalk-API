@@ -167,6 +167,7 @@ class BasinSubgraphRepository {
           where: {id: "${wellAddress}"}
         ) {
           tokens {
+            id
             decimals
           }
           tokenOrder
@@ -181,8 +182,9 @@ class BasinSubgraphRepository {
   }
 
   // Orders the tokens within the provided well. Minimal fields required are `tokens` and `tokenOrder`.
+  // `well.tokens[i]` must have an `id` field also
   static orderTokens(well) {
-    if (!well.tokens || !well.tokenOrder) {
+    if (!well.tokens || !well.tokenOrder || !well.tokens[0].id) {
       throw new Error(`Can't order tokens with the provided fields.`);
     }
     const tokenOrderMap = well.tokenOrder.reduce((a, next, idx) => {
