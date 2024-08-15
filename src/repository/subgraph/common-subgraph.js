@@ -1,6 +1,7 @@
 const SubgraphClient = require('../../datasources/subgraph-client');
 
 class CommonSubgraphRepository {
+  // TODO: once new version entity rollout is complete, add those results here and abstract the return format.
   static async getMeta(client) {
     const meta = await client(SubgraphClient.gql`
       {

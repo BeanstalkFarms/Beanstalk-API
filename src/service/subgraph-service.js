@@ -48,15 +48,24 @@ class SubgraphService {
 
     // Get more detailed information about all subgraphs, which can be matched against the deployment identified above
     const statusPromises = [];
-    for (const name of names) {
-      statusPromises.push(CommonSubgraphRepository.getAlchemyStatus(slugStatus(name)));
-    }
-    const statuses = await Promise.allSettled(statusPromises);
-    const allStatuses = [];
-    for (let i = 0; i < statuses.length; ++i) {
-      // Rejected promise will occur when the subgraph does not exist
-      if (statuses[i].status === 'fulfilled') {
-        allStatuses.push(statuses[i].value);
+
+    const GRAPH_NODE = true;
+    let allStatuses;
+    if (GRAPH_NODE) {
+      // For graph-node
+      allStatuses = await CommonSubgraphRepository.getNodeStatus(slugStatus(''));
+    } else {
+      // For alchemy
+      for (const name of names) {
+        statusPromises.push(CommonSubgraphRepository.getAlchemyStatus(slugStatus(name)));
+      }
+      const statuses = await Promise.allSettled(statusPromises);
+      allStatuses = [];
+      for (let i = 0; i < statuses.length; ++i) {
+        // Rejected promise will occur when the subgraph does not exist
+        if (statuses[i].status === 'fulfilled') {
+          allStatuses.push(statuses[i].value);
+        }
       }
     }
 
