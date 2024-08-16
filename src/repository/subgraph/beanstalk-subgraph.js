@@ -82,7 +82,6 @@ class BeanstalkSubgraphRepository {
         ) {
           seeds
           stalk
-          plantableStalk
           depositedBDV
         }
       }`);
@@ -121,7 +120,6 @@ class BeanstalkSubgraphRepository {
           beanToMaxLpGpPerBdvRatio
           seeds
           stalk
-          plantableStalk
           whitelistedTokens
         }
         siloAssets(
