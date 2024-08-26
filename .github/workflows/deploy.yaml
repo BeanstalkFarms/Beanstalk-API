@@ -64,4 +64,4 @@ jobs:
       - name: Execute Remote Deployment Script
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.USERNAME }}@${{ secrets.SERVER_HOST }} \
-          "bash /home/${{ secrets.USERNAME }}/deploy.sh ${{ needs.validation.outputs.branch }} ${{ needs.validation.outputs.environment }}"
+          "bash ${{secrets.DEPLOY_SCRIPT_PATH}} ${{ needs.validation.outputs.branch }} ${{ needs.validation.outputs.environment }}"
