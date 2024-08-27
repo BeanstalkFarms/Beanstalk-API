@@ -2,19 +2,13 @@ require('dotenv').config();
 const { GraphQLClient, gql } = require('graphql-request');
 const fs = require('fs');
 
-// const BASE_URL = 'https://graph.bean.money/';
-// const STATUS_URL = 'https://graph.bean.money/status/';
-const BASE_URL = 'https://graph.node.bean.money/subgraphs/name/';
-const STATUS_URL = 'http://graph.node.bean.money:8030/graphql';
+const BASE_URL = 'https://graph.bean.money/';
 const SLUGS = [
   (process.env.SG_BEANSTALK ?? '') !== '' ? process.env.SG_BEANSTALK : 'beanstalk',
   (process.env.SG_BEAN ?? '') !== '' ? process.env.SG_BEAN : 'bean',
   (process.env.SG_BASIN ?? '') !== '' ? process.env.SG_BASIN : 'basin',
   (process.env.SG_BEANFT ?? '') !== '' ? process.env.SG_BEANFT : 'beanft'
 ];
-
-const DECENTRALIZED_BEANSTALK = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/CQgB9aDyd13X6rUtJcCWr8KtFpGGRMifu1mM6k4xQ9YA`;
-const DECENTRALIZED_BEAN = `https://gateway-arbitrum.network.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/Hqtmas8CJUHXwFf7acS2sjaTw6tvdNQM3kaz2CqtYM3V`;
 
 const clients = {};
 
@@ -49,9 +43,6 @@ module.exports = {
   basinSG: clientBuilder(BASE_URL + SLUGS[2]),
   beanftSG: clientBuilder(BASE_URL + SLUGS[3]),
   slugSG: (slug) => clientBuilder(BASE_URL + slug),
-  graphBeanstalk: clientBuilder(DECENTRALIZED_BEANSTALK),
-  graphBean: clientBuilder(DECENTRALIZED_BEAN),
-  slugStatus: (slug) => clientBuilder(STATUS_URL + slug),
   urlGql: clientBuilder,
   gql,
   SLUGS
