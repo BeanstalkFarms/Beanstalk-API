@@ -176,21 +176,20 @@ class BeanstalkSubgraphRepository {
     );
   }
 
-  static async getBlockForSeason(beanstalk, season) {
+  static async getBlockForSeason(season) {
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
-        seasons(where: {beanstalk: "${beanstalk}", season: ${season}}) {
+        seasons(where: {season: ${season}}) {
           sunriseBlock
         }
       }`);
     return result.seasons[0]?.sunriseBlock;
   }
 
-  static async getLatestSeason(beanstalk) {
+  static async getLatestSeason() {
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
         seasons(
-          where: {beanstalk: "${beanstalk.toLowerCase()}"}
           orderBy: season
           orderDirection: desc
           first: 1
