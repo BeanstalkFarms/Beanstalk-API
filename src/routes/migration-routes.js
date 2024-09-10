@@ -2,6 +2,7 @@ const fs = require('fs');
 const Router = require('koa-router');
 const RestParsingUtil = require('../utils/rest-parsing');
 const { BEAN, BEANWETH, BEANWSTETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP } = require('../constants/addresses');
+const { providerThenable } = require('../datasources/alchemy');
 
 const router = new Router({
   prefix: '/migration'
@@ -14,7 +15,7 @@ const router = new Router({
 router.get('/', async (ctx) => {
   const options = RestParsingUtil.parseQuery(ctx.query);
 
-  const BLOCK = 20577510;
+  const BLOCK = 20717000;
   const allDeposits = JSON.parse(fs.readFileSync(`${__dirname}/../datasources/migration/deposits${BLOCK}.json`));
   const allPods = JSON.parse(fs.readFileSync(`${__dirname}/../datasources/migration/pods${BLOCK}.json`));
   const allFertilizer = JSON.parse(fs.readFileSync(`${__dirname}/../datasources/migration/fert${BLOCK}.json`));
@@ -25,6 +26,11 @@ router.get('/', async (ctx) => {
   const account = options.account.toLowerCase();
 
   const accountResults = {
+    meta: {
+      account,
+      block: BLOCK,
+      timestamp: (await (await providerThenable).getBlock(BLOCK)).timestamp
+    },
     silo: getSiloResult(allDeposits, account),
     field: getFieldResult(allPods, account),
     barn: getBarnResult(allFertilizer, account),
