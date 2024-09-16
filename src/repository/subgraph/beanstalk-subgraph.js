@@ -109,7 +109,7 @@ class BeanstalkSubgraphRepository {
           id
           stalkEarnedPerSeason
           stalkIssuedPerBdv
-          isGauge
+          isGaugeEnabled
           gaugePoints
           optimalPercentDepositedBdv
         }

@@ -154,7 +154,7 @@ class SiloApyService {
           continue;
         }
 
-        if (tokenInfo.isGauge) {
+        if (tokenInfo.isGaugeEnabled) {
           // Gauge LP
           gaugeLpPoints.push(tokenInfo.gaugePoints);
           gaugeLpOptimalPercentBdv.push(tokenInfo.optimalPercentDepositedBdv);
