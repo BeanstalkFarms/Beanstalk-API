@@ -109,7 +109,7 @@ class BeanstalkSubgraphRepository {
           id
           stalkEarnedPerSeason
           stalkIssuedPerBdv
-          gpSelector
+          isGauge
           gaugePoints
           optimalPercentDepositedBdv
         }
@@ -156,12 +156,11 @@ class BeanstalkSubgraphRepository {
     }
 
     const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
-      const { id, gpSelector, ...rest } = nextToken;
+      const { id, ...rest } = nextToken;
       result[id] = {
         depositedBDV: depositAmounts[id].depositedBDV,
         germinatingBDV: germinationInfo[id],
         isWhitelisted: apyInputs.silo.whitelistedTokens.includes(id),
-        isGauge: gpSelector != null,
         ...rest
       };
       return result;
@@ -172,7 +171,7 @@ class BeanstalkSubgraphRepository {
         silo: apyInputs.silo,
         tokens
       },
-      ['whitelistedTokens', 'gpSelector']
+      ['whitelistedTokens']
     );
   }
 
