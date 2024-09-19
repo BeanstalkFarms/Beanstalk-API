@@ -1,13 +1,8 @@
 const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
-const SubgraphRepository = require('./common-subgraph');
 
 class BeanstalkSubgraphRepository {
-  static async getMeta() {
-    return await SubgraphRepository.getMeta(SubgraphClients.beanstalkSG);
-  }
-
   static async getDepositedBdvs(accounts, blockNumber) {
     const silos = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.beanstalkSG,

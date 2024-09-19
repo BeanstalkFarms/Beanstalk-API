@@ -16,8 +16,8 @@ const { BigNumber } = require('alchemy-sdk');
 const ConstantProductUtil = require('../src/utils/pool/constant-product');
 const { parseQuery } = require('../src/utils/rest-parsing');
 const SubgraphClients = require('../src/datasources/subgraph-client');
-const { BEANSTALK } = require('../src/constants/addresses');
 const { allToBigInt, fromBigInt } = require('../src/utils/number');
+const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
 
 describe('Utils', () => {
   it('should format query parameters correctly', async () => {
@@ -34,12 +34,8 @@ describe('Utils', () => {
   });
 
   it('should maximally use block number that the subgraph has indexed', async () => {
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValue({
-      _meta: {
-        block: {
-          number: 19500000
-        }
-      }
+    jest.spyOn(CommonSubgraphRepository, 'getMeta').mockResolvedValue({
+      block: 19500000
     });
 
     jest.spyOn(BlockUtil, 'blockFromOptions').mockResolvedValue({

@@ -53,7 +53,7 @@ class OnSunriseUtil {
         CommonSubgraphRepository.getMeta(SubgraphClient.beanSG),
         CommonSubgraphRepository.getMeta(SubgraphClient.basinSG)
       ]);
-      return Math.min(parseInt(beanMeta.block.number), parseInt(basinMeta.block.number)) >= newSeasonBlock;
+      return Math.min(parseInt(beanMeta.block), parseInt(basinMeta.block)) >= newSeasonBlock;
     }
     return false;
   }

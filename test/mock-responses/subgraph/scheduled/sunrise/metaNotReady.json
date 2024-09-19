@@ -1,9 +1,14 @@
 {
   "_meta": {
-      "deployment": "QmYk7yDvzpkd7XsqUhHeoNG6twCNEqShGa8ZR5V6piagnB",
-      "hasIndexingErrors": false,
-      "block": {
-        "number": 18650643
-      }
+    "deployment": "QmYk7yDvzpkd7XsqUhHeoNG6twCNEqShGa8ZR5V6piagnB",
+    "hasIndexingErrors": false,
+    "block": {
+      "number": 18650643
     }
+  },
+  "version": {
+    "subgraphName": "beanstalk",
+    "chain": "ethereum",
+    "versionNumber": "2.3.1"
+  }
 }

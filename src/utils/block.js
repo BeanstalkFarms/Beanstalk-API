@@ -1,6 +1,7 @@
 const { providerThenable } = require('../datasources/alchemy');
 const { gql } = require('../datasources/subgraph-client');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
+const CommonSubgraphRepository = require('../repository/subgraph/common-subgraph');
 
 class BlockUtil {
   // Returns the block data to use for the given options.
@@ -17,20 +18,10 @@ class BlockUtil {
   // Returns the block data to use for the given options,
   // constrained by the maximal indexed block of the given subgraph.
   static async blockForSubgraphFromOptions(subgraphClient, options) {
-    const subgraphBlock = (
-      await subgraphClient(gql`
-        {
-          _meta {
-            block {
-              number
-            }
-          }
-        }
-      `)
-    )._meta.block.number;
+    const subgraphMeta = await CommonSubgraphRepository.getMeta(subgraphClient);
 
     const optionsBlock = await BlockUtil.blockFromOptions(options);
-    const blockToUse = Math.min(subgraphBlock, optionsBlock.number);
+    const blockToUse = Math.min(subgraphMeta.block, optionsBlock.number);
 
     return await (await providerThenable).getBlock(blockToUse);
   }
