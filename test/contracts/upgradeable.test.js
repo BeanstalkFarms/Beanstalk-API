@@ -1,13 +1,12 @@
-const { providerThenable } = require('../../src/datasources/alchemy');
 const Contracts = require('../../src/datasources/contracts/contracts');
 const UpgradeableContract = require('../../src/datasources/contracts/upgradeable-contract');
 const { priceMapping } = require('../../src/datasources/contracts/upgradeable-mappings');
 
 describe('UpgradeableContract', () => {
   it('should call the correct contract address by block number', async () => {
-    const spy = jest.spyOn(Contracts, 'makeContract');
+    const spy = jest.spyOn(Contracts, 'makeContract').mockResolvedValue(null);
 
-    const provider = await providerThenable;
+    const provider = null;
     const priceContract = new UpgradeableContract(priceMapping, provider);
 
     // Avoid invoking the external call, this is enough to create the proper contract

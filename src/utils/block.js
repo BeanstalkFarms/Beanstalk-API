@@ -1,4 +1,3 @@
-const { BEANSTALK } = require('../constants/addresses');
 const { providerThenable } = require('../datasources/alchemy');
 const { gql } = require('../datasources/subgraph-client');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
@@ -59,8 +58,8 @@ class BlockUtil {
     return bestBlock;
   }
 
-  static async findBlockForSeason(beanstalk, season) {
-    const block = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+  static async findBlockForSeason(season) {
+    const block = await BeanstalkSubgraphRepository.getBlockForSeason(season);
     return block;
   }
 }

@@ -108,7 +108,7 @@ describe('Utils', () => {
       ]
     });
 
-    const blockForSeason = await BlockUtil.findBlockForSeason(BEANSTALK, 22183);
+    const blockForSeason = await BlockUtil.findBlockForSeason(22183);
     expect(blockForSeason).toBe(20042493);
   });
 

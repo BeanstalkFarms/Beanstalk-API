@@ -65,7 +65,7 @@ class BeanstalkSubgraphRepository {
   }
 
   static async getPreGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season);
 
     const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
@@ -99,7 +99,7 @@ class BeanstalkSubgraphRepository {
   }
 
   static async getGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season);
 
     const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
@@ -203,7 +203,7 @@ class BeanstalkSubgraphRepository {
 
   // Returns all tokens that have been whitelisted prior to the given block or season.
   static async getPreviouslyWhitelistedTokens(beanstalk, { block, season }) {
-    const blockNumber = block ?? (await this.getBlockForSeason(beanstalk, season));
+    const blockNumber = block ?? (await this.getBlockForSeason(season));
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
         silo(
