@@ -24,8 +24,8 @@ class ConstantProductUtil {
   static calcDepth(reserves, decimals, percent = 2) {
     const sqrtPrecision = BigInt(10 ** 15);
     // For negative/positive depths
-    const negSqrt = BigInt(Math.round(Math.sqrt((100 - percent) / 100))) * sqrtPrecision;
-    const posSqrt = BigInt(Math.round(Math.sqrt((100 + percent) / 100))) * sqrtPrecision;
+    const negSqrt = BigInt(Math.round(Math.sqrt((100 - percent) / 100) * Number(sqrtPrecision)));
+    const posSqrt = BigInt(Math.round(Math.sqrt((100 + percent) / 100) * Number(sqrtPrecision)));
 
     // Determine amount of tokens in the pool after would-be transactions of the given percent.
     // Note that the answers for token0 and token1 are not related in the sense that they do not
