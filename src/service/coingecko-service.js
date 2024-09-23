@@ -119,7 +119,7 @@ class CoingeckoService {
     // i.e. if there is $50k volume, it expects something like 50k BEAN and 15 ETH to be reported
     const rollingVolume = await BasinSubgraphRepository.getRollingVolume(wellAddress, blockNumber);
     return createNumberSpread(
-      rollingVolume.map((v) => v.bn),
+      rollingVolume.map((v) => v.amount),
       rollingVolume.map((v) => v.decimals)
     );
   }

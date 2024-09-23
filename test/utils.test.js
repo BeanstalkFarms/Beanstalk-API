@@ -56,8 +56,8 @@ describe('Utils', () => {
   it('should calculate correct token prices in constant product pool', async () => {
     const prices = ConstantProductUtil.calcPrice([13834969782037n, 4519904117717436850412n], [6, 18]);
 
-    expect(prices.bn[0]).toEqual(326701408743658n);
-    expect(prices.bn[1]).toEqual(3060898953n);
+    expect(prices.raw[0]).toEqual(326701408743658n);
+    expect(prices.raw[1]).toEqual(3060898953n);
     expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
     expect(prices.float[1]).toBeCloseTo(3060.898953);
   });
@@ -73,13 +73,16 @@ describe('Utils', () => {
     const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
 
     const priceAfterBuy0 = ConstantProductUtil.calcPrice(
-      [reserves[0] - depth.buy.bn[0], ConstantProductUtil.calcMissingReserve(reserves, reserves[0] - depth.buy.bn[0])],
+      [
+        reserves[0] - depth.buy.raw[0],
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[0] - depth.buy.raw[0])
+      ],
       decimals
     );
     const priceAfterSell1 = ConstantProductUtil.calcPrice(
       [
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[1] + depth.sell.bn[1]),
-        reserves[1] + depth.sell.bn[1]
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[1] + depth.sell.raw[1]),
+        reserves[1] + depth.sell.raw[1]
       ],
       decimals
     );

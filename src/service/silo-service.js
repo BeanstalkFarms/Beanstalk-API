@@ -30,7 +30,7 @@ class SiloService {
       }
 
       // Parallelize all calls for this account
-      const grownStalkResults = (await Promise.all(promises)).map((bn) => createNumberSpread(bn, 10, 2));
+      const grownStalkResults = (await Promise.all(promises)).map((bi) => createNumberSpread(bi, 10, 2));
 
       // Compute total and by asset breakdown
       let total = 0;

@@ -175,7 +175,7 @@ class BasinSubgraphRepository {
       }`);
     result.wells.forEach(this.orderTokens);
     return result.wells[0].tokens.map((t, idx) => ({
-      bn: BigInt(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
+      amount: BigInt(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
       decimals: t.decimals
     }));
   }
