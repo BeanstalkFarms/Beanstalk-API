@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     entrypoint: ["./entrypoint-proxy.sh", "postgres", "5432", "npm", "start"]
-    restart: on-failure
+    restart: no
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
       interval: 30s

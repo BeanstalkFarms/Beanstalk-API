@@ -1,5 +1,4 @@
-const { BigNumber } = require('alchemy-sdk');
-const { TEN_BN, MILESTONE, ZERO_BN } = require('../../src/constants/constants');
+const { MILESTONE } = require('../../src/constants/constants');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../../src/service/silo-service');
 const BlockUtil = require('../../src/utils/block');
 const subgraphClient = require('../../src/datasources/subgraph-client');
@@ -25,9 +24,9 @@ describe('SiloService', () => {
       callStatic: {
         balanceOfGrownStalk: jest.fn().mockImplementation((account, asset) => {
           if (account == accounts[0]) {
-            return BigNumber.from(50).mul(TEN_BN.pow(10));
+            return 50n * BigInt(10 ** 10);
           } else {
-            return BigNumber.from(15).mul(TEN_BN.pow(10));
+            return 15n * BigInt(10 ** 10);
           }
         })
       }
@@ -54,16 +53,16 @@ describe('SiloService', () => {
       callStatic: {
         stemTipForToken: jest.fn().mockImplementation((token, options) => {
           if (options.blockTag == MILESTONE.siloV3 || token == UNRIPE_BEAN || token == UNRIPE_LP) {
-            return ZERO_BN;
+            return 0n;
           } else {
-            return BigNumber.from(10000);
+            return 10000n;
           }
         }),
         balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
           if (account == accounts[0]) {
-            return BigNumber.from(5000).mul(TEN_BN.pow(10));
+            return 5000n * BigInt(10 ** 10);
           } else {
-            return BigNumber.from(150000).mul(TEN_BN.pow(10));
+            return 150000n * BigInt(10 ** 10);
           }
         })
       }

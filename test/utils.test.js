@@ -12,7 +12,6 @@ jest.mock('../src/datasources/alchemy', () => ({
 }));
 const alchemy = require('../src/datasources/alchemy');
 
-const { BigNumber } = require('alchemy-sdk');
 const ConstantProductUtil = require('../src/utils/pool/constant-product');
 const { parseQuery } = require('../src/utils/rest-parsing');
 const SubgraphClients = require('../src/datasources/subgraph-client');
@@ -55,19 +54,16 @@ describe('Utils', () => {
   });
 
   it('should calculate correct token prices in constant product pool', async () => {
-    const prices = ConstantProductUtil.calcPrice(
-      ['13834969782037', '4519904117717436850412'].map(BigNumber.from),
-      [6, 18]
-    );
+    const prices = ConstantProductUtil.calcPrice([13834969782037n, 4519904117717436850412n], [6, 18]);
 
-    expect(prices.bn[0]).toEqual(BigNumber.from(326701408743658));
-    expect(prices.bn[1]).toEqual(BigNumber.from(3060898953));
+    expect(prices.bn[0]).toEqual(326701408743658n);
+    expect(prices.bn[1]).toEqual(3060898953n);
     expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
     expect(prices.float[1]).toBeCloseTo(3060.898953);
   });
 
   it('should calculate liquidity depth in constant product pool', async () => {
-    const reserves = ['14327543308971', '3915916427871363595968'].map(BigNumber.from);
+    const reserves = [14327543308971n, 3915916427871363595968n];
     const decimals = [6, 18];
     const percent = 40;
     const buyMultiple = (100 + percent) / 100;
@@ -77,16 +73,13 @@ describe('Utils', () => {
     const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
 
     const priceAfterBuy0 = ConstantProductUtil.calcPrice(
-      [
-        reserves[0].sub(depth.buy.bn[0]),
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[0].sub(depth.buy.bn[0]))
-      ],
+      [reserves[0] - depth.buy.bn[0], ConstantProductUtil.calcMissingReserve(reserves, reserves[0] - depth.buy.bn[0])],
       decimals
     );
     const priceAfterSell1 = ConstantProductUtil.calcPrice(
       [
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[1].add(depth.sell.bn[1])),
-        reserves[1].add(depth.sell.bn[1])
+        ConstantProductUtil.calcMissingReserve(reserves, reserves[1] + depth.sell.bn[1]),
+        reserves[1] + depth.sell.bn[1]
       ],
       decimals
     );

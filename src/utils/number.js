@@ -1,7 +1,7 @@
 const { formatUnits } = require('ethers');
 
 class NumberUtil {
-  // For the given BigNumber/decimal precision, spread into bn, string, and float result.
+  // For the given BigInt/decimal precision, spread into bn, string, and float result.
   // bns/decimals can either be a single value, or an array
   static createNumberSpread(bns, decimals, floatPrecision = undefined) {
     if (!Array.isArray(bns)) {
@@ -22,7 +22,7 @@ class NumberUtil {
     return retval;
   }
 
-  // Internal function for spreading an individual BigNumber
+  // Internal function for spreading an individual BigInt
   static #getSpread(bn, decimals, floatPrecision) {
     let string = formatUnits(bn.toString(), decimals);
     let float = parseFloat(formatUnits(bn.toString(), decimals));

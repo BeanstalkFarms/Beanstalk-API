@@ -1,7 +1,6 @@
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const { BEAN, WETH, WSTETH } = require('../constants/addresses');
-const { TEN_BN } = require('../constants/constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 
 class PriceService {
@@ -22,9 +21,9 @@ class PriceService {
       block: block.number,
       timestamp: block.timestamp,
       token: BEAN,
-      usdPrice: createNumberSpread(priceResult.price, 6, 4).float,
-      liquidityUSD: createNumberSpread(priceResult.liquidity, 6, 2).float,
-      deltaB: createNumberSpread(priceResult.deltaB, 6, 0).float
+      usdPrice: createNumberSpread(BigInt(priceResult.price), 6, 4).float,
+      liquidityUSD: createNumberSpread(BigInt(priceResult.liquidity), 6, 2).float,
+      deltaB: createNumberSpread(BigInt(priceResult.deltaB), 6, 0).float
     };
     return readable;
   }
@@ -33,11 +32,12 @@ class PriceService {
   static async getUsdOracleTokenPrice(token, options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
     const usdOracle = await ContractGetters.getUsdOracleContract(block.number);
-    const result = await (usdOracle.__version() === 1
-      ? usdOracle.callStatic.getUsdPrice(token)
-      : usdOracle.callStatic.getTokenUsdPrice(token));
+    const result =
+      usdOracle.__version() === 1
+        ? BigInt(await usdOracle.callStatic.getUsdPrice(token))
+        : BigInt(await usdOracle.callStatic.getTokenUsdPrice(token));
     // Version 1 returned a twa price, but with no lookback. Its already instantaneous but needs conversion
-    const instPrice = usdOracle.__version() === 1 ? TEN_BN.pow(24).div(result) : result;
+    const instPrice = usdOracle.__version() === 1 ? BigInt(10 ** 24) / result : result;
 
     const readable = {
       block: block.number,

@@ -1,7 +1,6 @@
 const BlockUtil = require('../../src/utils/block');
 
 const { getBeanPrice, getUsdOracleTokenPrice } = require('../../src/service/price-service');
-const { BigNumber } = require('alchemy-sdk');
 const ContractGetters = require('../../src/datasources/contracts/contract-getters');
 
 const defaultOptions = { blockNumber: 19000000 };
@@ -19,9 +18,9 @@ describe('PriceService', () => {
     const mockPrice = {
       callStatic: {
         price: jest.fn().mockResolvedValue({
-          price: BigNumber.from('997747'),
-          liquidity: BigNumber.from('27676822893057'),
-          deltaB: BigNumber.from('-16781104856')
+          price: 997747n,
+          liquidity: 27676822893057n,
+          deltaB: -16781104856n
         })
       }
     };
@@ -36,8 +35,8 @@ describe('PriceService', () => {
   it('should fetch and format USDOracle price correctly', async () => {
     mockUsdOracle = {
       callStatic: {
-        getUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('390100082091451')),
-        getTokenUsdPrice: jest.fn().mockResolvedValue(BigNumber.from('3403121673'))
+        getUsdPrice: jest.fn().mockResolvedValue(390100082091451n),
+        getTokenUsdPrice: jest.fn().mockResolvedValue(3403121673n)
       },
       __version: jest.fn().mockReturnValue(1)
     };

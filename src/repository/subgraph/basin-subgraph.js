@@ -1,4 +1,3 @@
-const { BigNumber } = require('alchemy-sdk');
 const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 
@@ -26,7 +25,7 @@ class BasinSubgraphRepository {
       'asc'
     );
     allWells.forEach(this.orderTokens);
-    allWells.map((well) => (well.reserves = well.reserves.map(BigNumber.from)));
+    allWells.map((well) => (well.reserves = well.reserves.map(BigInt)));
     return allWells;
   }
 
@@ -72,8 +71,8 @@ class BasinSubgraphRepository {
       'asc'
     );
     allSwaps.map((swap) => {
-      swap.amountIn = BigNumber.from(swap.amountIn);
-      swap.amountOut = BigNumber.from(swap.amountOut);
+      swap.amountIn = BigInt(swap.amountIn);
+      swap.amountOut = BigInt(swap.amountOut);
     });
 
     return allSwaps;
@@ -108,8 +107,8 @@ class BasinSubgraphRepository {
         }
       }`);
     result.swaps.map((swap) => {
-      swap.amountIn = BigNumber.from(swap.amountIn);
-      swap.amountOut = BigNumber.from(swap.amountOut);
+      swap.amountIn = BigInt(swap.amountIn);
+      swap.amountOut = BigInt(swap.amountOut);
     });
 
     return result.swaps;
@@ -132,7 +131,7 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allDeposits.map((deposit) => (deposit.reserves = deposit.reserves.map(BigNumber.from)));
+    allDeposits.map((deposit) => (deposit.reserves = deposit.reserves.map(BigInt)));
 
     return allDeposits;
   }
@@ -154,7 +153,7 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allWithdraws.map((withdraw) => (withdraw.reserves = withdraw.reserves.map(BigNumber.from)));
+    allWithdraws.map((withdraw) => (withdraw.reserves = withdraw.reserves.map(BigInt)));
 
     return allWithdraws;
   }
@@ -176,7 +175,7 @@ class BasinSubgraphRepository {
       }`);
     result.wells.forEach(this.orderTokens);
     return result.wells[0].tokens.map((t, idx) => ({
-      bn: BigNumber.from(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
+      bn: BigInt(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
       decimals: t.decimals
     }));
   }

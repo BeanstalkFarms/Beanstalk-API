@@ -11,7 +11,6 @@ const {
   get24hVolume
 } = require('../../src/service/coingecko-service');
 const { BEANWETH, WETH, BEAN } = require('../../src/constants/addresses');
-const { BigNumber } = require('alchemy-sdk');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 
 describe('CoingeckoService', () => {
@@ -77,12 +76,7 @@ describe('CoingeckoService', () => {
         decimals: 18
       }
     ];
-    const priceRange = await getWellPriceRange(
-      BEANWETH,
-      tokens,
-      [BigNumber.from('20000000000'), BigNumber.from('10000000000000000000')],
-      1715020584
-    );
+    const priceRange = await getWellPriceRange(BEANWETH, tokens, [20000000000n, 10000000000000000000n], 1715020584);
     expect(priceRange.high.float[0]).toBeCloseTo(0.00075);
     expect(priceRange.low.float[0]).toBeCloseTo(0.001416666666666666);
   });

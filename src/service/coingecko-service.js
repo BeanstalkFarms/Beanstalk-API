@@ -1,9 +1,7 @@
-const { BigNumber } = require('alchemy-sdk');
 const SubgraphClients = require('../datasources/subgraph-client');
 const BlockUtil = require('../utils/block');
 const { calcPoolLiquidityUSD } = require('../utils/pool/liquidity');
 const { createNumberSpread } = require('../utils/number');
-const { ZERO_BN } = require('../constants/constants');
 const ConstantProductUtil = require('../utils/pool/constant-product');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
@@ -131,14 +129,14 @@ class CoingeckoService {
     const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
 
     if (allSwaps.length === 0) {
-      return createNumberSpread([BigNumber.from(0), BigNumber.from(0)], [1, 1]);
+      return createNumberSpread([0n, 0n], [1, 1]);
     }
 
     // Add all of the swap amounts for each token
     const swapVolume = {};
     for (const swap of allSwaps) {
-      swapVolume[swap.fromToken.id] = swapVolume[swap.fromToken.id]?.add(swap.amountIn) ?? swap.amountIn;
-      swapVolume[swap.toToken.id] = swapVolume[swap.toToken.id]?.add(swap.amountOut) ?? swap.amountOut;
+      swapVolume[swap.fromToken.id] = (swapVolume[swap.fromToken.id] ?? 0n) + swap.amountIn;
+      swapVolume[swap.toToken.id] = (swapVolume[swap.toToken.id] ?? 0n) + swap.amountOut;
     }
 
     const decimals = {
@@ -156,7 +154,7 @@ class CoingeckoService {
    * Gets the high/low over the given time range
    * @param {string} wellAddress - address of the well
    * @param {object[]} wellTokens - tokens in the well and their decimals
-   * @param {BigNumber[]} endReserves - reserves in the well at `timestamp`
+   * @param {BigInt[]} endReserves - reserves in the well at `timestamp`
    * @param {number} timestamp - the upper bound timestamp
    * @param {number} lookback - amount of time to look in the past
    * @returns high/low price over the given time period, in terms of the underlying tokens
@@ -177,15 +175,15 @@ class CoingeckoService {
     // Aggregate all into one list. Initial entry with big timestamp to also consider the current price.
     const aggregated = [
       {
-        0: ZERO_BN,
-        1: ZERO_BN,
+        0: 0n,
+        1: 0n,
         timestamp: 5000000000000
       }
     ];
     for (const swap of allSwaps) {
       aggregated.push({
         [wellTokens.findIndex((t) => t.id === swap.fromToken.id)]: swap.amountIn,
-        [wellTokens.findIndex((t) => t.id === swap.toToken.id)]: ZERO_BN.sub(swap.amountOut),
+        [wellTokens.findIndex((t) => t.id === swap.toToken.id)]: -swap.amountOut,
         timestamp: swap.timestamp
       });
     }
@@ -196,7 +194,7 @@ class CoingeckoService {
           timestamp: liqEvent.timestamp
         };
         for (let i = 0; i < wellTokens.length; ++i) {
-          normalized[i] = neg ? ZERO_BN.sub(liqEvent.reserves[i]) : liqEvent.reserves[i];
+          normalized[i] = neg ? -liqEvent.reserves[i] : liqEvent.reserves[i];
         }
         aggregated.push(normalized);
       }
@@ -211,7 +209,7 @@ class CoingeckoService {
     const tokenPrices = [];
     for (const event of aggregated) {
       for (let i = 0; i < runningReserves.length; ++i) {
-        runningReserves[i] = runningReserves[i].sub(event[i.toString()]);
+        runningReserves[i] = runningReserves[i] - event[i.toString()];
       }
       // Calculate current price
       const price = ConstantProductUtil.calcPrice(
