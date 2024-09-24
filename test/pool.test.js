@@ -1,4 +1,6 @@
+const NumberUtil = require('../src/utils/number');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
+const WellFnUtil = require('../src/utils/pool/well-fn');
 
 describe('Pool Math', () => {
   describe('CP2', () => {
@@ -40,5 +42,21 @@ describe('Pool Math', () => {
       expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterSell1.float[1]);
     });
   });
-  describe('Stable2', () => {});
+  describe('Stable2', () => {
+    //14327543308971n
+    //3915916427871363595968n
+    //239222848948278213n
+    //234532204851253150n
+    test.only('Temp test', async () => {
+      const reserves = [14263546671971n, 2216675511188549508768n];
+      const decimals = [6, 18];
+
+      const fromContract = await WellFnUtil.t(reserves);
+      const netDelta = [reserves[0] - fromContract[0], fromContract[1] - reserves[1]];
+      console.log(NumberUtil.createNumberSpread(netDelta, decimals));
+
+      const depth = ConstantProductWellUtil.calcDepth(reserves, decimals);
+      console.log(depth.sell);
+    });
+  });
 });

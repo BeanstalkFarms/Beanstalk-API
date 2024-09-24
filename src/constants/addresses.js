@@ -1,6 +1,11 @@
 const bip45Abi = require('../datasources/abi/Beanstalk-BIP45.json');
 const erc20Abi = require('../datasources/abi/ERC20.json');
 
+// Multichain constants:
+// ARB.BEANSTALK / ETH.BEANSTALK / ETH.provider, C(chain).BEANSTALK
+// OR
+// BEANSTALK(chain), provider(chain)
+
 const contracts = {
   BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, bip45Abi],
   BEAN: ['0xBEA0000029AD1c77D3d5D23Ba2D8893dB9d1Efab', 6, erc20Abi],
