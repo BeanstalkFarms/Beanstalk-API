@@ -1,6 +1,6 @@
 const NumberUtil = require('../number');
 
-class ConstantProductUtil {
+class ConstantProductWellUtil {
   // Given the reserves, returns the current price of each token in a constant product pool
   // The prices returned are in terms of the other token
   static calcPrice(reserves, decimals) {
@@ -48,4 +48,4 @@ class ConstantProductUtil {
   }
 }
 
-module.exports = ConstantProductUtil;
+module.exports = ConstantProductWellUtil;

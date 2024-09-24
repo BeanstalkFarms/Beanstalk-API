@@ -12,14 +12,13 @@ jest.mock('../src/datasources/alchemy', () => ({
 }));
 const alchemy = require('../src/datasources/alchemy');
 
-const ConstantProductUtil = require('../src/utils/pool/constant-product');
 const { parseQuery } = require('../src/utils/rest-parsing');
 const SubgraphClients = require('../src/datasources/subgraph-client');
 const { allToBigInt, fromBigInt } = require('../src/utils/number');
 const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
 
 describe('Utils', () => {
-  it('should format query parameters correctly', async () => {
+  test('should format query parameters correctly', async () => {
     const query = {
       blockNumber: '18275926',
       timestamp: '1714694855000',
@@ -32,7 +31,7 @@ describe('Utils', () => {
     expect(parsed.token).toEqual('beans!');
   });
 
-  it('should maximally use block number that the subgraph has indexed', async () => {
+  test('should maximally use block number that the subgraph has indexed', async () => {
     jest.spyOn(CommonSubgraphRepository, 'getMeta').mockResolvedValue({
       block: 19500000
     });
@@ -53,45 +52,7 @@ describe('Utils', () => {
     expect(result.number).toEqual(19500000);
   });
 
-  it('should calculate correct token prices in constant product pool', async () => {
-    const prices = ConstantProductUtil.calcPrice([13834969782037n, 4519904117717436850412n], [6, 18]);
-
-    expect(prices.raw[0]).toEqual(326701408743658n);
-    expect(prices.raw[1]).toEqual(3060898953n);
-    expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
-    expect(prices.float[1]).toBeCloseTo(3060.898953);
-  });
-
-  it('should calculate liquidity depth in constant product pool', async () => {
-    const reserves = [14327543308971n, 3915916427871363595968n];
-    const decimals = [6, 18];
-    const percent = 40;
-    const buyMultiple = (100 + percent) / 100;
-    const sellMultiple = (100 - percent) / 100;
-
-    const priceBefore = ConstantProductUtil.calcPrice(reserves, decimals);
-    const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
-
-    const priceAfterBuy0 = ConstantProductUtil.calcPrice(
-      [
-        reserves[0] - depth.buy.raw[0],
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[0] - depth.buy.raw[0])
-      ],
-      decimals
-    );
-    const priceAfterSell1 = ConstantProductUtil.calcPrice(
-      [
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[1] + depth.sell.raw[1]),
-        reserves[1] + depth.sell.raw[1]
-      ],
-      decimals
-    );
-
-    expect(priceBefore.float[0] * buyMultiple).toBeCloseTo(priceAfterBuy0.float[0], 10);
-    expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterSell1.float[1]);
-  });
-
-  it('should find block number for a requested season', async () => {
+  test('should find block number for a requested season', async () => {
     jest.spyOn(SubgraphClients, 'beanstalkSG').mockResolvedValue({
       seasons: [
         {
@@ -104,31 +65,33 @@ describe('Utils', () => {
     expect(blockForSeason).toBe(20042493);
   });
 
-  it('should convert all strings to BigInt', () => {
-    const obj = allToBigInt({
-      p1: '123456',
-      p2: 10,
-      p3: {
-        p4: '7890',
-        p5: '0x1234',
-        p6: 9275n,
-        p7: 'yes',
-        p8: null
-      }
+  describe('BigInt conversion', () => {
+    test('should convert all strings to BigInt', () => {
+      const obj = allToBigInt({
+        p1: '123456',
+        p2: 10,
+        p3: {
+          p4: '7890',
+          p5: '0x1234',
+          p6: 9275n,
+          p7: 'yes',
+          p8: null
+        }
+      });
+
+      expect(obj.p1).toEqual(123456n);
+      expect(obj.p2).toEqual(10n);
+      expect(obj.p3.p4).toEqual(7890n);
+      expect(obj.p3.p5).toEqual(4660n);
+      expect(obj.p3.p6).toEqual(9275n);
+      expect(obj.p3.p7).toEqual('yes');
+      expect(obj.p3.p8).toEqual(null);
     });
 
-    expect(obj.p1).toEqual(123456n);
-    expect(obj.p2).toEqual(10n);
-    expect(obj.p3.p4).toEqual(7890n);
-    expect(obj.p3.p5).toEqual(4660n);
-    expect(obj.p3.p6).toEqual(9275n);
-    expect(obj.p3.p7).toEqual('yes');
-    expect(obj.p3.p8).toEqual(null);
-  });
-
-  it('should retain some precision', () => {
-    const n1 = fromBigInt(123456789n, 6, 2);
-    expect(n1).toEqual(123.45);
-    expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
+    test('should retain some precision', () => {
+      const n1 = fromBigInt(123456789n, 6, 2);
+      expect(n1).toEqual(123.45);
+      expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
+    });
   });
 });

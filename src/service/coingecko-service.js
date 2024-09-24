@@ -2,7 +2,7 @@ const SubgraphClients = require('../datasources/subgraph-client');
 const BlockUtil = require('../utils/block');
 const { calcPoolLiquidityUSD } = require('../utils/pool/liquidity');
 const { createNumberSpread } = require('../utils/number');
-const ConstantProductUtil = require('../utils/pool/constant-product');
+const ConstantProductWellUtil = require('../utils/pool/constant-product');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
 
@@ -29,11 +29,11 @@ class CoingeckoService {
         const token0 = well.tokens[0].id;
         const token1 = well.tokens[1].id;
 
-        const poolPrice = ConstantProductUtil.calcPrice(
+        const poolPrice = ConstantProductWellUtil.calcPrice(
           well.reserves,
           well.tokens.map((t) => t.decimals)
         );
-        const depth2 = ConstantProductUtil.calcDepth(
+        const depth2 = ConstantProductWellUtil.calcDepth(
           well.reserves,
           well.tokens.map((t) => t.decimals),
           2
@@ -92,7 +92,7 @@ class CoingeckoService {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: ConstantProductUtil.calcPrice(
+        price: ConstantProductWellUtil.calcPrice(
           [swap.amountIn, swap.amountOut],
           [swap.fromToken.decimals, swap.toToken.decimals]
         ).float[0],
@@ -212,7 +212,7 @@ class CoingeckoService {
         runningReserves[i] = runningReserves[i] - event[i.toString()];
       }
       // Calculate current price
-      const price = ConstantProductUtil.calcPrice(
+      const price = ConstantProductWellUtil.calcPrice(
         runningReserves,
         wellTokens.map((t) => t.decimals)
       );
