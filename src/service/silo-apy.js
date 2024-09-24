@@ -115,7 +115,7 @@ class SiloApyService {
           sgResult.tokens[BEAN].grownStalkPerSeason,
           sgResult.silo.depositedBDV,
           sgResult.silo.stalk,
-          sgResult.silo.seeds,
+          sgResult.silo.grownStalkPerSeason,
           options
         );
       }

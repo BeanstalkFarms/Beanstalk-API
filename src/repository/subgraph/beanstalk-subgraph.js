@@ -75,8 +75,8 @@ class BeanstalkSubgraphRepository {
           id: "${beanstalk}",
           block: {number: ${blockNumber}}
         ) {
-          seeds
           stalk
+          grownStalkPerSeason
           depositedBDV
         }
       }`);
@@ -113,7 +113,6 @@ class BeanstalkSubgraphRepository {
           block: {number: ${blockNumber}}
         ) {
           beanToMaxLpGpPerBdvRatio
-          seeds
           stalk
           whitelistedTokens
         }

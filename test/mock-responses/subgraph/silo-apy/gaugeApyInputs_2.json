@@ -43,7 +43,6 @@
   ],
   "silo": {
     "beanToMaxLpGpPerBdvRatio": "100000000000000000000",
-    "seeds": "21487556277054",
     "stalk": "1718032876867569323",
     "whitelistedTokens": [
       "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
