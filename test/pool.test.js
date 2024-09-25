@@ -51,12 +51,12 @@ describe('Pool Math', () => {
       const reserves = [14263546671971n, 2216675511188549508768n];
       const decimals = [6, 18];
 
-      const fromContract = await WellFnUtil.t(reserves);
+      const fromContract = await WellFnUtil.depth(reserves, decimals);
       const netDelta = [reserves[0] - fromContract[0], fromContract[1] - reserves[1]];
       console.log(NumberUtil.createNumberSpread(netDelta, decimals));
 
       const depth = ConstantProductWellUtil.calcDepth(reserves, decimals);
-      console.log(depth.sell);
+      console.log(depth);
     });
   });
 });

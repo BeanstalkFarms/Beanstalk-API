@@ -1,38 +1,51 @@
 const { BEANWSTETH } = require('../../constants/addresses');
 const ContractGetters = require('../../datasources/contracts/contract-getters');
 
+const CP2 = '0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26';
+
 class WellFnUtil {
-  // CP2
-  // quoteToken + 18 / baseToken
-  // so for bean:
-  // 6 + 18 - 18 = 6
-  // and eth:
-  // 18 + 18 - 6 = 30
-  // Stable2: always returns 6
+  /**
+   * Transforms a rate returned from `calcRate` such that its precision is the same as the "i" token.
+   * This is not necessary for Stable2.
+   * @param {*} rate - The computed rate from `calcRate`
+   * @param {*} j - The "j" token used to compute this rate
+   * @param {*} decimals - decimal precision of tokens in this well
+   */
+  static transformRate(rate, wellFnAddr, j, decimals) {
+    if (wellFnAddr === CP2) {
+      const decimalsToRemove = 18 - decimals[j];
+      return rate / BigInt(10 ** decimalsToRemove);
+    }
+    return rate;
+  }
 
-  static async t(originalReserves) {
-    const CP2 = '0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26';
+  // Returns adjusted rates from `calcRate` that have precision equivalent to their corresponding token
+  static async getRates(reserves, data, wellFnAddr, decimals) {
+    const wellFn = await ContractGetters.getWellFunctionContract(wellFnAddr);
+    const rates = await Promise.all([
+      wellFn.callStatic.calcRate(reserves, 0, 1, data),
+      wellFn.callStatic.calcRate(reserves, 1, 0, data)
+    ]);
+    return [
+      WellFnUtil.transformRate(BigInt(rates[0]), wellFnAddr, 1, decimals),
+      WellFnUtil.transformRate(BigInt(rates[1]), wellFnAddr, 0, decimals)
+    ];
+  }
+
+  static async depth(reserves, decimals) {
+    const precision = decimals.map((d) => BigInt(10 ** d));
+
+    const rates = await WellFnUtil.getRates(reserves, '0x00', CP2, decimals);
+
+    // const ratio = [rates[0], BigInt(10 ** 18)];
+    // const ratio = [(rates[0] * 98n) / 100n, BigInt(10 ** 18)];
+    // const ratio = [(rates[0] * 102n) / 100n, BigInt(10 ** 18)];
+    // const ratio = [BigInt(10 ** 6), (rates[1] * 102n) / 100n];
+    const ratio = [precision[0], (rates[1] * 98n) / 100n];
+
     const wellFn = await ContractGetters.getWellFunctionContract(CP2);
-    const rate0 = await wellFn.callStatic.calcRate(originalReserves, 0, 1, '0x00');
-    const rate1 = await wellFn.callStatic.calcRate(originalReserves, 1, 0, '0x00');
-    console.log(BigInt(rate0), BigInt(rate1));
-
-    const outReserves0 = await wellFn.callStatic.calcReserveAtRatioSwap(
-      originalReserves,
-      0,
-      // [rate0, BigInt(10 ** 18)],
-      [Math.floor(Number(rate0) * 0.98), BigInt(10 ** 18)],
-      '0x00'
-    );
-    console.log(BigInt(outReserves0));
-
-    const outReserves1 = await wellFn.callStatic.calcReserveAtRatioSwap(
-      originalReserves,
-      1,
-      // [rate0, BigInt(10 ** 18)],
-      [Math.floor(Number(rate0) * 0.98), BigInt(10 ** 18)],
-      '0x00'
-    );
+    const outReserves0 = await wellFn.callStatic.calcReserveAtRatioSwap(reserves, 0, ratio, '0x00');
+    const outReserves1 = await wellFn.callStatic.calcReserveAtRatioSwap(reserves, 1, ratio, '0x00');
     return [BigInt(outReserves0), BigInt(outReserves1)];
   }
 }
