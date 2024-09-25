@@ -1,7 +1,5 @@
-const { BEANWSTETH } = require('../../constants/addresses');
+const { BEANWSTETH, CP2 } = require('../../constants/addresses');
 const ContractGetters = require('../../datasources/contracts/contract-getters');
-
-const CP2 = '0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26';
 
 class WellFnUtil {
   /**

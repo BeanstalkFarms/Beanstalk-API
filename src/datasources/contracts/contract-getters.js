@@ -3,7 +3,7 @@ const { providerThenable } = require('../alchemy.js');
 const Contracts = require('./contracts.js');
 const UpgradeableContract = require('./upgradeable-contract.js');
 const { priceMapping, usdOracleMapping } = require('./upgradeable-mappings.js');
-const wellFunctionAbi = require('../abi/well-function.json');
+const wellAbi = require('../abi/basin/Well.json');
 
 class ContractGetters {
   /// Regular Contracts
@@ -15,8 +15,12 @@ class ContractGetters {
     return await Contracts.getContractAsync(token, blockNumber, await providerTh);
   }
 
-  static async getWellFunctionContract(address, providerTh = providerThenable) {
-    return Contracts.makeContract(address, wellFunctionAbi, await providerTh);
+  static async getWellContract(address, providerTh = providerThenable) {
+    return Contracts.makeContract(address, wellAbi, await providerTh);
+  }
+
+  static async getWellFunctionContract(address, blockNumber = 0, providerTh = providerThenable) {
+    return Contracts.getContractAsync(address, blockNumber, await providerTh);
   }
 
   /// Upgradeable Contracts

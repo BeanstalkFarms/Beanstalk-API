@@ -1,10 +1,12 @@
-const bip45Abi = require('../datasources/abi/Beanstalk-BIP45.json');
+const bip45Abi = require('../datasources/abi/beanstalk/Beanstalk-BIP45.json');
 const erc20Abi = require('../datasources/abi/ERC20.json');
+const wellFunctionAbi = require('../datasources/abi/basin/WellFunction.json');
 
 // Multichain constants:
 // ARB.BEANSTALK / ETH.BEANSTALK / ETH.provider, C(chain).BEANSTALK
 // OR
 // BEANSTALK(chain), provider(chain)
+// Need solution for Wells can be either well or erc20 abi. Maybe this is nonissue since well > erc20
 
 const contracts = {
   BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, bip45Abi],
@@ -15,7 +17,8 @@ const contracts = {
   UNRIPE_BEAN: ['0x1BEA0050E63e05FBb5D8BA2f10cf5800B6224449', 6, erc20Abi],
   UNRIPE_LP: ['0x1BEA3CcD22F4EBd3d37d731BA31Eeca95713716D', 6, erc20Abi],
   WETH: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18, erc20Abi],
-  WSTETH: ['0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0', 18, erc20Abi]
+  WSTETH: ['0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0', 18, erc20Abi],
+  CP2: ['0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26', null, wellFunctionAbi]
 };
 
 const addressesOnly = Object.fromEntries(Object.entries(contracts).map(([k, v]) => [k, v[0].toLowerCase()]));

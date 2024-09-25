@@ -1,5 +1,6 @@
 const NumberUtil = require('../src/utils/number');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
+const WellUtil = require('../src/utils/pool/well');
 const WellFnUtil = require('../src/utils/pool/well-fn');
 
 describe('Pool Math', () => {
@@ -43,11 +44,7 @@ describe('Pool Math', () => {
     });
   });
   describe('Stable2', () => {
-    //14327543308971n
-    //3915916427871363595968n
-    //239222848948278213n
-    //234532204851253150n
-    test.only('Temp test', async () => {
+    test('TEMPORARY test depth via view functions', async () => {
       const reserves = [14263546671971n, 2216675511188549508768n];
       const decimals = [6, 18];
 
@@ -57,6 +54,14 @@ describe('Pool Math', () => {
 
       const depth = ConstantProductWellUtil.calcDepth(reserves, decimals);
       console.log(depth);
+    });
+    test.only('TEMPORARY test liquidity vol generalization', async () => {
+      const result = await WellUtil.calcLiquidityVolume(
+        [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+        [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+        [6, 18]
+      );
+      console.log(result);
     });
   });
 });
