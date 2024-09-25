@@ -11,6 +11,7 @@ class ContractGetters {
     return await Contracts.getContractAsync(BEANSTALK, blockNumber, await providerTh);
   }
 
+  // TODO: refactor these to "getDefaultContract" or something similar, where no abi is provided.
   static async getERC20Contract(token, blockNumber = 0, providerTh = providerThenable) {
     return await Contracts.getContractAsync(token, blockNumber, await providerTh);
   }
@@ -20,7 +21,7 @@ class ContractGetters {
   }
 
   static async getWellFunctionContract(address, blockNumber = 0, providerTh = providerThenable) {
-    return Contracts.getContractAsync(address, blockNumber, await providerTh);
+    return await Contracts.getContractAsync(address, blockNumber, await providerTh);
   }
 
   /// Upgradeable Contracts

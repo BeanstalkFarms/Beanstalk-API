@@ -62,6 +62,13 @@ describe('Pool Math', () => {
         [6, 18]
       );
       console.log(result);
+
+      const result2 = await WellUtil.calcLiquidityVolume(
+        [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+        [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+        [6, 18]
+      );
+      console.log(result2);
     });
   });
 });
