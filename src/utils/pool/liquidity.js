@@ -3,30 +3,27 @@ const ContractGetters = require('../../datasources/contracts/contract-getters');
 const PriceService = require('../../service/price-service');
 const NumberUtil = require('../number');
 const { BigInt_applyPercent } = require('../bigint');
-const { createNumberSpread } = require('../number');
 
 class LiquidityUtil {
   // Calculates the current usd liquidity for a pool having these tokens and reserves
-  static async calcPoolLiquidityUSD(tokens, reserves, blockNumber) {
+  static async calcWellLiquidityUSD(well, blockNumber) {
     let totalLiquidity = 0;
-    for (let i = 0; i < tokens.length; ++i) {
-      const tokenPrice = await PriceService.getTokenPrice(tokens[i].id, { blockNumber });
-      const tokenCount = createNumberSpread(reserves[i], tokens[i].decimals);
+    for (let i = 0; i < well.tokens.length; ++i) {
+      const tokenPrice = await PriceService.getTokenPrice(well.tokens[i].address, { blockNumber });
+      const tokenCount = NumberUtil.createNumberSpread(well.reserves.raw[i], well.tokens[i].decimals);
       totalLiquidity += tokenPrice.usdPrice * tokenCount.float;
     }
     return totalLiquidity;
   }
 
-  // TODO: consider accepting a Well object that can encapsulate reserves, rates, decimals, and the well function.
   /**
    * Calculates the liquidity depth if a trade were to occur that would move the price by `percent`
-   * @param {*} reserves - current well reserves
-   * @param {*} rates - current token exchange rates
-   * @param {*} decimals - decimal precision for each token
+   * @param {WellDto} well - contains information about the current reserves, rates, etc
    * @param {*} percent (defualt 2) - the percent for which to calculate depth
    * @returns buy/sell depth in terms of each token
    */
-  static async depth(reserves, rates, decimals, percent = 2) {
+  static async depth(well, percent = 2) {
+    const [reserves, rates, decimals] = [well.reserves.raw, well.rates.raw, well.tokenDecimals()];
     const oneToken = decimals.map((d) => BigInt(10 ** d));
 
     const ratesBuy0 = [BigInt_applyPercent(rates[0], 100 + percent), oneToken[1]];

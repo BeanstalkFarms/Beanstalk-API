@@ -14,7 +14,7 @@ class CommonSubgraphRepository {
         version(id: "subgraph") {
           subgraphName
           chain
-          versisonNumber
+          versionNumber
         }
       }`);
     return {

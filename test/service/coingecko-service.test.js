@@ -7,8 +7,7 @@ const {
   getTickers,
   deprecated_calcWellSwapVolume,
   getWellPriceRange,
-  getTrades,
-  get24hVolume
+  getTrades
 } = require('../../src/service/coingecko-service');
 const { BEANWETH, WETH, BEAN } = require('../../src/constants/addresses');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
@@ -38,15 +37,6 @@ describe('CoingeckoService', () => {
     expect(tickers[0].depth2.sell).toEqual([139870.493345, 54.44273921546687]);
     expect(tickers[0].high).toBeCloseTo(0.000392979136931714);
     expect(tickers[0].low).toBeCloseTo(0.000383640247389837);
-  });
-
-  it('should get 24h token volume from subgraph calculation', async () => {
-    const wellVolumeResponse = require('../mock-responses/subgraph/coingecko/tickers_2.json');
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
-
-    const volume = await get24hVolume(BEANWETH, 19000000);
-    expect(volume.float[0]).toBeCloseTo(362621.652657);
-    expect(volume.float[1]).toBeCloseTo(141.01800893122126);
   });
 
   it('should calculate token volume in the well (calculated directly from swaps only)', async () => {

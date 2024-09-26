@@ -5,9 +5,15 @@ const WellFnUtil = require('../src/utils/pool/well-fn');
 
 describe('Pool Math', () => {
   test('Liquidity depth', async () => {
-    const reserves = [14263546671971n, 2216675511188549508768n];
-    const rates = [6434657034n, 155408438179298n];
-    const decimals = [6, 18];
+    const mockWellDto = {
+      reserves: {
+        raw: [14263546671971n, 2216675511188549508768n]
+      },
+      rates: {
+        raw: [6434657034n, 155408438179298n]
+      },
+      tokenDecimals: () => [6, 18]
+    };
     jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
       callStatic: {
         calcReserveAtRatioSwap: jest
@@ -19,7 +25,7 @@ describe('Pool Math', () => {
       }
     });
 
-    const depth2 = await LiquidityUtil.depth(reserves, rates, decimals);
+    const depth2 = await LiquidityUtil.depth(mockWellDto);
 
     expect(depth2.buy.float[0]).toBeCloseTo(140530.980586);
     expect(depth2.buy.float[1]).toBeCloseTo(21.839699955989666);

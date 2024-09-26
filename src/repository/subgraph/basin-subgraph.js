@@ -17,6 +17,7 @@ class BasinSubgraphRepository {
           tokenOrder
           reserves
           symbol
+          tokenPrice
           rollingDailyBiTradeVolumeReserves
         }
       }`,
@@ -41,10 +42,11 @@ class BasinSubgraphRepository {
           tokenOrder
           reserves
           symbol
+          tokenPrice
           rollingDailyBiTradeVolumeReserves
         }
       }`);
-    return pairWells.map((w) => new WellDto(w));
+    return pairWells.wells.map((w) => new WellDto(w));
   }
 
   static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {

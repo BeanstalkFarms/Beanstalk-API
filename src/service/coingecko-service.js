@@ -1,10 +1,10 @@
 const SubgraphClients = require('../datasources/subgraph-client');
 const BlockUtil = require('../utils/block');
-const { calcPoolLiquidityUSD } = require('../utils/pool/liquidity');
 const { createNumberSpread } = require('../utils/number');
 const ConstantProductWellUtil = require('../utils/pool/constant-product');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
+const LiquidityUtil = require('../utils/pool/liquidity');
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -21,34 +21,25 @@ class CoingeckoService {
     for (const well of allWells) {
       batchPromiseGenerators.push(async () => {
         // Filter pools having < 1k liquidity
-        const poolLiquidity = await calcPoolLiquidityUSD(well.tokens, well.reserves, block.number);
+        const poolLiquidity = await LiquidityUtil.calcWellLiquidityUSD(well, block.number);
         if (poolLiquidity < 1000) {
           return;
         }
 
-        const token0 = well.tokens[0].id;
-        const token1 = well.tokens[1].id;
+        const [base_currency, target_currency] = well.tokens.map((t) => t.address);
 
-        const poolPrice = well.tokenPrice; // TODO
+        const depth2 = LiquidityUtil.depth(well, 2);
 
-        const depth2 = ConstantProductWellUtil.calcDepth(
-          well.reserves,
-          well.tokens.map((t) => t.decimals),
-          2
-        );
-        const [pool24hVolume, priceRange] = await Promise.all([
-          CoingeckoService.get24hVolume(well.id, block.number),
-          CoingeckoService.getWellPriceRange(well.id, well.tokens, well.reserves, block.timestamp)
-        ]);
+        const priceRange = await CoingeckoService.getWellPriceRange(well, block.timestamp);
 
         const ticker = {
           ticker_id: `${token0}_${token1}`,
-          base_currency: token0,
-          target_currency: token1,
+          base_currency,
+          target_currency,
           pool_id: well.id,
-          last_price: poolPrice.float[0],
-          base_volume: pool24hVolume.float[0],
-          target_volume: pool24hVolume.float[1],
+          last_price: well.rates.float[1],
+          base_volume: well.biTokenVolume24h.float[0],
+          target_volume: well.biTokenVolume24h.float[1],
           liquidity_in_usd: parseFloat(poolLiquidity.toFixed(0)),
           depth2: {
             buy: depth2.buy.float,
@@ -107,33 +98,14 @@ class CoingeckoService {
     return retval;
   }
 
-  // Gets the 24h volume in usd and in terms of the tokens in the well
-  static async get24hVolume(wellAddress, blockNumber) {
-    // Retrieves the rolling 24h volume from the subgraph.
-    // CoinGecko expects volume to be presented in equal proportion on both tokens.
-    // i.e. if there is $50k volume, it expects something like 50k BEAN and 15 ETH to be reported
-    const rollingVolume = await BasinSubgraphRepository.getRollingVolume(wellAddress, blockNumber);
-    return createNumberSpread(
-      rollingVolume.map((v) => v.amount),
-      rollingVolume.map((v) => v.decimals)
-    );
-  }
-
   /**
    * Gets the high/low over the given time range
-   * @param {string} wellAddress - address of the well
-   * @param {object[]} wellTokens - tokens in the well and their decimals
-   * @param {BigInt[]} endReserves - reserves in the well at `timestamp`
+   * @param {WellDto} well - the well dto
    * @param {number} timestamp - the upper bound timestamp
    * @param {number} lookback - amount of time to look in the past
    * @returns high/low price over the given time period, in terms of the underlying tokens
-   *
-   * In practice it is more performant to calculate the reserves in reverse from known reserves at `timestamp`,
-   * since in most cases we are calculating a price range in the past 24h, and the current block is known.
-   * If an older timestamp is desired, prior to calling this method, the block/reserves for that timestamp
-   * will need to be computed as well, which is a longer operation.
    */
-  static async getWellPriceRange(wellAddress, wellTokens, endReserves, timestamp, lookback = ONE_DAY) {
+  static async getWellPriceRange(well, timestamp, lookback = ONE_DAY) {
     // Retrieve relevant events
     const [allSwaps, allDeposits, allWithdraws] = await Promise.all([
       BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp),
