@@ -127,7 +127,6 @@ class CoingeckoService {
         low: well.rates
       };
     }
-    console.log(flattened);
 
     // Return the min/max token price from the perspective of token0.
     // The maximal value of token0 is when fewer of its tokens can be bought with token1

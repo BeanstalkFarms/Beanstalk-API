@@ -56,19 +56,17 @@ describe('CoingeckoService', () => {
     const withdrawResponse = require('../mock-responses/subgraph/coingecko/withdrawals.json');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(withdrawResponse);
 
-    const tokens = [
-      {
-        id: BEAN.toLowerCase(),
-        decimals: 6
-      },
-      {
-        id: WETH.toLowerCase(),
-        decimals: 18
-      }
-    ];
-    const priceRange = await getWellPriceRange(BEANWETH, tokens, [20000000000n, 10000000000000000000n], 1715020584);
-    expect(priceRange.high.float[0]).toBeCloseTo(0.00075);
-    expect(priceRange.low.float[0]).toBeCloseTo(0.001416666666666666);
+    const mockWellDto = {
+      address: 'abc',
+      tokenDecimals: () => [6, 18]
+    };
+
+    const priceRange = await getWellPriceRange(mockWellDto, 1715020584);
+
+    expect(priceRange.high.float[0]).toEqual(0.000065);
+    expect(priceRange.high.float[1]).toEqual(0.00000000000175889);
+    expect(priceRange.low.float[0]).toEqual(210.587245);
+    expect(priceRange.low.float[1]).toEqual(0.00000001717847889);
   });
 
   it('should return swap history', async () => {
