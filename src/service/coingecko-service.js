@@ -5,6 +5,7 @@ const ConstantProductWellUtil = require('../utils/pool/constant-product');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
 const LiquidityUtil = require('../utils/pool/liquidity');
+const NumberUtil = require('../utils/number');
 
 const ONE_DAY = 60 * 60 * 24;
 
@@ -28,12 +29,11 @@ class CoingeckoService {
 
         const [base_currency, target_currency] = well.tokens.map((t) => t.address);
 
-        const depth2 = LiquidityUtil.depth(well, 2);
-
+        const depth2 = await LiquidityUtil.calcDepth(well, 2);
         const priceRange = await CoingeckoService.getWellPriceRange(well, block.timestamp);
 
         const ticker = {
-          ticker_id: `${token0}_${token1}`,
+          ticker_id: `${base_currency}_${target_currency}`,
           base_currency,
           target_currency,
           pool_id: well.id,
@@ -45,8 +45,8 @@ class CoingeckoService {
             buy: depth2.buy.float,
             sell: depth2.sell.float
           },
-          high: priceRange.high.float[0],
-          low: priceRange.low.float[0]
+          high: priceRange.high.float[1],
+          low: priceRange.low.float[1]
         };
         return ticker;
       });
@@ -106,62 +106,34 @@ class CoingeckoService {
    * @returns high/low price over the given time period, in terms of the underlying tokens
    */
   static async getWellPriceRange(well, timestamp, lookback = ONE_DAY) {
-    // Retrieve relevant events
-    const [allSwaps, allDeposits, allWithdraws] = await Promise.all([
-      BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp),
-      BasinSubgraphRepository.getAllDeposits(wellAddress, timestamp - lookback, timestamp),
-      BasinSubgraphRepository.getAllWithdraws(wellAddress, timestamp - lookback, timestamp)
+    // Retrieves history of token exchange rates over the requested period
+    const allPriceChangeEvents = await Promise.all([
+      BasinSubgraphRepository.getAllSwaps(well.address, timestamp - lookback, timestamp),
+      BasinSubgraphRepository.getAllDeposits(well.address, timestamp - lookback, timestamp),
+      BasinSubgraphRepository.getAllWithdraws(well.address, timestamp - lookback, timestamp)
     ]);
 
-    // Aggregate all into one list. Initial entry with big timestamp to also consider the current price.
-    const aggregated = [
-      {
-        0: 0n,
-        1: 0n,
-        timestamp: 5000000000000
-      }
-    ];
-    for (const swap of allSwaps) {
-      aggregated.push({
-        [wellTokens.findIndex((t) => t.id === swap.fromToken.id)]: swap.amountIn,
-        [wellTokens.findIndex((t) => t.id === swap.toToken.id)]: -swap.amountOut,
-        timestamp: swap.timestamp
-      });
+    const flattened = allPriceChangeEvents
+      .reduce((acc, next) => {
+        acc.push(...next);
+        return acc;
+      }, [])
+      .map((rates) => NumberUtil.createNumberSpread(rates, well.tokenDecimals()));
+
+    if (flattened.length === 0) {
+      // No trading activity over this period, returns the current rates
+      return {
+        high: well.rates,
+        low: well.rates
+      };
     }
+    console.log(flattened);
 
-    const addLiquidityEvents = (arr, neg) => {
-      for (const liqEvent of arr) {
-        const normalized = {
-          timestamp: liqEvent.timestamp
-        };
-        for (let i = 0; i < wellTokens.length; ++i) {
-          normalized[i] = neg ? -liqEvent.reserves[i] : liqEvent.reserves[i];
-        }
-        aggregated.push(normalized);
-      }
-    };
-    addLiquidityEvents(allDeposits, false);
-    addLiquidityEvents(allWithdraws, true);
-
-    aggregated.sort((a, b) => b.timestamp - a.timestamp);
-
-    // Track the running reserves and prices
-    const runningReserves = [...endReserves];
-    const tokenPrices = [];
-    for (const event of aggregated) {
-      for (let i = 0; i < runningReserves.length; ++i) {
-        runningReserves[i] = runningReserves[i] - event[i.toString()];
-      }
-      // Calculate current price
-      const price = event.tokenPrice; // TODO
-      price.reserves = [...runningReserves];
-      tokenPrices.push(price);
-    }
-
-    // Return the min/max token price from the perspective of token0
+    // Return the min/max token price from the perspective of token0.
+    // The maximal value of token0 is when fewer of its tokens can be bought with token1
     return {
-      high: tokenPrices.reduce((max, obj) => (obj.float[0] > max.float[0] ? obj : max), tokenPrices[0]),
-      low: tokenPrices.reduce((min, obj) => (obj.float[0] < min.float[0] ? obj : min), tokenPrices[0])
+      high: flattened.reduce((max, obj) => (obj.float[0] < max.float[0] ? obj : max), flattened[0]),
+      low: flattened.reduce((min, obj) => (obj.float[0] > min.float[0] ? obj : min), flattened[0])
     };
   }
 

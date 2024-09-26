@@ -22,7 +22,7 @@ class LiquidityUtil {
    * @param {*} percent (defualt 2) - the percent for which to calculate depth
    * @returns buy/sell depth in terms of each token
    */
-  static async depth(well, percent = 2) {
+  static async calcDepth(well, percent = 2) {
     const [reserves, rates, decimals] = [well.reserves.raw, well.rates.raw, well.tokenDecimals()];
     const oneToken = decimals.map((d) => BigInt(10 ** d));
 

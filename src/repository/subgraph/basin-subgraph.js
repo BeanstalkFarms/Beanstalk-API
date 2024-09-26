@@ -49,40 +49,6 @@ class BasinSubgraphRepository {
     return pairWells.wells.map((w) => new WellDto(w));
   }
 
-  static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
-    const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      SubgraphClients.gql`
-      {
-        swaps {
-          amountIn
-          amountOut
-          fromToken {
-            id
-            decimals
-          }
-          toToken {
-            decimals
-            id
-          }
-          timestamp
-          logIndex
-        }
-      }`,
-      '',
-      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
-      ['timestamp', 'logIndex'],
-      [fromTimestamp.toFixed(0), 0],
-      'asc'
-    );
-    allSwaps.map((swap) => {
-      swap.amountIn = BigInt(swap.amountIn);
-      swap.amountOut = BigInt(swap.amountOut);
-    });
-
-    return allSwaps;
-  }
-
   static async getSwaps(wellAddresses, fromTimestamp, toTimestamp, limit) {
     const result = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
@@ -119,13 +85,13 @@ class BasinSubgraphRepository {
     return result.swaps;
   }
 
-  static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
-    const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
+  static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
+    const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
       {
-        deposits {
-          reserves
+        swaps {
+          tokenPrice
           timestamp
           logIndex
         }
@@ -136,9 +102,27 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allDeposits.map((deposit) => (deposit.reserves = deposit.reserves.map(BigInt)));
+    return allSwaps.map((s) => (s.tokenPrice = s.tokenPrice.map(BigInt)));
+  }
 
-    return allDeposits;
+  static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
+    const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
+      SubgraphClients.basinSG,
+      SubgraphClients.gql`
+      {
+        deposits {
+          tokenPrice
+          timestamp
+          logIndex
+        }
+      }`,
+      '',
+      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      ['timestamp', 'logIndex'],
+      [fromTimestamp.toFixed(0), 0],
+      'asc'
+    );
+    return allDeposits.map((d) => (d.tokenPrice = d.tokenPrice.map(BigInt)));
   }
 
   static async getAllWithdraws(wellAddress, fromTimestamp, toTimestamp) {
@@ -147,7 +131,7 @@ class BasinSubgraphRepository {
       SubgraphClients.gql`
       {
         withdraws {
-          reserves
+          tokenPrice
           timestamp
           logIndex
         }
@@ -158,22 +142,7 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    allWithdraws.map((withdraw) => (withdraw.reserves = withdraw.reserves.map(BigInt)));
-
-    return allWithdraws;
-  }
-
-  // Orders the tokens within the provided well. Minimal fields required are `tokens` and `tokenOrder`.
-  // `well.tokens[i]` must have an `id` field also
-  static orderTokens(well) {
-    if (!well.tokens || !well.tokenOrder || !well.tokens[0].id) {
-      throw new Error(`Can't order tokens with the provided fields.`);
-    }
-    const tokenOrderMap = well.tokenOrder.reduce((a, next, idx) => {
-      a[next] = idx;
-      return a;
-    }, {});
-    well.tokens.sort((a, b) => tokenOrderMap[a.id] - tokenOrderMap[b.id]);
+    return allWithdraws.map((w) => (w.tokenPrice = w.tokenPrice.map(BigInt)));
   }
 }
 

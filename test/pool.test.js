@@ -25,7 +25,7 @@ describe('Pool Math', () => {
       }
     });
 
-    const depth2 = await LiquidityUtil.depth(mockWellDto);
+    const depth2 = await LiquidityUtil.calcDepth(mockWellDto);
 
     expect(depth2.buy.float[0]).toBeCloseTo(140530.980586);
     expect(depth2.buy.float[1]).toBeCloseTo(21.839699955989666);
