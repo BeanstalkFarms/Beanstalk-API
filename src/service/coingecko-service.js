@@ -29,10 +29,8 @@ class CoingeckoService {
         const token0 = well.tokens[0].id;
         const token1 = well.tokens[1].id;
 
-        const poolPrice = ConstantProductWellUtil.calcPrice(
-          well.reserves,
-          well.tokens.map((t) => t.decimals)
-        );
+        const poolPrice = well.tokenPrice; // TODO
+
         const depth2 = ConstantProductWellUtil.calcDepth(
           well.reserves,
           well.tokens.map((t) => t.decimals),
@@ -92,10 +90,7 @@ class CoingeckoService {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: ConstantProductWellUtil.calcPrice(
-          [swap.amountIn, swap.amountOut],
-          [swap.fromToken.decimals, swap.toToken.decimals]
-        ).float[0],
+        price: swap.tokenPrice, // TODO
         base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).float,
         target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).float,
         trade_timestamp: parseInt(swap.timestamp) * 1000,
@@ -212,16 +207,12 @@ class CoingeckoService {
         runningReserves[i] = runningReserves[i] - event[i.toString()];
       }
       // Calculate current price
-      const price = ConstantProductWellUtil.calcPrice(
-        runningReserves,
-        wellTokens.map((t) => t.decimals)
-      );
+      const price = event.tokenPrice; // TODO
       price.reserves = [...runningReserves];
       tokenPrices.push(price);
     }
 
     // Return the min/max token price from the perspective of token0
-    // console.log(tokenPrices, tokenPrices.map(t => t.float[0] + "_" + t.reserves[0].toString() + "_" + t.reserves[1].toString()));
     return {
       high: tokenPrices.reduce((max, obj) => (obj.float[0] > max.float[0] ? obj : max), tokenPrices[0]),
       low: tokenPrices.reduce((min, obj) => (obj.float[0] < min.float[0] ? obj : min), tokenPrices[0])

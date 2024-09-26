@@ -18,6 +18,8 @@ class WellFnUtil {
   }
 
   // Returns adjusted rates from `calcRate` that have precision equivalent to their corresponding token
+  // Value at index i corresponds to how much of the token at index i is received in exchange
+  // for one of token 1 - i.
   static async getRates(reserves, data, wellFnAddr, decimals) {
     const wellFn = await ContractGetters.getWellFunctionContract(wellFnAddr);
     const rates = await Promise.all([
@@ -30,21 +32,25 @@ class WellFnUtil {
     ];
   }
 
-  static async depth(reserves, decimals) {
-    const precision = decimals.map((d) => BigInt(10 ** d));
-
-    const rates = await WellFnUtil.getRates(reserves, '0x00', CP2, decimals);
-
-    // const ratio = [rates[0], BigInt(10 ** 18)];
-    // const ratio = [(rates[0] * 98n) / 100n, BigInt(10 ** 18)];
-    // const ratio = [(rates[0] * 102n) / 100n, BigInt(10 ** 18)];
-    // const ratio = [BigInt(10 ** 6), (rates[1] * 102n) / 100n];
-    const ratio = [precision[0], (rates[1] * 98n) / 100n];
-
+  // Calculates the token volume resulting from a liquidity add operation.
+  // This functionality may or may not be helpful within this API project - it is used in subgraphs.
+  // However it was first developed here as a means of understanding the inputs/outputs.
+  static async calcLiquidityVolume(prevReserves, newReserves) {
     const wellFn = await ContractGetters.getWellFunctionContract(CP2);
-    const outReserves0 = await wellFn.callStatic.calcReserveAtRatioSwap(reserves, 0, ratio, '0x00');
-    const outReserves1 = await wellFn.callStatic.calcReserveAtRatioSwap(reserves, 1, ratio, '0x00');
-    return [BigInt(outReserves0), BigInt(outReserves1)];
+
+    const initialLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(prevReserves, '0x'));
+    const newLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(newReserves, '0x'));
+    const deltaLp = newLp - initialLp;
+
+    // Determines how much of the liquidity operation was double sided.
+    // Can then calculate how much was single sided.
+    const doubleSided = (
+      await wellFn.callStatic.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, '0x')
+    ).map((bn) => {
+      return deltaLp > 0n ? BigInt(bn) : -BigInt(bn);
+    });
+    const deltaReserves = [newReserves[0] - prevReserves[0], newReserves[1] - prevReserves[1]];
+    return [doubleSided[0] - deltaReserves[0], doubleSided[1] - deltaReserves[1]];
   }
 }
 

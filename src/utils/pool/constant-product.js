@@ -1,9 +1,8 @@
 const NumberUtil = require('../number');
 
 class ConstantProductWellUtil {
-  // Given the reserves, returns the current price of each token in a constant product pool
-  // The prices returned are in terms of the other token
-  static calcPrice(reserves, decimals) {
+  // Retroactive replacement functionality for well function `calcRates` - did not exist in CP2 1.0
+  static calcRate(reserves, decimals) {
     if (reserves[0] === 0n || reserves[1] === 0n) {
       return NumberUtil.createNumberSpread([0n, 0n], [decimals[1], decimals[0]]);
     }
@@ -16,12 +15,13 @@ class ConstantProductWellUtil {
     return NumberUtil.createNumberSpread([token0Price, token1Price], [decimals[1], decimals[0]]);
   }
 
+  // DEPRECATED
   // Calculates the requested percent depth from the reserves in the pool.
   // Equation derived by solving a system of equations where x2, y2 are the reserves after buying or selling percent:
   // x1y1 = c,
   // x2y2 = c,
   // x2/y2 = (1 +/- percent)x1/y1
-  static calcDepth(reserves, decimals, percent = 2) {
+  static deprecated_calcDepth(reserves, decimals, percent = 2) {
     const sqrtPrecision = BigInt(10 ** 15);
     // For negative/positive depths
     const negSqrt = BigInt(Math.round(Math.sqrt((100 - percent) / 100) * Number(sqrtPrecision)));
@@ -41,10 +41,6 @@ class ConstantProductWellUtil {
       buy: NumberUtil.createNumberSpread([reserves[0] - token0AfterBought, reserves[1] - token1AfterBought], decimals),
       sell: NumberUtil.createNumberSpread([token0AfterSold - reserves[0], token1AfterSold - reserves[1]], decimals)
     };
-  }
-
-  static calcMissingReserve(originalReserves, knownReserve) {
-    return (originalReserves[0] * originalReserves[1]) / knownReserve;
   }
 }
 
