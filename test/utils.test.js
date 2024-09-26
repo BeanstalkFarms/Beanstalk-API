@@ -16,9 +16,10 @@ const { parseQuery } = require('../src/utils/rest-parsing');
 const SubgraphClients = require('../src/datasources/subgraph-client');
 const { allToBigInt, fromBigInt } = require('../src/utils/number');
 const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
+const { BigInt_applyPercent } = require('../src/utils/bigint');
 
 describe('Utils', () => {
-  test('should format query parameters correctly', async () => {
+  test('Formats query parameters', async () => {
     const query = {
       blockNumber: '18275926',
       timestamp: '1714694855000',
@@ -31,7 +32,7 @@ describe('Utils', () => {
     expect(parsed.token).toEqual('beans!');
   });
 
-  test('should maximally use block number that the subgraph has indexed', async () => {
+  test('Maximally uses block number that the subgraph has indexed', async () => {
     jest.spyOn(CommonSubgraphRepository, 'getMeta').mockResolvedValue({
       block: 19500000
     });
@@ -52,7 +53,7 @@ describe('Utils', () => {
     expect(result.number).toEqual(19500000);
   });
 
-  test('should find block number for a requested season', async () => {
+  test('Find block number for a requested season', async () => {
     jest.spyOn(SubgraphClients, 'beanstalkSG').mockResolvedValue({
       seasons: [
         {
@@ -65,8 +66,8 @@ describe('Utils', () => {
     expect(blockForSeason).toBe(20042493);
   });
 
-  describe('BigInt conversion', () => {
-    test('should convert all strings to BigInt', () => {
+  describe('BigInt', () => {
+    test('Converts all strings to BigInt', () => {
       const obj = allToBigInt({
         p1: '123456',
         p2: 10,
@@ -88,10 +89,16 @@ describe('Utils', () => {
       expect(obj.p3.p8).toEqual(null);
     });
 
-    test('should retain some precision', () => {
+    test('Retain some precision on string conversion', () => {
       const n1 = fromBigInt(123456789n, 6, 2);
       expect(n1).toEqual(123.45);
       expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
+    });
+
+    test('Applies percentage', () => {
+      expect(BigInt_applyPercent(100n, 102)).toEqual(102n);
+      expect(BigInt_applyPercent(100n, 95)).toEqual(95n);
+      expect(BigInt_applyPercent(10000n, 105.371)).toEqual(10537n);
     });
   });
 });

@@ -1,4 +1,3 @@
-const { CP2 } = require('../src/constants/addresses');
 const ContractGetters = require('../src/datasources/contracts/contract-getters');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
 const LiquidityUtil = require('../src/utils/pool/liquidity');
@@ -7,14 +6,25 @@ const WellFnUtil = require('../src/utils/pool/well-fn');
 describe('Pool Math', () => {
   test('Liquidity depth', async () => {
     const reserves = [14263546671971n, 2216675511188549508768n];
+    const rates = [6434657034n, 155408438179298n];
     const decimals = [6, 18];
+    jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
+      callStatic: {
+        calcReserveAtRatioSwap: jest
+          .fn()
+          .mockResolvedValueOnce(2194835811232559843749n)
+          .mockResolvedValueOnce(14123015691385n)
+          .mockResolvedValueOnce(2239180408272262904842n)
+          .mockResolvedValueOnce(14408357965030n)
+      }
+    });
 
-    const rates = await WellFnUtil.getRates(reserves, '0x', CP2, decimals);
-    console.log(rates);
-    const trueDepth = await LiquidityUtil.depth(reserves, rates, decimals);
-    const oldDepth = ConstantProductWellUtil.calcDepth(reserves, decimals);
+    const depth2 = await LiquidityUtil.depth(reserves, rates, decimals);
 
-    console.log(trueDepth, oldDepth);
+    expect(depth2.buy.float[0]).toBeCloseTo(140530.980586);
+    expect(depth2.buy.float[1]).toBeCloseTo(21.839699955989666);
+    expect(depth2.sell.float[0]).toBeCloseTo(144811.293059);
+    expect(depth2.sell.float[1]).toBeCloseTo(22.504897083713395);
   });
   test('Liquidity event volume', async () => {
     const prevLp = 38729833462074168851n;
