@@ -1,8 +1,7 @@
 const { CP2 } = require('../src/constants/addresses');
-const NumberUtil = require('../src/utils/number');
+const ContractGetters = require('../src/datasources/contracts/contract-getters');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
 const LiquidityUtil = require('../src/utils/pool/liquidity');
-const WellUtil = require('../src/utils/pool/well');
 const WellFnUtil = require('../src/utils/pool/well-fn');
 
 describe('Pool Math', () => {
@@ -18,17 +17,25 @@ describe('Pool Math', () => {
     console.log(trueDepth, oldDepth);
   });
   test('Liquidity event volume', async () => {
-    const result = await WellUtil.calcLiquidityVolume(
+    const prevLp = 38729833462074168851n;
+    const newLp = 54772255750516611345n;
+    const deltaLp = newLp - prevLp;
+    const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
+    jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
+      callStatic: {
+        calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
+        calcLPTokenUnderlying: calcLPTokenUnderlyingMock
+      }
+    });
+
+    const result = await WellFnUtil.calcLiquidityVolume(
       [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
       [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)]
     );
-    console.log(result);
 
-    const result2 = await WellUtil.calcLiquidityVolume(
-      [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
-      [1200n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)]
-    );
-    console.log(result2);
+    expect(calcLPTokenUnderlyingMock).toHaveBeenCalledWith(deltaLp, expect.any(Array), newLp, expect.any(String));
+    expect(result[0]).toEqual(-621320344n);
+    expect(result[1]).toEqual(292893218813452475n);
   });
   describe('Off-chain calculations', () => {
     test('Constant product rate', async () => {

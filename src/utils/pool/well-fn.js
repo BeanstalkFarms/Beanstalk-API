@@ -1,5 +1,6 @@
-const { BEANWSTETH, CP2 } = require('../../constants/addresses');
+const { CP2 } = require('../../constants/addresses');
 const ContractGetters = require('../../datasources/contracts/contract-getters');
+const { BigInt_abs } = require('../bigint');
 
 class WellFnUtil {
   /**
@@ -18,8 +19,7 @@ class WellFnUtil {
   }
 
   // Returns adjusted rates from `calcRate` that have precision equivalent to their corresponding token
-  // Value at index i corresponds to how much of the token at index i is received in exchange
-  // for one of token 1 - i.
+  // Value at index i is how much of token i is received in exchange for one of token 1 - i.
   static async getRates(reserves, data, wellFnAddr, decimals) {
     const wellFn = await ContractGetters.getWellFunctionContract(wellFnAddr);
     const rates = await Promise.all([
@@ -36,7 +36,7 @@ class WellFnUtil {
   // This functionality may or may not be helpful within this API project - it is used in subgraphs.
   // However it was first developed here as a means of understanding the inputs/outputs.
   static async calcLiquidityVolume(prevReserves, newReserves) {
-    const wellFn = await ContractGetters.getWellFunctionContract(CP2);
+    const wellFn = await ContractGetters.getWellFunctionContract(CP2); // TODO: well fn
 
     const initialLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(prevReserves, '0x'));
     const newLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(newReserves, '0x'));
