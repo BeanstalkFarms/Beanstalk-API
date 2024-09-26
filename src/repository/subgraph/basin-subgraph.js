@@ -9,16 +9,7 @@ class BasinSubgraphRepository {
       SubgraphClients.gql`
       {
         wells {
-          id
-          tokens {
-            id
-            decimals
-          }
-          tokenOrder
-          reserves
-          symbol
-          tokenPrice
-          rollingDailyBiTradeVolumeReserves
+          ${WellDto.subgraphFields}
         }
       }`,
       `block: {number: ${blockNumber}}`,
@@ -30,59 +21,46 @@ class BasinSubgraphRepository {
     return allWells.map((w) => new WellDto(w));
   }
 
-  static async getWellsForPair(tokens) {
-    const pairWells = await SubgraphClients.basinSG(SubgraphClients.gql`
+  static async getWellSwapsForPair(tokens, fromTimestamp, toTimestamp, limit) {
+    const wellSwaps = await SubgraphClients.basinSG(SubgraphClients.gql`
       {
         wells(where: { tokens: [${tokens.map((t) => `"${t}"`).join(', ')}] }) {
-          id
-          tokens {
-            id
-            decimals
+          swaps(
+            where: {
+              timestamp_gte: ${fromTimestamp}
+              timestamp_lte: ${toTimestamp}
+            }
+            first: ${limit}
+            orderBy: timestamp
+            orderDirection: desc
+          ) {
+            amountIn
+            amountOut
+            fromToken {
+              id
+              decimals
+            }
+            toToken {
+              id
+              decimals
+            }
+            timestamp
+            blockNumber
+            logIndex
           }
-          tokenOrder
-          reserves
-          symbol
-          tokenPrice
-          rollingDailyBiTradeVolumeReserves
         }
       }`);
-    return pairWells.wells.map((w) => new WellDto(w));
-  }
 
-  static async getSwaps(wellAddresses, fromTimestamp, toTimestamp, limit) {
-    const result = await SubgraphClients.basinSG(SubgraphClients.gql`
-      {
-        swaps(
-          where: {
-            well_in: [${wellAddresses.map((a) => `"${a}"`).join(', ')}]
-            timestamp_gte: ${fromTimestamp}
-            timestamp_lte: ${toTimestamp}
-          }
-          first: ${limit}
-          orderBy: timestamp
-          orderDirection: desc
-        ) {
-          amountIn
-          amountOut
-          fromToken {
-            id
-            decimals
-          }
-          toToken {
-            id
-            decimals
-          }
-          timestamp
-          blockNumber
-          logIndex
-        }
-      }`);
-    result.swaps.map((swap) => {
+    const flattenedSwaps = wellSwaps.wells.reduce((acc, next) => {
+      acc.push(...next.swaps);
+      return acc;
+    }, []);
+
+    flattenedSwaps.forEach((swap) => {
       swap.amountIn = BigInt(swap.amountIn);
       swap.amountOut = BigInt(swap.amountOut);
     });
-
-    return result.swaps;
+    return flattenedSwaps;
   }
 
   static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {

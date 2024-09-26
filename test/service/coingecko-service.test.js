@@ -48,7 +48,7 @@ describe('CoingeckoService', () => {
     expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
   });
 
-  it('should calculate high/low prices over the given period', async () => {
+  test('Returns correct high/low prices over the given period', async () => {
     const swapsResponse = require('../mock-responses/subgraph/coingecko/swaps.json');
     jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(swapsResponse);
     const depositResponse = require('../mock-responses/subgraph/coingecko/deposits.json');
@@ -69,10 +69,7 @@ describe('CoingeckoService', () => {
     expect(priceRange.low.float[1]).toEqual(0.00000001717847889);
   });
 
-  it('should return swap history', async () => {
-    jest
-      .spyOn(SubgraphClients, 'basinSG')
-      .mockResolvedValueOnce(require('../mock-responses/subgraph/coingecko/wells.json'));
+  test('Returns swap history', async () => {
     jest
       .spyOn(SubgraphClients, 'basinSG')
       .mockResolvedValueOnce(require('../mock-responses/subgraph/coingecko/swapHistory.json'));

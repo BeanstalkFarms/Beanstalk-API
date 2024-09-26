@@ -59,17 +59,13 @@ class CoingeckoService {
   }
 
   static async getTrades(options) {
-    // Find the well matching the requested ticker
-    const tokens = options.ticker_id.split('_');
-    const wells = await BasinSubgraphRepository.getWellsForPair(tokens);
-
     // Retrieve swaps matching the criteria
-    const limit = Math.min(options.limit, 1000);
-    const swaps = await BasinSubgraphRepository.getSwaps(
-      wells.map((w) => w.id),
+    const tokens = options.ticker_id.split('_');
+    const swaps = await BasinSubgraphRepository.getWellSwapsForPair(
+      tokens,
       options.start_time,
       options.end_time,
-      limit
+      Math.min(options.limit, 1000)
     );
 
     // Format the response
@@ -79,9 +75,10 @@ class CoingeckoService {
     };
     for (const swap of swaps) {
       const type = swap.fromToken.id === tokens[0] ? 'sell' : 'buy';
+      const effectivePrice = (swap.amountOut * BigInt(10 ** swap.fromToken.decimals)) / swap.amountIn;
       retval[type].push({
         trade_id: swap.blockNumber * 10000 + swap.logIndex,
-        price: swap.tokenPrice, // TODO
+        price: createNumberSpread(effectivePrice, swap.toToken.decimals).float,
         base_volume: createNumberSpread(swap.amountIn, swap.fromToken.decimals).float,
         target_volume: createNumberSpread(swap.amountOut, swap.toToken.decimals).float,
         trade_timestamp: parseInt(swap.timestamp) * 1000,

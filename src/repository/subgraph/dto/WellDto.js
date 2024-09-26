@@ -1,6 +1,19 @@
 const NumberUtil = require('../../../utils/number');
 
 class WellDto {
+  static subgraphFields = `
+    id
+    tokens {
+      id
+      decimals
+    }
+    tokenOrder
+    reserves
+    symbol
+    tokenPrice
+    rollingDailyBiTradeVolumeReserves
+  `;
+
   constructor(subgraphWell) {
     this.address = subgraphWell.id;
     this.symbol = subgraphWell.symbol;
