@@ -2,7 +2,7 @@ const { BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP } = require
 const YieldModelAssembler = require('../../src/repository/postgres/models/assemblers/yield-assembler');
 const { ApyInitType } = require('../../src/repository/postgres/models/types/types');
 
-describe('Yield Assembler', () => {
+describe('Model Assemblers', () => {
   test('Yield model transform - round trip', async () => {
     const yieldDto = require('./dtos/yield.json');
     const tokenIdMapping = [

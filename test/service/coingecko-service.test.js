@@ -5,7 +5,7 @@ jest.spyOn(BlockUtil, 'blockForSubgraphFromOptions').mockResolvedValue({ number:
 
 const {
   getTickers,
-  calcWellSwapVolume,
+  deprecated_calcWellSwapVolume,
   getWellPriceRange,
   getTrades,
   get24hVolume
@@ -53,7 +53,7 @@ describe('CoingeckoService', () => {
     const wellsResponse = require('../mock-responses/subgraph/coingecko/swapVolume.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
 
-    const volume = await calcWellSwapVolume(BEANWETH, 1715020584);
+    const volume = await deprecated_calcWellSwapVolume(BEANWETH, 1715020584);
     expect(volume[BEAN].float).toBeCloseTo(71708.944062);
     expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
   });

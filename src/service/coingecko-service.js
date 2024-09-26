@@ -119,32 +119,6 @@ class CoingeckoService {
     );
   }
 
-  // Gets the swap volume in terms of token amounts in the well over the requested period
-  static async calcWellSwapVolume(wellAddress, timestamp, lookback = ONE_DAY) {
-    const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
-
-    if (allSwaps.length === 0) {
-      return createNumberSpread([0n, 0n], [1, 1]);
-    }
-
-    // Add all of the swap amounts for each token
-    const swapVolume = {};
-    for (const swap of allSwaps) {
-      swapVolume[swap.fromToken.id] = (swapVolume[swap.fromToken.id] ?? 0n) + swap.amountIn;
-      swapVolume[swap.toToken.id] = (swapVolume[swap.toToken.id] ?? 0n) + swap.amountOut;
-    }
-
-    const decimals = {
-      [allSwaps[0].fromToken.id]: allSwaps[0].fromToken.decimals,
-      [allSwaps[0].toToken.id]: allSwaps[0].toToken.decimals
-    };
-    // Convert to the appropriate precision
-    for (const token in swapVolume) {
-      swapVolume[token] = createNumberSpread(swapVolume[token], decimals[token]);
-    }
-    return swapVolume;
-  }
-
   /**
    * Gets the high/low over the given time range
    * @param {string} wellAddress - address of the well
@@ -217,6 +191,33 @@ class CoingeckoService {
       high: tokenPrices.reduce((max, obj) => (obj.float[0] > max.float[0] ? obj : max), tokenPrices[0]),
       low: tokenPrices.reduce((min, obj) => (obj.float[0] < min.float[0] ? obj : min), tokenPrices[0])
     };
+  }
+
+  /// Deprecated in favor of using the precomputed 24h rolling volumes from the subgraph
+  // Gets the swap volume in terms of token amounts in the well over the requested period
+  static async deprecated_calcWellSwapVolume(wellAddress, timestamp, lookback = ONE_DAY) {
+    const allSwaps = await BasinSubgraphRepository.getAllSwaps(wellAddress, timestamp - lookback, timestamp);
+
+    if (allSwaps.length === 0) {
+      return createNumberSpread([0n, 0n], [1, 1]);
+    }
+
+    // Add all of the swap amounts for each token
+    const swapVolume = {};
+    for (const swap of allSwaps) {
+      swapVolume[swap.fromToken.id] = (swapVolume[swap.fromToken.id] ?? 0n) + swap.amountIn;
+      swapVolume[swap.toToken.id] = (swapVolume[swap.toToken.id] ?? 0n) + swap.amountOut;
+    }
+
+    const decimals = {
+      [allSwaps[0].fromToken.id]: allSwaps[0].fromToken.decimals,
+      [allSwaps[0].toToken.id]: allSwaps[0].toToken.decimals
+    };
+    // Convert to the appropriate precision
+    for (const token in swapVolume) {
+      swapVolume[token] = createNumberSpread(swapVolume[token], decimals[token]);
+    }
+    return swapVolume;
   }
 }
 

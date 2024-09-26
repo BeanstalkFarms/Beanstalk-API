@@ -1,5 +1,6 @@
 const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
+const WellDto = require('./dto/WellDto');
 
 class BasinSubgraphRepository {
   static async getAllWells(blockNumber) {
@@ -16,6 +17,7 @@ class BasinSubgraphRepository {
           tokenOrder
           reserves
           symbol
+          rollingDailyBiTradeVolumeReserves
         }
       }`,
       `block: {number: ${blockNumber}}`,
@@ -24,9 +26,7 @@ class BasinSubgraphRepository {
       [' '],
       'asc'
     );
-    allWells.forEach(this.orderTokens);
-    allWells.map((well) => (well.reserves = well.reserves.map(BigInt)));
-    return allWells;
+    return allWells.map((w) => new WellDto(w));
   }
 
   static async getWellsForPair(tokens) {
@@ -36,12 +36,15 @@ class BasinSubgraphRepository {
           id
           tokens {
             id
+            decimals
           }
           tokenOrder
+          reserves
+          symbol
+          rollingDailyBiTradeVolumeReserves
         }
       }`);
-    pairWells.wells.forEach(this.orderTokens);
-    return pairWells.wells;
+    return pairWells.map((w) => new WellDto(w));
   }
 
   static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
@@ -156,28 +159,6 @@ class BasinSubgraphRepository {
     allWithdraws.map((withdraw) => (withdraw.reserves = withdraw.reserves.map(BigInt)));
 
     return allWithdraws;
-  }
-
-  static async getRollingVolume(wellAddress, blockNumber) {
-    const result = await SubgraphClients.basinSG(SubgraphClients.gql`
-      {
-        wells(
-          block: {number: ${blockNumber}}
-          where: {id: "${wellAddress}"}
-        ) {
-          tokens {
-            id
-            decimals
-          }
-          tokenOrder
-          rollingDailyBiTradeVolumeReserves
-        }
-      }`);
-    result.wells.forEach(this.orderTokens);
-    return result.wells[0].tokens.map((t, idx) => ({
-      amount: BigInt(result.wells[0].rollingDailyBiTradeVolumeReserves[idx]),
-      decimals: t.decimals
-    }));
   }
 
   // Orders the tokens within the provided well. Minimal fields required are `tokens` and `tokenOrder`.

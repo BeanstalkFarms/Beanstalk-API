@@ -1,0 +1,26 @@
+{
+  "id": "0xbea0e11282e2bb5893bece110cf199501e872bad",
+  "tokens": [
+    {
+      "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "decimals": 18
+    },
+    {
+      "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+      "decimals": 6
+    }
+  ],
+  "tokenOrder": [
+    "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  ],
+  "reserves": [
+    "12345678",
+    "18275892375891378924"
+  ],
+  "symbol": "BEANWETHCP2w",
+  "rollingDailyBiTradeVolumeReserves": [
+    "123456",
+    "182758923758913789"
+  ]
+}
