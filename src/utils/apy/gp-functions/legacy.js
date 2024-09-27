@@ -1,11 +1,15 @@
+// NOTE:
+// Gauge Points are computed with 0 decimals instead of 18 (i.e. 1000e18 is max GP, here its 1000)
+// Percentages are also computed with 0 instead of 6 (i.e. 100e6 is max percent, here it is 100)
+
 const DEFAULT_MAX_GAUGE_POINTS = 1000;
 const DEFAULT_UPPER_THRESHOLD = 10001;
 const DEFAULT_LOWER_THRESHOLD = 9999;
 const DEFAULT_THRESHOLD_PRECISION = 10000;
 
-class GaugePointFunctions {
+class LegacyDefaultGaugePointFunction {
   // See {GaugePointFacet.defaultGaugePointFunction} for contract implementation.
-  static defaultGaugePointFunction(currentGaugePoints, optimalPercentDepositedBdv, percentOfDepositedBdv) {
+  static next(currentGaugePoints, optimalPercentDepositedBdv, percentOfDepositedBdv) {
     if (percentOfDepositedBdv > (optimalPercentDepositedBdv * DEFAULT_UPPER_THRESHOLD) / DEFAULT_THRESHOLD_PRECISION) {
       if (currentGaugePoints <= 1) {
         // Gauge points cannot go below 0.
@@ -30,4 +34,4 @@ class GaugePointFunctions {
   }
 }
 
-module.exports = GaugePointFunctions;
+module.exports = LegacyDefaultGaugePointFunction;

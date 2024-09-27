@@ -7,7 +7,7 @@ const { PRECISION } = require('../../constants/constants');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
-const GaugePointFunctions = require('./gauge-point-functions');
+const LegacyDefaultGaugePointFunction = require('./gp-functions/legacy');
 
 class GaugeApyUtil {
   /**
@@ -162,7 +162,7 @@ class GaugeApyUtil {
       // Handle multiple whitelisted gauge LP, or gauge points changing during germination
       if (gaugeLpPoints.length > 1 || i < 2) {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
-          gaugeLpPointsCopy[j] = GaugePointFunctions.defaultGaugePointFunction(
+          gaugeLpPointsCopy[j] = LegacyDefaultGaugePointFunction.next(
             gaugeLpPointsCopy[j],
             gaugeLpOptimalPercentBdvCopy[j],
             currentPercentLpBdv[j]
