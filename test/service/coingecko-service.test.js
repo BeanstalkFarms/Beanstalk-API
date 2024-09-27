@@ -14,13 +14,10 @@ const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
-    const wellsResponse = require('../mock-responses/subgraph/coingecko/tickers_1.json');
+    const wellsResponse = require('../mock-responses/subgraph/coingecko/wells.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
-    const wellVolumeResponse = require('../mock-responses/subgraph/coingecko/tickers_2.json');
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellVolumeResponse);
 
     const tickers = await getTickers({ blockNumber: 19000000 });
-    // console.log(tickers);
 
     expect(tickers).toHaveLength(1);
     expect(tickers[0].ticker_id).toEqual(
@@ -33,19 +30,12 @@ describe('CoingeckoService', () => {
     expect(tickers[0].base_volume).toBeCloseTo(362621.652657);
     expect(tickers[0].target_volume).toBeCloseTo(141.01800893122126);
     expect(tickers[0].liquidity_in_usd).toEqual(27491580);
-    expect(tickers[0].depth2.buy).toEqual([135736.220357, 52.8335281459809]);
-    expect(tickers[0].depth2.sell).toEqual([139870.493345, 54.44273921546687]);
-    expect(tickers[0].high).toBeCloseTo(0.000392979136931714);
-    expect(tickers[0].low).toBeCloseTo(0.000383640247389837);
-  });
-
-  it('should calculate token volume in the well (calculated directly from swaps only)', async () => {
-    const wellsResponse = require('../mock-responses/subgraph/coingecko/swapVolume.json');
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
-
-    const volume = await deprecated_calcWellSwapVolume(BEANWETH, 1715020584);
-    expect(volume[BEAN].float).toBeCloseTo(71708.944062);
-    expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
+    expect(tickers[0].depth2.buy[0]).toEqual(135736.220357);
+    expect(tickers[0].depth2.buy[1]).toBeCloseTo(52.8335281459809, 5);
+    expect(tickers[0].depth2.sell[0]).toEqual(139870.493345);
+    expect(tickers[0].depth2.sell[1]).toBeCloseTo(54.44273921546687, 5);
+    expect(tickers[0].high).toBeCloseTo(0.000392979136931714, 5);
+    expect(tickers[0].low).toBeCloseTo(0.000383640247389837, 5);
   });
 
   test('Returns correct high/low prices over the given period', async () => {
@@ -90,5 +80,15 @@ describe('CoingeckoService', () => {
     expect(trades.buy[0].target_volume).toBeCloseTo(1412.728161);
     expect(trades.buy[0].trade_timestamp).toEqual(1714613735000);
     expect(trades.buy[0].type).toEqual('buy');
+  });
+
+  // This test is for a deprecated feature, the underlying query has changed, mocking is fine
+  test('(deprecated) should calculate token volume in the well (calculated directly from swaps only)', async () => {
+    const wellsResponse = require('../mock-responses/subgraph/coingecko/swapVolume.json');
+    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
+
+    const volume = await deprecated_calcWellSwapVolume(BEANWETH, 1715020584);
+    expect(volume[BEAN].float).toBeCloseTo(71708.944062);
+    expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
   });
 });

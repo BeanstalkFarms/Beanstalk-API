@@ -36,7 +36,7 @@ class CoingeckoService {
           ticker_id: `${base_currency}_${target_currency}`,
           base_currency,
           target_currency,
-          pool_id: well.id,
+          pool_id: well.address,
           last_price: well.rates.float[1],
           base_volume: well.biTokenVolume24h.float[0],
           target_volume: well.biTokenVolume24h.float[1],
@@ -115,7 +115,7 @@ class CoingeckoService {
         acc.push(...next);
         return acc;
       }, [])
-      .map((rates) => NumberUtil.createNumberSpread(rates, well.tokenDecimals()));
+      .map((event) => NumberUtil.createNumberSpread(event.tokenPrice, well.tokenDecimals()));
 
     if (flattened.length === 0) {
       // No trading activity over this period, returns the current rates
@@ -145,8 +145,8 @@ class CoingeckoService {
     // Add all of the swap amounts for each token
     const swapVolume = {};
     for (const swap of allSwaps) {
-      swapVolume[swap.fromToken.id] = (swapVolume[swap.fromToken.id] ?? 0n) + swap.amountIn;
-      swapVolume[swap.toToken.id] = (swapVolume[swap.toToken.id] ?? 0n) + swap.amountOut;
+      swapVolume[swap.fromToken.id] = (swapVolume[swap.fromToken.id] ?? 0n) + BigInt(swap.amountIn);
+      swapVolume[swap.toToken.id] = (swapVolume[swap.toToken.id] ?? 0n) + BigInt(swap.amountOut);
     }
 
     const decimals = {

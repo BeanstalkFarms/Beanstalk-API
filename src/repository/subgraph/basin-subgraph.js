@@ -80,7 +80,8 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    return allSwaps.map((s) => (s.tokenPrice = s.tokenPrice.map(BigInt)));
+    allSwaps.forEach((s) => (s.tokenPrice = s.tokenPrice.map(BigInt)));
+    return allSwaps;
   }
 
   static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
@@ -100,7 +101,8 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    return allDeposits.map((d) => (d.tokenPrice = d.tokenPrice.map(BigInt)));
+    allDeposits.forEach((d) => (d.tokenPrice = d.tokenPrice.map(BigInt)));
+    return allDeposits;
   }
 
   static async getAllWithdraws(wellAddress, fromTimestamp, toTimestamp) {
@@ -120,7 +122,8 @@ class BasinSubgraphRepository {
       [fromTimestamp.toFixed(0), 0],
       'asc'
     );
-    return allWithdraws.map((w) => (w.tokenPrice = w.tokenPrice.map(BigInt)));
+    allWithdraws.forEach((w) => (w.tokenPrice = w.tokenPrice.map(BigInt)));
+    return allWithdraws;
   }
 }
 
