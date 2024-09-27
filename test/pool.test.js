@@ -14,7 +14,7 @@ describe('Pool Math', () => {
       },
       tokenDecimals: () => [6, 18],
       wellFunction: {
-        target: 'abc',
+        id: 'abc',
         data: '0x'
       }
     };
@@ -51,7 +51,7 @@ describe('Pool Math', () => {
     const result = await WellFnUtil.calcLiquidityVolume(
       {
         wellFunction: {
-          target: 'abc',
+          id: 'abc',
           data: '0x'
         }
       },

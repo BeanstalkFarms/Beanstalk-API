@@ -21,7 +21,7 @@ class WellFnUtil {
 
   // Calculates the token volume resulting from a liquidity add operation.
   static async calcLiquidityVolume(well, prevReserves, newReserves) {
-    const wellFn = await ContractGetters.getWellFunctionContract(well.wellFunction.target);
+    const wellFn = await ContractGetters.getWellFunctionContract(well.wellFunction.id);
     const data = well.wellFunction.data;
 
     const initialLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(prevReserves, data));

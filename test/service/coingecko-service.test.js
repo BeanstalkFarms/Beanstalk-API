@@ -19,6 +19,7 @@ describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
     const wellsResponse = require('../mock-responses/subgraph/basin/wells.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
+    // NOTE: incomplete mocking in this test
 
     const tickers = await getTickers({ blockNumber: 19000000 });
 

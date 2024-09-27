@@ -13,7 +13,7 @@ class WellDto {
     tokenPrice
     rollingDailyBiTradeVolumeReserves
     wellFunction {
-      target
+      id
       data
     }
   `;
