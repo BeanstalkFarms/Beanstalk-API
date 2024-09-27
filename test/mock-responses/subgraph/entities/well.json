@@ -26,5 +26,9 @@
   "rollingDailyBiTradeVolumeReserves": [
     "123456",
     "182758923758913789"
-  ]
+  ],
+  "wellFunction": {
+    "target": "0xba510c20fd2c52e4cb0d23cfc3ccd092f9165a6e",
+    "data": "0x"
+  }
 }

@@ -20,17 +20,18 @@ class WellFnUtil {
   }
 
   // Calculates the token volume resulting from a liquidity add operation.
-  static async calcLiquidityVolume(prevReserves, newReserves) {
-    const wellFn = await ContractGetters.getWellFunctionContract(CP2); // TODO: well fn
+  static async calcLiquidityVolume(well, prevReserves, newReserves) {
+    const wellFn = await ContractGetters.getWellFunctionContract(well.wellFunction.target);
+    const data = well.wellFunction.data;
 
-    const initialLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(prevReserves, '0x'));
-    const newLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(newReserves, '0x'));
+    const initialLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(prevReserves, data));
+    const newLp = BigInt(await wellFn.callStatic.calcLpTokenSupply(newReserves, data));
     const deltaLp = newLp - initialLp;
 
     // Determines how much of the liquidity operation was double sided.
     // Can then calculate how much was single sided.
     const doubleSided = (
-      await wellFn.callStatic.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, '0x')
+      await wellFn.callStatic.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, data)
     ).map((bn) => {
       return deltaLp > 0n ? BigInt(bn) : -BigInt(bn);
     });

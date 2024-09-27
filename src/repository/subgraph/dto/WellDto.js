@@ -12,6 +12,10 @@ class WellDto {
     symbol
     tokenPrice
     rollingDailyBiTradeVolumeReserves
+    wellFunction {
+      target
+      data
+    }
   `;
 
   constructor(subgraphWell) {
@@ -24,6 +28,7 @@ class WellDto {
       subgraphWell.rollingDailyBiTradeVolumeReserves.map(BigInt),
       this.tokenDecimals()
     );
+    this.wellFunction = subgraphWell.wellFunction;
   }
 
   tokenDecimals() {

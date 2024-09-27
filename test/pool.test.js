@@ -12,7 +12,11 @@ describe('Pool Math', () => {
       rates: {
         raw: [6434657034n, 155408438179298n]
       },
-      tokenDecimals: () => [6, 18]
+      tokenDecimals: () => [6, 18],
+      wellFunction: {
+        target: 'abc',
+        data: '0x'
+      }
     };
     jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
       callStatic: {
@@ -45,6 +49,12 @@ describe('Pool Math', () => {
     });
 
     const result = await WellFnUtil.calcLiquidityVolume(
+      {
+        wellFunction: {
+          target: 'abc',
+          data: '0x'
+        }
+      },
       [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
       [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)]
     );

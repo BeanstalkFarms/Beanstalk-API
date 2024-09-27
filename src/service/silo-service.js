@@ -68,10 +68,12 @@ class SiloService {
 
     const stemDeltas = [];
     for (const asset of siloAssets) {
-      const [migrationStemTip, stemTipNow] = await Promise.all([
-        BigInt(beanstalk.callStatic.stemTipForToken(asset, { blockTag: MILESTONE.siloV3 })),
-        BigInt(beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number }))
-      ]);
+      const [migrationStemTip, stemTipNow] = (
+        await Promise.all([
+          beanstalk.callStatic.stemTipForToken(asset, { blockTag: MILESTONE.siloV3 }),
+          beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number })
+        ])
+      ).map(BigInt);
       stemDeltas.push(Number(stemTipNow - migrationStemTip));
     }
 
