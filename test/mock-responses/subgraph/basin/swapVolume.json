@@ -1,6 +1,9 @@
 {
   "swaps": [
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "5131964424",
       "amountOut": "1627597256416504757",
       "fromToken": {
@@ -15,6 +18,9 @@
       "timestamp": "1714937735"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "71520435",
       "amountOut": "22668472364298959",
       "fromToken": {
@@ -29,6 +35,9 @@
       "timestamp": "1714973123"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "18078262136",
       "amountOut": "5722530055315977132",
       "fromToken": {
@@ -43,6 +52,9 @@
       "timestamp": "1714975211"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "16792473647",
       "amountOut": "5288380773207334379",
       "fromToken": {
@@ -57,6 +69,9 @@
       "timestamp": "1714976867"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "14616377416",
       "amountOut": "4592844421686613661",
       "fromToken": {
@@ -71,6 +86,9 @@
       "timestamp": "1714983803"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "742442383",
       "amountOut": "233041161817517121",
       "fromToken": {
@@ -85,6 +103,9 @@
       "timestamp": "1714984139"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "422877031",
       "amountOut": "132723607168152499",
       "fromToken": {
@@ -99,6 +120,9 @@
       "timestamp": "1714984211"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "318301411",
       "amountOut": "99896408349110369",
       "fromToken": {
@@ -113,6 +137,9 @@
       "timestamp": "1714984235"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "500000000000000000",
       "amountOut": "1593024080",
       "fromToken": {
@@ -127,6 +154,9 @@
       "timestamp": "1714999859"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "10000000000",
       "amountOut": "3136819142012486603",
       "fromToken": {
@@ -141,6 +171,9 @@
       "timestamp": "1715000567"
     },
     {
+      "well": {
+        "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
+      },
       "amountIn": "3941701099",
       "amountOut": "1235222073079723666",
       "fromToken": {

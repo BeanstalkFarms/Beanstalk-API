@@ -7,14 +7,17 @@ const {
   getTickers,
   deprecated_calcWellSwapVolume,
   getWellPriceRange,
-  getTrades
+  getTrades,
+  getAllPriceChanges
 } = require('../../src/service/coingecko-service');
-const { BEANWETH, WETH, BEAN } = require('../../src/constants/addresses');
+const { BEANWETH, BEANWSTETH, WETH, BEAN } = require('../../src/constants/addresses');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
+
+const testTimestamp = 1715020584;
 
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
-    const wellsResponse = require('../mock-responses/subgraph/coingecko/wells.json');
+    const wellsResponse = require('../mock-responses/subgraph/basin/wells.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
 
     const tickers = await getTickers({ blockNumber: 19000000 });
@@ -38,20 +41,14 @@ describe('CoingeckoService', () => {
     expect(tickers[0].low).toBeCloseTo(0.000383640247389837, 5);
   });
 
-  test('Returns correct high/low prices over the given period', async () => {
-    const swapsResponse = require('../mock-responses/subgraph/coingecko/swaps.json');
-    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(swapsResponse);
-    const depositResponse = require('../mock-responses/subgraph/coingecko/deposits.json');
-    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(depositResponse);
-    const withdrawResponse = require('../mock-responses/subgraph/coingecko/withdrawals.json');
-    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(withdrawResponse);
-
+  test('Returns correct high/low prices over the given period', () => {
+    const mockPriceEvents = require('../mock-responses/coingecko/priceChanges.json');
     const mockWellDto = {
-      address: 'abc',
+      address: BEANWSTETH.toLowerCase(),
       tokenDecimals: () => [6, 18]
     };
 
-    const priceRange = await getWellPriceRange(mockWellDto, 1715020584);
+    const priceRange = getWellPriceRange(mockWellDto, mockPriceEvents);
 
     expect(priceRange.high.float[0]).toEqual(0.000065);
     expect(priceRange.high.float[1]).toEqual(0.00000000000175889);
@@ -62,7 +59,7 @@ describe('CoingeckoService', () => {
   test('Returns swap history', async () => {
     jest
       .spyOn(SubgraphClients, 'basinSG')
-      .mockResolvedValueOnce(require('../mock-responses/subgraph/coingecko/swapHistory.json'));
+      .mockResolvedValueOnce(require('../mock-responses/subgraph/basin/swapHistory.json'));
 
     const options = {
       ticker_id: `${BEAN}_${WETH}`,
@@ -82,12 +79,34 @@ describe('CoingeckoService', () => {
     expect(trades.buy[0].type).toEqual('buy');
   });
 
+  test('Identifies price changes', async () => {
+    const swapsResponse = require('../mock-responses/subgraph/basin/swaps.json');
+    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(swapsResponse);
+    const depositResponse = require('../mock-responses/subgraph/basin/deposits.json');
+    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(depositResponse);
+    const withdrawResponse = require('../mock-responses/subgraph/basin/withdrawals.json');
+    jest.spyOn(SubgraphQueryUtil, 'allPaginatedSG').mockResolvedValueOnce(withdrawResponse);
+
+    const mockWells = {
+      [BEANWETH.toLowerCase()]: {
+        tokenDecimals: () => [6, 18]
+      },
+      [BEANWSTETH.toLowerCase()]: {
+        tokenDecimals: () => [6, 18]
+      }
+    };
+
+    const priceRange = await getAllPriceChanges(mockWells, testTimestamp);
+    expect(priceRange[BEANWETH.toLowerCase()].length).toEqual(5);
+    expect(priceRange[BEANWSTETH.toLowerCase()].length).toEqual(2);
+  });
+
   // This test is for a deprecated feature, the underlying query has changed, mocking is fine
   test('(deprecated) should calculate token volume in the well (calculated directly from swaps only)', async () => {
-    const wellsResponse = require('../mock-responses/subgraph/coingecko/swapVolume.json');
+    const wellsResponse = require('../mock-responses/subgraph/basin/swapVolume.json');
     jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
 
-    const volume = await deprecated_calcWellSwapVolume(BEANWETH, 1715020584);
+    const volume = await deprecated_calcWellSwapVolume(BEANWETH, testTimestamp);
     expect(volume[BEAN].float).toBeCloseTo(71708.944062);
     expect(volume[WETH].float).toBeCloseTo(22.591723371417718);
   });

@@ -18,7 +18,12 @@ class BasinSubgraphRepository {
       [' '],
       'asc'
     );
-    return allWells.map((w) => new WellDto(w));
+    return allWells
+      .map((w) => new WellDto(w))
+      .reduce((acc, next) => {
+        acc[next.address] = next;
+        return acc;
+      }, {});
   }
 
   static async getWellSwapsForPair(tokens, fromTimestamp, toTimestamp, limit) {
@@ -63,19 +68,22 @@ class BasinSubgraphRepository {
     return flattenedSwaps;
   }
 
-  static async getAllSwaps(wellAddress, fromTimestamp, toTimestamp) {
+  static async getAllSwaps(fromTimestamp, toTimestamp) {
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
       {
         swaps {
+          well {
+            id
+          }
           tokenPrice
           timestamp
           logIndex
         }
       }`,
       '',
-      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
       [fromTimestamp.toFixed(0), 0],
       'asc'
@@ -84,19 +92,22 @@ class BasinSubgraphRepository {
     return allSwaps;
   }
 
-  static async getAllDeposits(wellAddress, fromTimestamp, toTimestamp) {
+  static async getAllDeposits(fromTimestamp, toTimestamp) {
     const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
       {
         deposits {
+          well {
+            id
+          }
           tokenPrice
           timestamp
           logIndex
         }
       }`,
       '',
-      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
       [fromTimestamp.toFixed(0), 0],
       'asc'
@@ -105,19 +116,22 @@ class BasinSubgraphRepository {
     return allDeposits;
   }
 
-  static async getAllWithdraws(wellAddress, fromTimestamp, toTimestamp) {
+  static async getAllWithdraws(fromTimestamp, toTimestamp) {
     const allWithdraws = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.basinSG,
       SubgraphClients.gql`
       {
         withdraws {
+          well {
+            id
+          }
           tokenPrice
           timestamp
           logIndex
         }
       }`,
       '',
-      `well: "${wellAddress}", timestamp_lte: "${toTimestamp}"`,
+      `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
       [fromTimestamp.toFixed(0), 0],
       'asc'
