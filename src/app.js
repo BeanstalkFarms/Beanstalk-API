@@ -10,6 +10,7 @@ const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
 const { formatBigintHex } = require('./utils/bigint.js');
+const AsyncContext = require('./utils/context.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -30,6 +31,12 @@ async function appStartup() {
   );
 
   app.use(bodyParser());
+
+  app.use(async (ctx, next) => {
+    const chain = ctx.headers['x-chain'] ?? 'arb';
+    // Stores chain in the async context
+    AsyncContext.run({ chain }, next);
+  });
 
   app.use(async (ctx, next) => {
     if (!ctx.originalUrl.includes('healthcheck')) {

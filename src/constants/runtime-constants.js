@@ -1,10 +1,6 @@
 const AlchemyUtil = require('../datasources/alchemy');
+const AsyncContext = require('../utils/context');
 const BeanstalkEth = require('./raw/beanstalk-eth');
-
-// Multichain constants:
-// ARB.BEANSTALK / ETH.BEANSTALK / ETH.provider, C(chain).BEANSTALK
-// OR
-// BEANSTALK(chain), provider(chain)
 
 // C(chain).BEANSTALK
 // C(chain).ABIS[addr]
@@ -39,12 +35,17 @@ class RuntimeConstants {
 }
 
 // Convenience object for succinct usage.
-// Input can be either a chain string, or an object with `chain` and `block` properties
+// Input can be any of the following:
+// 1. Empty - will use AsyncContext.get('chain')
+// 2. A chain string
+// 3. An object with `chain` and (optionally) `block` properties
 const C = (opt) => {
-  if (opt.chain) {
-    return RuntimeConstants.underlying(opt.chain, opt.block);
-  } else {
+  if (!opt) {
+    return RuntimeConstants.underlying(AsyncContext.get('chain'));
+  } else if (!opt.chain) {
     return RuntimeConstants.underlying(opt);
+  } else {
+    return RuntimeConstants.underlying(opt.chain, opt.block);
   }
 };
 
