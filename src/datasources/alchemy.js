@@ -1,15 +1,24 @@
 require('dotenv').config();
-const { Network, Alchemy } = require('alchemy-sdk');
+const { Alchemy } = require('alchemy-sdk');
 
-// TODO: configured networks in .env, setup for each
-const settings = {
-  apiKey: process.env.ALCHEMY_API_KEY,
-  network: Network.ETH_MAINNET
-};
+class AlchemyUtil {
+  // Contains a provider by chain
+  static _providers = {};
 
-const alchemy = new Alchemy(settings);
+  static {
+    const enabledChains = process.env.ENABLED_CHAINS?.split(',');
+    for (const chain of enabledChains) {
+      const settings = {
+        apiKey: process.env.ALCHEMY_API_KEY,
+        network: `${chain}-mainnet` // Of type alchemy-sdk.Network
+      };
+      this._providers[chain] = new Alchemy(settings).config.getProvider();
+    }
+  }
 
-module.exports = {
-  alchemy: alchemy,
-  providerThenable: alchemy.config.getProvider()
-};
+  static providerForChain(chain) {
+    return AlchemyUtil._providers[chain];
+  }
+}
+
+module.exports = AlchemyUtil;

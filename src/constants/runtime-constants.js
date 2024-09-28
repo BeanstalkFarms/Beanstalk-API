@@ -1,3 +1,4 @@
+const AlchemyUtil = require('../datasources/alchemy');
 const BeanstalkEth = require('./raw/beanstalk-eth');
 
 // Multichain constants:
@@ -21,8 +22,7 @@ class RuntimeConstants {
     return {
       get: (target, property, receiver) => {
         if (property === 'provider') {
-          // TODO: provider for chain (will be available method in alchemy util)
-          return 75;
+          return AlchemyUtil.providerForChain(chain);
         }
         // TODO: orchestrate constants, unclear what is chain paramter (+ set beanstalkarb)
         const constants = chain === 'eth' ? BeanstalkEth : BeanstalkEth; /** */
