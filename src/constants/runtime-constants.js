@@ -42,7 +42,14 @@ class RuntimeConstants {
 // TODO: should also accept a season.
 const C = (opt) => {
   if (!opt) {
-    return RuntimeConstants.underlying(AsyncContext.get('chain'));
+    let defaultChain;
+    try {
+      defaultChain = AsyncContext.get('chain');
+    } catch (e) {
+      // If there is no async context, this is from a system process/non rest. Use default configured chain
+      defaultChain = 'arb'; // TODO: default from .env
+    }
+    return RuntimeConstants.underlying(defaultChain);
   } else if (!opt.chain) {
     return RuntimeConstants.underlying(opt);
   } else {

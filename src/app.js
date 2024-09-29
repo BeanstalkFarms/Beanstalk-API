@@ -33,7 +33,7 @@ async function appStartup() {
   app.use(bodyParser());
 
   app.use(async (ctx, next) => {
-    const chain = ctx.headers['x-chain'] ?? 'arb';
+    const chain = ctx.headers['x-chain'] ?? 'arb'; // TODO: use default according to .env
     // Stores chain in the async context
     await AsyncContext.run({ chain }, next);
   });
