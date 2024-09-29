@@ -8,7 +8,6 @@ class Contracts {
     const network = (await provider.detectNetwork()).name;
     const key = JSON.stringify({ address, blockNumber, network });
     if (!contracts[key]) {
-      console.log(key, address, C().ABIS[address] == undefined);
       contracts[key] = this.makeContract(address, C().ABIS[address], provider);
     }
     return contracts[key];

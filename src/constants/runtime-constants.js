@@ -1,5 +1,6 @@
 const AlchemyUtil = require('../datasources/alchemy');
 const AsyncContext = require('../utils/context');
+const EnvUtil = require('../utils/env');
 const BeanstalkEth = require('./raw/beanstalk-eth');
 
 // C(chain).BEANSTALK
@@ -47,7 +48,7 @@ const C = (opt) => {
       defaultChain = AsyncContext.get('chain');
     } catch (e) {
       // If there is no async context, this is from a system process/non rest. Use default configured chain
-      defaultChain = 'arb'; // TODO: default from .env
+      defaultChain = EnvUtil.defaultChain();
     }
     return RuntimeConstants.underlying(defaultChain);
   } else if (!opt.chain) {
