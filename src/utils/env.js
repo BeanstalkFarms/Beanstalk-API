@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Network } = require('alchemy-sdk');
+const ChainUtil = require('./chain');
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
@@ -23,7 +23,7 @@ if (ENABLED_CHAINS.length === 0) {
 }
 
 for (const chain of ENABLED_CHAINS) {
-  if (!Object.values(Network).includes(`${chain}-mainnet`)) {
+  if (!ChainUtil.isValidChain(chain)) {
     throw new Error(`Invalid environment configured: chain '${chain}-mainnet' not supported by Alchemy.`);
   }
 }

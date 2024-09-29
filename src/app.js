@@ -11,6 +11,7 @@ const { sequelize } = require('./repository/postgres/models/index.js');
 const { formatBigintHex } = require('./utils/bigint.js');
 const AsyncContext = require('./utils/context.js');
 const EnvUtil = require('./utils/env.js');
+const ChainUtil = require('./utils/chain.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -34,6 +35,13 @@ async function appStartup() {
 
   app.use(async (ctx, next) => {
     const chain = ctx.headers['x-chain'] ?? EnvUtil.defaultChain();
+    if (!ChainUtil.isValidChain(chain)) {
+      ctx.status = 400;
+      ctx.body = {
+        message: `Invalid chain '${chain}' was requested.`
+      };
+      return;
+    }
     // Stores chain in the async context
     await AsyncContext.run({ chain }, next);
   });
