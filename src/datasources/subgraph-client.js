@@ -1,14 +1,9 @@
-require('dotenv').config();
 const { GraphQLClient, gql } = require('graphql-request');
 const fs = require('fs');
+const EnvUtil = require('../utils/env');
 
 const BASE_URL = 'https://graph.bean.money/';
-const SLUGS = [
-  (process.env.SG_BEANSTALK ?? '') !== '' ? process.env.SG_BEANSTALK : 'beanstalk',
-  (process.env.SG_BEAN ?? '') !== '' ? process.env.SG_BEAN : 'bean',
-  (process.env.SG_BASIN ?? '') !== '' ? process.env.SG_BASIN : 'basin',
-  (process.env.SG_BEANFT ?? '') !== '' ? process.env.SG_BEANFT : 'beanft'
-];
+const SLUGS = [EnvUtil.getSGBeanstalk(), EnvUtil.getSGBean(), EnvUtil.getSGBasin()];
 
 const clients = {};
 
@@ -25,7 +20,7 @@ function clientBuilder(url) {
     const client = getClient(url);
     const response = await client.request(query);
 
-    // if (process.env.NODE_ENV === 'local') {
+    // if (EnvUtil.getDeploymentEnv() === 'local') {
     //   // Use this to assist in mocking. Should be commented in/out as needed.
     //   await fs.promises.writeFile(
     //     `${__dirname}/../../test/mock-responses/subgraph/silo-apy/gaugeApyInputs_${callNumber++}.json`,
@@ -41,7 +36,6 @@ module.exports = {
   beanstalkSG: clientBuilder(BASE_URL + SLUGS[0]),
   beanSG: clientBuilder(BASE_URL + SLUGS[1]),
   basinSG: clientBuilder(BASE_URL + SLUGS[2]),
-  beanftSG: clientBuilder(BASE_URL + SLUGS[3]),
   slugSG: (slug) => clientBuilder(BASE_URL + slug),
   urlGql: clientBuilder,
   gql,

@@ -1,4 +1,3 @@
-require('dotenv').config();
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
@@ -11,11 +10,12 @@ const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
 const { formatBigintHex } = require('./utils/bigint.js');
 const AsyncContext = require('./utils/context.js');
+const EnvUtil = require('./utils/env.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
-  const cronJobs = process.env.ENABLED_CRON_JOBS?.split(',');
-  if (cronJobs && (cronJobs.length > 1 || cronJobs[0] != '')) {
+  const cronJobs = EnvUtil.getEnabledCronJobs();
+  if (cronJobs.length > 0) {
     activateJobs(cronJobs);
   }
 
