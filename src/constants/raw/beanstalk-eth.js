@@ -14,7 +14,8 @@ const contracts = {
   UNRIPE_LP: ['0x1BEA3CcD22F4EBd3d37d731BA31Eeca95713716D', 6, erc20Abi],
   WETH: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18, erc20Abi],
   WSTETH: ['0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0', 18, erc20Abi],
-  CP2: ['0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26', null, wellFunctionAbi]
+  CP2: ['0xBA150C2ae0f8450D4B832beeFa3338d4b5982d26', null, wellFunctionAbi],
+  CP2_1_0: ['0xBA510C20FD2c52E4cb0d23CFC3cCD092F9165a6E', null, wellFunctionAbi]
 };
 
 // Extract values from the above contracts

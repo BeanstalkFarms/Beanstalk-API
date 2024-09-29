@@ -1,4 +1,3 @@
-const { CP2 } = require('../../constants/addresses');
 const ContractGetters = require('../../datasources/contracts/contract-getters');
 const PriceService = require('../../service/price-service');
 const NumberUtil = require('../number');

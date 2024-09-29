@@ -1,5 +1,4 @@
-const { BEANSTALK } = require('../constants/addresses');
-const { MILESTONE } = require('../constants/constants');
+const { C } = require('../constants/runtime-constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const EVM = require('../datasources/evm');
 const subgraphClient = require('../datasources/subgraph-client');
@@ -15,7 +14,7 @@ class SiloService {
     const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
 
     const siloAssets = (
-      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
         block: block.number
       })
     ).all;
@@ -61,7 +60,7 @@ class SiloService {
     // In practice this should always be true because the ui does not allow partial migration.
     const depositedBdvs = await BeanstalkSubgraphRepository.getDepositedBdvs(accounts, block.number);
     const siloAssets = (
-      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
         block: block.number
       })
     ).all;
@@ -70,7 +69,7 @@ class SiloService {
     for (const asset of siloAssets) {
       const [migrationStemTip, stemTipNow] = (
         await Promise.all([
-          beanstalk.callStatic.stemTipForToken(asset, { blockTag: MILESTONE.siloV3 }),
+          beanstalk.callStatic.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3 }),
           beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number })
         ])
       ).map(BigInt);

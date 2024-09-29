@@ -4,7 +4,16 @@ const asyncLocalStorage = new AsyncLocalStorage();
 
 class AsyncContext {
   static run(contextValues, callback) {
-    asyncLocalStorage.run(contextValues, callback);
+    return new Promise((resolve, reject) => {
+      asyncLocalStorage.run(contextValues, async () => {
+        try {
+          await callback();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
   }
 
   static get(key) {

@@ -1,5 +1,4 @@
-const { providerThenable } = require('../datasources/alchemy');
-const { gql } = require('../datasources/subgraph-client');
+const { C } = require('../constants/runtime-constants');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const CommonSubgraphRepository = require('../repository/subgraph/common-subgraph');
 
@@ -11,7 +10,7 @@ class BlockUtil {
     if (options.timestamp) {
       return await BlockUtil.findBlockByTimestamp(options.timestamp);
     } else {
-      return await (await providerThenable).getBlock(blockTag);
+      return await (await C().provider).getBlock(blockTag);
     }
   }
 
@@ -23,12 +22,12 @@ class BlockUtil {
     const optionsBlock = await BlockUtil.blockFromOptions(options);
     const blockToUse = Math.min(subgraphMeta.block, optionsBlock.number);
 
-    return await (await providerThenable).getBlock(blockToUse);
+    return await (await C().provider).getBlock(blockToUse);
   }
 
   // Performs a binary search lookup to find the ethereum block number closest to this timestamp
   static async findBlockByTimestamp(timestamp) {
-    const provider = await providerThenable;
+    const provider = await C().provider;
     let upper = await provider.getBlockNumber();
     let lower = 12900000; // Beanstalk did not exist prior to this block
     let bestBlock = null;

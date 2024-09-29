@@ -5,9 +5,9 @@ const {
   BEANWETH,
   BEANWSTETH,
   UNRIPE_BEAN,
-  UNRIPE_LP
-} = require('../../src/constants/addresses');
-const { PRECISION } = require('../../src/constants/constants');
+  UNRIPE_LP,
+  PRECISION
+} = require('../../src/constants/raw/beanstalk-eth');
 const subgraphClient = require('../../src/datasources/subgraph-client');
 const SiloApyService = require('../../src/service/silo-apy');
 const GaugeApyUtil = require('../../src/utils/apy/gauge');
@@ -23,7 +23,7 @@ describe('Window EMA', () => {
     const rewardMintResponse = require('../mock-responses/subgraph/silo-apy/siloHourlyRewardMints_1.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValue(rewardMintResponse);
 
-    const emaResult = await SiloApyService.calcWindowEMA(BEANSTALK, 21816, [24, 168, 720]);
+    const emaResult = await SiloApyService.calcWindowEMA(21816, [24, 168, 720]);
 
     expect(emaResult[0]).toEqual({
       window: 24,
@@ -40,15 +40,15 @@ describe('Window EMA', () => {
   });
 
   it('should fail on invalid seasons or windows', async () => {
-    await expect(SiloApyService.calcWindowEMA(BEANSTALK, 6000, [24])).rejects.toThrow();
-    await expect(SiloApyService.calcWindowEMA(BEANSTALK, 21816, [0])).rejects.toThrow();
+    await expect(SiloApyService.calcWindowEMA(6000, [24])).rejects.toThrow();
+    await expect(SiloApyService.calcWindowEMA(21816, [0])).rejects.toThrow();
   });
 
   it('should use up to as many season as are available', async () => {
     const rewardMintResponse = require('../mock-responses/subgraph/silo-apy/siloHourlyRewardMints_2.json');
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValue(rewardMintResponse);
 
-    const emaResult = await SiloApyService.calcWindowEMA(BEANSTALK, 6100, [10000, 20000]);
+    const emaResult = await SiloApyService.calcWindowEMA(6100, [10000, 20000]);
 
     expect(emaResult[0].beansPerSeason).not.toBeNaN();
     expect(emaResult[0].beansPerSeason).toEqual(emaResult[1].beansPerSeason);

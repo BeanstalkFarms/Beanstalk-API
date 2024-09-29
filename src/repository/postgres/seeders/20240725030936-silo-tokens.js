@@ -1,19 +1,10 @@
 'use strict';
 
-const {
-  BEANSTALK,
-  BEAN,
-  BEANWETH,
-  BEANWSTETH,
-  BEAN3CRV,
-  UNRIPE_BEAN,
-  UNRIPE_LP
-} = require('../../../constants/addresses');
 const { getERC20Contract } = require('../../../datasources/contracts/contract-getters');
 const db = require('../models');
 const EVM = require('../../../datasources/evm');
 
-const tokens = [BEAN, BEANWETH, BEANWSTETH, BEAN3CRV, UNRIPE_BEAN, UNRIPE_LP];
+const tokens = [C().BEAN, C().BEANWETH, C().BEANWSTETH, C().BEAN3CRV, C().UNRIPE_BEAN, C().UNRIPE_LP];
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

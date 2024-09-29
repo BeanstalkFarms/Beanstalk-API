@@ -6,7 +6,6 @@
 
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 
-const { BEAN, BEANSTALK } = require('../constants/addresses');
 const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
 const GaugeApyUtil = require('../utils/apy/gauge');
 const InputError = require('../error/input-error');
@@ -14,6 +13,7 @@ const YieldRepository = require('../repository/postgres/queries/yield-repository
 const { ApyInitType } = require('../repository/postgres/models/types/types');
 const YieldModelAssembler = require('../repository/postgres/models/assemblers/yield-assembler');
 const RestParsingUtil = require('../utils/rest-parsing');
+const { C } = require('../constants/runtime-constants');
 
 // First sunrise after replant was for season 6075
 const ZERO_SEASON = 6074;
@@ -21,6 +21,8 @@ const ZERO_SEASON = 6074;
 const GAUGE_SEASON = 21798;
 
 const DEFAULT_WINDOWS = [24, 168, 720];
+
+// TODO: remove all usages of `beanstalk` variable. need to determine (along with which subgraph) by chain
 
 class SiloApyService {
   /**
@@ -34,7 +36,7 @@ class SiloApyService {
       (!request.options || RestParsingUtil.onlyHasProperties(request.options, ['initType'])) &&
       (!request.emaWindows || request.emaWindows.every((w) => DEFAULT_WINDOWS.includes(w)))
     ) {
-      const season = request.season ?? (await BeanstalkSubgraphRepository.getLatestSeason(BEANSTALK)).season;
+      const season = request.season ?? (await BeanstalkSubgraphRepository.getLatestSeason()).season;
       const yields = await YieldRepository.findSeasonYields(season, {
         emaWindows: request.emaWindows ?? DEFAULT_WINDOWS,
         initType: request.options?.initType ?? ApyInitType.AVERAGE
@@ -60,17 +62,17 @@ class SiloApyService {
    * @returns {GetApyRequest}
    */
   static async validate({ beanstalk, season, emaWindows, tokens, options }) {
-    beanstalk = (beanstalk ?? BEANSTALK).toLowerCase();
+    beanstalk = (beanstalk ?? C().BEANSTALK).toLowerCase();
     emaWindows = emaWindows ?? DEFAULT_WINDOWS;
 
     // Check whether season/tokens are valid
-    const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason(beanstalk)).season;
+    const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason()).season;
     season = season ?? latestSeason;
     if (season > latestSeason) {
       throw new InputError(`Requested season ${season} exceeds the latest available season ${latestSeason}`);
     }
 
-    const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(beanstalk, { season });
+    const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({ season });
     if (!tokens) {
       tokens = availableTokens.whitelisted;
     } else {
@@ -98,7 +100,7 @@ class SiloApyService {
       season,
       yields: {}
     };
-    const windowEMAs = await this.calcWindowEMA(beanstalk, season, windows);
+    const windowEMAs = await this.calcWindowEMA(season, windows);
     apyResults.emaBeans = windowEMAs.reduce((a, c) => {
       a[c.window] = c.beansPerSeason;
       return a;
@@ -112,7 +114,7 @@ class SiloApyService {
           ema.beansPerSeason,
           tokens,
           tokens.map((t) => sgResult.tokens[t].grownStalkPerSeason),
-          sgResult.tokens[BEAN].grownStalkPerSeason,
+          sgResult.tokens[C().BEAN].grownStalkPerSeason,
           sgResult.silo.depositedBDV,
           sgResult.silo.stalk,
           sgResult.silo.grownStalkPerSeason,
@@ -165,7 +167,7 @@ class SiloApyService {
             staticSeeds.push(null);
           }
         } else {
-          if (token === BEAN) {
+          if (token === C().BEAN) {
             depositedBeanBdv = tokenInfo.depositedBDV;
             germinatingBeanBdv = tokenInfo.germinatingBDV;
             if (tokens.includes(token)) {
@@ -211,12 +213,11 @@ class SiloApyService {
 
   /**
    * Calculates the beans per season EMA for the requested season and windows
-   * @param {number} beanstalk - which Beanstalk to use
    * @param {number} season - the season for which to calculate the EMA
    * @param {number[]} windows - the lookback windows to use
    * @returns {WindowEMAResult[]}
    */
-  static async calcWindowEMA(beanstalk, season, windows) {
+  static async calcWindowEMA(season, windows) {
     if (season <= ZERO_SEASON) {
       throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${ZERO_SEASON}.`);
     }
@@ -235,7 +236,7 @@ class SiloApyService {
 
     // Get all results from the subgraph
     const maxWindow = Math.max(...effectiveWindows);
-    const mints = await BeanstalkSubgraphRepository.getSiloHourlyRewardMints(beanstalk, season - maxWindow, season);
+    const mints = await BeanstalkSubgraphRepository.getSiloHourlyRewardMints(season - maxWindow, season);
 
     // Compute the EMA for each window
     const windowResults = [];

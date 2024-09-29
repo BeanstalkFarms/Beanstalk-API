@@ -1,4 +1,11 @@
-const { BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP } = require('../../src/constants/addresses');
+const {
+  BEAN,
+  BEAN3CRV,
+  BEANWETH,
+  BEANWSTETH,
+  UNRIPE_BEAN,
+  UNRIPE_LP
+} = require('../../src/constants/raw/beanstalk-eth');
 const YieldModelAssembler = require('../../src/repository/postgres/models/assemblers/yield-assembler');
 const { ApyInitType } = require('../../src/repository/postgres/models/types/types');
 

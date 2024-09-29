@@ -35,7 +35,7 @@ async function appStartup() {
   app.use(async (ctx, next) => {
     const chain = ctx.headers['x-chain'] ?? 'arb';
     // Stores chain in the async context
-    AsyncContext.run({ chain }, next);
+    await AsyncContext.run({ chain }, next);
   });
 
   app.use(async (ctx, next) => {

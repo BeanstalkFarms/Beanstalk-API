@@ -1,4 +1,4 @@
-const { CP2 } = require('../../constants/addresses');
+const { C } = require('../../constants/runtime-constants');
 const ContractGetters = require('../../datasources/contracts/contract-getters');
 const { BigInt_abs } = require('../bigint');
 
@@ -47,7 +47,7 @@ class WellFnUtil {
    * @param {*} decimals - decimal precision of tokens in this well
    */
   static _transformRate(rate, wellFnAddr, j, decimals) {
-    if (wellFnAddr === CP2) {
+    if (wellFnAddr === C().CP2) {
       const decimalsToRemove = 18 - decimals[j];
       return rate / BigInt(10 ** decimalsToRemove);
     }

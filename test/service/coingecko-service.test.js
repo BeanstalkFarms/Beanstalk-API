@@ -10,7 +10,7 @@ const {
   getTrades,
   getAllPriceChanges
 } = require('../../src/service/coingecko-service');
-const { BEANWETH, BEANWSTETH, WETH, BEAN } = require('../../src/constants/addresses');
+const { BEANWETH, BEANWSTETH, WETH, BEAN } = require('../../src/constants/raw/beanstalk-eth');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 
 const testTimestamp = 1715020584;

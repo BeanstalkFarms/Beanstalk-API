@@ -3,7 +3,6 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { PRECISION } = require('../../constants/constants');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
@@ -68,6 +67,9 @@ class GaugeApyUtil {
     staticSeeds,
     options
   ) {
+    // In practice this probably doesnt need to get updated as seasons pass in the simulation
+    let PRECISION = C().PRECISION;
+
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
@@ -85,7 +87,7 @@ class GaugeApyUtil {
       const points = fromBigInt(gaugeLpPoints[i], PRECISION.gaugePoints, PRECISION.gaugePoints / 3);
       const bdv =
         fromBigInt(gaugeLpDepositedBdv[i], PRECISION.bdv, PRECISION.bdv / 3) -
-        sumGerminatingBdv(gaugeLpGerminatingBdv[i]);
+        GaugeApyUtil.#sumGerminatingBdv(gaugeLpGerminatingBdv[i], PRECISION.bdv);
       lpGpPerBdv.push(points / bdv);
       gaugeLpPointsCopy.push(points);
       gaugeLpDepositedBdvCopy.push(bdv);
@@ -103,11 +105,13 @@ class GaugeApyUtil {
     let rScaled;
     const siloReward = fromBigInt(beansPerSeason, PRECISION.bdv, PRECISION.bdv);
     let beanBdv =
-      fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(germinatingBeanBdv);
+      fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3) -
+      GaugeApyUtil.#sumGerminatingBdv(germinatingBeanBdv, PRECISION.bdv);
     let totalStalk = fromBigInt(siloStalk, PRECISION.stalk, 0);
     let gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
     let nonGaugeDepositedBdv_ =
-      fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3) - sumGerminatingBdv(nonGaugeGerminatingBdv);
+      fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3) -
+      GaugeApyUtil.#sumGerminatingBdv(nonGaugeGerminatingBdv, PRECISION.bdv);
     let totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
     let largestLpGpPerBdv = Math.max(...lpGpPerBdv);
 
@@ -226,17 +230,18 @@ class GaugeApyUtil {
     }
     return [newR, 0.5 + 0.5 * newR];
   }
-}
 
-/**
- * Returns the sum of germinating bdvs as a number
- * @param {BigInt[]} germinating - germinating bdv
- */
-function sumGerminatingBdv(germinating) {
-  return (
-    fromBigInt(germinating[0], PRECISION.bdv, PRECISION.bdv / 3) +
-    fromBigInt(germinating[1], PRECISION.bdv, PRECISION.bdv / 3)
-  );
+  /**
+   * Returns the sum of germinating bdvs as a number
+   * @param {BigInt[]} germinating - germinating bdv
+   * @param {Number} bdvPrecision - decimals for bdv
+   */
+  static #sumGerminatingBdv(germinating, bdvPrecision) {
+    return (
+      fromBigInt(germinating[0], bdvPrecision, bdvPrecision / 3) +
+      fromBigInt(germinating[1], bdvPrecision, bdvPrecision / 3)
+    );
+  }
 }
 
 module.exports = GaugeApyUtil;

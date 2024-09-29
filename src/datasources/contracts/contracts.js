@@ -1,5 +1,5 @@
 const { Contract } = require('alchemy-sdk');
-const { ABIS } = require('../../constants/addresses.js');
+const { C } = require('../../constants/runtime-constants');
 
 const contracts = {};
 
@@ -8,7 +8,8 @@ class Contracts {
     const network = (await provider.detectNetwork()).name;
     const key = JSON.stringify({ address, blockNumber, network });
     if (!contracts[key]) {
-      contracts[key] = this.makeContract(address, ABIS[address], provider);
+      console.log(key, address, C().ABIS[address] == undefined);
+      contracts[key] = this.makeContract(address, C().ABIS[address], provider);
     }
     return contracts[key];
   }

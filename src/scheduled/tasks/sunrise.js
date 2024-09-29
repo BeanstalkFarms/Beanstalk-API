@@ -7,6 +7,8 @@ const SiloService = require('../../service/silo-service');
 const Log = require('../../utils/logging');
 const OnSunriseUtil = require('../util/on-sunrise');
 
+// TODO: probably need to establish async context for chain config
+
 class SunriseTask {
   static async handleSunrise() {
     Log.info('Waiting for sunrise to be processed by subgraphs...');

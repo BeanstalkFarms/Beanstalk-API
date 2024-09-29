@@ -16,8 +16,8 @@ class AlchemyUtil {
     }
   }
 
-  static providerForChain(chain) {
-    return AlchemyUtil._providers[chain];
+  static async providerForChain(chain) {
+    return await AlchemyUtil._providers[chain];
   }
 }
 

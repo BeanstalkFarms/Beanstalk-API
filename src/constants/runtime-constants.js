@@ -39,6 +39,7 @@ class RuntimeConstants {
 // 1. Empty - will use AsyncContext.get('chain')
 // 2. A chain string
 // 3. An object with `chain` and (optionally) `block` properties
+// TODO: should also accept a season.
 const C = (opt) => {
   if (!opt) {
     return RuntimeConstants.underlying(AsyncContext.get('chain'));

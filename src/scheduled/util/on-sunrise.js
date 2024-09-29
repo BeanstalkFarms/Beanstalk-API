@@ -1,4 +1,3 @@
-const { BEANSTALK } = require('../../constants/addresses');
 const SubgraphClient = require('../../datasources/subgraph-client');
 const BeanstalkSubgraphRepository = require('../../repository/subgraph/beanstalk-subgraph');
 const CommonSubgraphRepository = require('../../repository/subgraph/common-subgraph');
@@ -42,7 +41,7 @@ class OnSunriseUtil {
   }
 
   static async checkSubgraphsForSunrise() {
-    const beanstalkSeason = await BeanstalkSubgraphRepository.getLatestSeason(BEANSTALK);
+    const beanstalkSeason = await BeanstalkSubgraphRepository.getLatestSeason();
     const currentTime = Date.now() / 1000;
     const createdAtSeconds = parseInt(beanstalkSeason.createdAt);
     const isNewSeason = Math.abs(currentTime - createdAtSeconds) <= 5 * 60;

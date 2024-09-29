@@ -1,6 +1,7 @@
 const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
+const { C } = require('../../constants/runtime-constants');
 
 class BeanstalkSubgraphRepository {
   static async getDepositedBdvs(accounts, blockNumber) {
@@ -34,7 +35,7 @@ class BeanstalkSubgraphRepository {
     return retval;
   }
 
-  static async getSiloHourlyRewardMints(beanstalk, fromSeason, toSeason) {
+  static async getSiloHourlyRewardMints(fromSeason, toSeason) {
     const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.beanstalkSG,
       SubgraphClients.gql`
@@ -45,7 +46,7 @@ class BeanstalkSubgraphRepository {
         }
       }`,
       '',
-      `silo: "${beanstalk}", season_lte: ${toSeason}`,
+      `silo: "${C().BEANSTALK}", season_lte: ${toSeason}`,
       // Lower bound season is applied here
       ['season'],
       [fromSeason],
@@ -196,12 +197,12 @@ class BeanstalkSubgraphRepository {
   }
 
   // Returns all tokens that have been whitelisted prior to the given block or season.
-  static async getPreviouslyWhitelistedTokens(beanstalk, { block, season }) {
+  static async getPreviouslyWhitelistedTokens({ block, season }) {
     const blockNumber = block ?? (await this.getBlockForSeason(season));
     const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
       {
         silo(
-          id: "${beanstalk.toLowerCase()}"
+          id: "${C().BEANSTALK}"
           block: {number: ${blockNumber}}
         ) {
           whitelistedTokens

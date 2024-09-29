@@ -1,7 +1,7 @@
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
-const { BEAN, WETH, WSTETH } = require('../constants/addresses');
 const ContractGetters = require('../datasources/contracts/contract-getters');
+const { C } = require('../constants/runtime-constants');
 
 class PriceService {
   // Gets the price of the requested token
@@ -20,7 +20,7 @@ class PriceService {
     const readable = {
       block: block.number,
       timestamp: block.timestamp,
-      token: BEAN,
+      token: C().BEAN,
       usdPrice: createNumberSpread(BigInt(priceResult.price), 6, 4).float,
       liquidityUSD: createNumberSpread(BigInt(priceResult.liquidity), 6, 2).float,
       deltaB: createNumberSpread(BigInt(priceResult.deltaB), 6, 0).float
@@ -49,9 +49,9 @@ class PriceService {
   }
 
   static #getPriceFunction(token) {
-    if (token === BEAN) {
+    if (token === C().BEAN) {
       return PriceService.getBeanPrice;
-    } else if ([WETH, WSTETH].includes(token)) {
+    } else if ([C().WETH, C().WSTETH].includes(token)) {
       return (options) => PriceService.getUsdOracleTokenPrice(token, options);
     }
     return () => ({
