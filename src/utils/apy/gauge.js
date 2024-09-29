@@ -3,6 +3,7 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
+const { C } = require('../../constants/runtime-constants');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
@@ -68,7 +69,7 @@ class GaugeApyUtil {
     options
   ) {
     // In practice this probably doesnt need to get updated as seasons pass in the simulation
-    let PRECISION = C().PRECISION;
+    let PRECISION = C().DECIMALS;
 
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;

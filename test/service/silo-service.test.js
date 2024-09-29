@@ -1,7 +1,10 @@
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../../src/service/silo-service');
 const BlockUtil = require('../../src/utils/block');
 const subgraphClient = require('../../src/datasources/subgraph-client');
-const { BEAN, UNRIPE_BEAN, UNRIPE_LP, MILESTONE } = require('../../src/constants/raw/beanstalk-eth');
+const {
+  ADDRESSES: { BEAN, UNRIPE_BEAN, UNRIPE_LP },
+  MILESTONE
+} = require('../../src/constants/raw/beanstalk-eth');
 const ContractGetters = require('../../src/datasources/contracts/contract-getters');
 
 const defaultOptions = { blockNumber: 19000000 };

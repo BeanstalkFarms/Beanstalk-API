@@ -30,7 +30,7 @@ class PreGaugeApyUtil {
     totalSeeds,
     options
   ) {
-    const PRECISION = C('eth').PRECISION;
+    const PRECISION = C('eth').DECIMALS;
 
     const duration = options?.duration ?? 8760;
 

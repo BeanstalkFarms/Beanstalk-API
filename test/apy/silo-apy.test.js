@@ -1,12 +1,6 @@
 const {
-  BEANSTALK,
-  BEAN,
-  BEAN3CRV,
-  BEANWETH,
-  BEANWSTETH,
-  UNRIPE_BEAN,
-  UNRIPE_LP,
-  PRECISION
+  ADDRESSES: { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP },
+  DECIMALS
 } = require('../../src/constants/raw/beanstalk-eth');
 const subgraphClient = require('../../src/datasources/subgraph-client');
 const SiloApyService = require('../../src/service/silo-apy');
@@ -129,21 +123,21 @@ describe('Pre-Gauge Silo APY', () => {
 describe('Gauge Silo APY', () => {
   it('should calculate with required inputs', () => {
     const apy = GaugeApyUtil.calcApy(
-      toBigInt(1278, PRECISION.bdv),
+      toBigInt(1278, DECIMALS.bdv),
       [BEAN, BEANWETH, UNRIPE_BEAN, UNRIPE_LP],
       [-1, 0, -2, -2],
-      [toBigInt(100, PRECISION.gaugePoints)],
-      [toBigInt(899088, PRECISION.bdv)],
-      toBigInt(44139839, PRECISION.bdv),
-      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
-      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
-      toBigInt(2798474, PRECISION.bdv),
-      toBigInt(161540879, PRECISION.stalk),
+      [toBigInt(100, DECIMALS.gaugePoints)],
+      [toBigInt(899088, DECIMALS.bdv)],
+      toBigInt(44139839, DECIMALS.bdv),
+      [toBigInt(100, DECIMALS.optimalPercentDepositedBdv)],
+      toBigInt(0.33, DECIMALS.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, DECIMALS.bdv),
+      toBigInt(161540879, DECIMALS.stalk),
       0,
       [0n, 0n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, null, 0n, toBigInt(4, PRECISION.seeds)]
+      [null, null, 0n, toBigInt(4, DECIMALS.seeds)]
     );
 
     expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
@@ -165,20 +159,20 @@ describe('Gauge Silo APY', () => {
 
   it('should calculate with optional inputs', () => {
     const apy = GaugeApyUtil.calcApy(
-      toBigInt(1278, PRECISION.bdv),
+      toBigInt(1278, DECIMALS.bdv),
       [BEAN, BEANWETH],
       [-1, 0],
-      [toBigInt(100, PRECISION.gaugePoints)],
-      [toBigInt(899088, PRECISION.bdv)],
-      toBigInt(44139839, PRECISION.bdv),
-      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
-      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
-      toBigInt(2798474, PRECISION.bdv),
-      toBigInt(161540879, PRECISION.stalk),
+      [toBigInt(100, DECIMALS.gaugePoints)],
+      [toBigInt(899088, DECIMALS.bdv)],
+      toBigInt(44139839, DECIMALS.bdv),
+      [toBigInt(100, DECIMALS.optimalPercentDepositedBdv)],
+      toBigInt(0.33, DECIMALS.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, DECIMALS.bdv),
+      toBigInt(161540879, DECIMALS.stalk),
       0,
-      [0n, toBigInt(1500000, PRECISION.bdv)],
-      [[toBigInt(500000, PRECISION.bdv), 0n]],
-      [toBigInt(1000000, PRECISION.bdv), toBigInt(500000, PRECISION.bdv)],
+      [0n, toBigInt(1500000, DECIMALS.bdv)],
+      [[toBigInt(500000, DECIMALS.bdv), 0n]],
+      [toBigInt(1000000, DECIMALS.bdv), toBigInt(500000, DECIMALS.bdv)],
       [null, null],
       {
         // User starts with a specific deposit
@@ -206,16 +200,16 @@ describe('Gauge Silo APY', () => {
     expect(apy[BEANWETH].ownership).toBeCloseTo(1.104927809285005);
 
     const apyNew = GaugeApyUtil.calcApy(
-      toBigInt(1278, PRECISION.bdv),
+      toBigInt(1278, DECIMALS.bdv),
       [BEAN, BEANWETH],
       [-1, 0],
-      [toBigInt(100, PRECISION.gaugePoints)],
-      [toBigInt(899088, PRECISION.bdv)],
-      toBigInt(44139839, PRECISION.bdv),
-      [toBigInt(100, PRECISION.optimalPercentDepositedBdv)],
-      toBigInt(0.33, PRECISION.beanToMaxLpGpPerBdvRatio),
-      toBigInt(2798474, PRECISION.bdv),
-      toBigInt(161540879, PRECISION.stalk),
+      [toBigInt(100, DECIMALS.gaugePoints)],
+      [toBigInt(899088, DECIMALS.bdv)],
+      toBigInt(44139839, DECIMALS.bdv),
+      [toBigInt(100, DECIMALS.optimalPercentDepositedBdv)],
+      toBigInt(0.33, DECIMALS.beanToMaxLpGpPerBdvRatio),
+      toBigInt(2798474, DECIMALS.bdv),
+      toBigInt(161540879, DECIMALS.stalk),
       0,
       [0n, 0n],
       [[0n, 0n]],
@@ -237,16 +231,16 @@ describe('Gauge Silo APY', () => {
 
   it('should calculate with multiple gauge lp', () => {
     const apy = GaugeApyUtil.calcApy(
-      toBigInt(1278, PRECISION.bdv),
+      toBigInt(1278, DECIMALS.bdv),
       [BEAN, BEANWETH, BEANWSTETH, UNRIPE_LP],
       [-1, 0, 1, -2],
-      [toBigInt(100, PRECISION.gaugePoints), toBigInt(400, PRECISION.gaugePoints)],
-      [toBigInt(152986, PRECISION.bdv), toBigInt(2917, PRECISION.bdv)],
-      toBigInt(45236258, PRECISION.bdv),
-      [toBigInt(20, PRECISION.optimalPercentDepositedBdv), toBigInt(80, PRECISION.optimalPercentDepositedBdv)],
-      toBigInt(1, PRECISION.beanToMaxLpGpPerBdvRatio),
-      toBigInt(5588356, PRECISION.bdv),
-      toBigInt(172360290, PRECISION.stalk),
+      [toBigInt(100, DECIMALS.gaugePoints), toBigInt(400, DECIMALS.gaugePoints)],
+      [toBigInt(152986, DECIMALS.bdv), toBigInt(2917, DECIMALS.bdv)],
+      toBigInt(45236258, DECIMALS.bdv),
+      [toBigInt(20, DECIMALS.optimalPercentDepositedBdv), toBigInt(80, DECIMALS.optimalPercentDepositedBdv)],
+      toBigInt(1, DECIMALS.beanToMaxLpGpPerBdvRatio),
+      toBigInt(5588356, DECIMALS.bdv),
+      toBigInt(172360290, DECIMALS.stalk),
       0,
       [0n, 0n],
       [
