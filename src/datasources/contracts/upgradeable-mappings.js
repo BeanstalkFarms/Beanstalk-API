@@ -1,3 +1,5 @@
+// TODO: multichain solution
+
 const priceMapping = [
   {
     start: 17978222,

@@ -2,11 +2,12 @@ const AlchemyUtil = require('../datasources/alchemy');
 const AsyncContext = require('../utils/context');
 const EnvUtil = require('../utils/env');
 const BeanstalkEth = require('./raw/beanstalk-eth');
+const BeanstalkArb = require('./raw/beanstalk-arb');
 
-// C(chain).BEANSTALK
-// C(chain).ABIS[addr]
-// C(chain).DECIMALS[token]
-// C(chain).provider
+const C_MAPPING = {
+  eth: BeanstalkEth,
+  arb: BeanstalkArb
+};
 
 // Separated into a class such that mocking can be done easily when the simplified `C` object is used.
 // i.e. jest.spyOn(RuntimeConstants, 'underlying').mockReturnValue(4);
@@ -21,9 +22,7 @@ class RuntimeConstants {
         if (property === 'provider') {
           return AlchemyUtil.providerForChain(chain);
         }
-        // TODO: orchestrate constants, unclear what is chain paramter (+ set beanstalkarb)
-        const constants = chain === 'eth' ? BeanstalkEth : BeanstalkEth; /** */
-
+        const constants = C_MAPPING[chain];
         let value = constants[property];
         if (!value) {
           // Secondarily search for the property among the addresses
@@ -41,6 +40,11 @@ class RuntimeConstants {
 // 2. A chain string
 // 3. An object with `chain` and (optionally) `block` properties
 // TODO: should also accept a season.
+// Example access:
+// C(chain).BEANSTALK
+// C(chain).ABIS[addr]
+// C(chain).DECIMALS[token]
+// C(chain).provider
 const C = (opt) => {
   if (!opt) {
     let defaultChain;
