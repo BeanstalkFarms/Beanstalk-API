@@ -1,23 +1,24 @@
-const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
 const { C } = require('../../constants/runtime-constants');
+const { gql } = require('graphql-request');
 
 class BeanstalkSubgraphRepository {
-  static async getDepositedBdvs(accounts, blockNumber) {
+  static async getDepositedBdvs(accounts, blockNumber, c = C()) {
     const silos = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.beanstalkSG,
-      SubgraphClients.gql`
-      {
-        silos {
-          id
-          stalk
-          assets {
-            token
-            depositedBDV
+      c.SG.BEANSTALK,
+      gql`
+        {
+          silos {
+            id
+            stalk
+            assets {
+              token
+              depositedBDV
+            }
           }
         }
-      }`,
+      `,
       `block: {number: ${blockNumber}}`,
       `id_in: [${accounts.map((a) => `"${a}"`).join(', ')}]`,
       ['stalk'],
@@ -35,16 +36,17 @@ class BeanstalkSubgraphRepository {
     return retval;
   }
 
-  static async getSiloHourlyRewardMints(fromSeason, toSeason) {
+  static async getSiloHourlyRewardMints(fromSeason, toSeason, c = C()) {
     const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.beanstalkSG,
-      SubgraphClients.gql`
-      {
-        siloHourlySnapshots {
-          season
-          deltaBeanMints
+      c.SG.BEANSTALK,
+      gql`
+        {
+          siloHourlySnapshots {
+            season
+            deltaBeanMints
+          }
         }
-      }`,
+      `,
       '',
       `silo: "${C().BEANSTALK}", season_lte: ${toSeason}`,
       // Lower bound season is applied here
@@ -60,10 +62,10 @@ class BeanstalkSubgraphRepository {
     );
   }
 
-  static async getPreGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season);
+  static async getPreGaugeApyInputs(beanstalk, season, c = C()) {
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
-    const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+    const apyInputs = await c.SG.BEANSTALK(gql`
       {
         whitelistTokenSettings(
           block: {number: ${blockNumber}}
@@ -94,10 +96,10 @@ class BeanstalkSubgraphRepository {
     });
   }
 
-  static async getGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season);
+  static async getGaugeApyInputs(beanstalk, season, c = C()) {
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
-    const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+    const apyInputs = await c.SG.BEANSTALK(gql`
       {
         whitelistTokenSettings(
           block: {number: ${blockNumber}}
@@ -170,8 +172,8 @@ class BeanstalkSubgraphRepository {
     );
   }
 
-  static async getBlockForSeason(season) {
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getBlockForSeason(season, c = C()) {
+    const result = await c.SG.BEANSTALK(gql`
       {
         seasons(where: {season: ${season}}) {
           sunriseBlock
@@ -180,26 +182,23 @@ class BeanstalkSubgraphRepository {
     return result.seasons[0]?.sunriseBlock;
   }
 
-  static async getLatestSeason() {
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getLatestSeason(c = C()) {
+    const result = await c.SG.BEANSTALK(gql`
       {
-        seasons(
-          orderBy: season
-          orderDirection: desc
-          first: 1
-        ) {
+        seasons(orderBy: season, orderDirection: desc, first: 1) {
           season
           sunriseBlock
           createdAt
         }
-      }`);
+      }
+    `);
     return result.seasons[0];
   }
 
   // Returns all tokens that have been whitelisted prior to the given block or season.
-  static async getPreviouslyWhitelistedTokens({ block, season }) {
-    const blockNumber = block ?? (await this.getBlockForSeason(season));
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getPreviouslyWhitelistedTokens({ block, season }, c = C()) {
+    const blockNumber = block ?? (await BeanstalkSubgraphRepository.getBlockForSeason(season, c));
+    const result = await c.SG.BEANSTALK(gql`
       {
         silo(
           id: "${C().BEANSTALK}"

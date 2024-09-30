@@ -4,6 +4,7 @@
 const bip45Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP45.json');
 const erc20Abi = require('../../datasources/abi/ERC20.json');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
+const EnvUtil = require('../../utils/env');
 
 const contracts = {
   BEANSTALK: ['0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70', null, bip45Abi],
@@ -43,10 +44,13 @@ const DECIMALS = {
 
 const MILESTONE = {};
 
+const SG = EnvUtil.getSG('arb');
+
 Object.freeze(ADDRESSES);
 Object.freeze(DECIMALS);
 Object.freeze(ABIS);
 Object.freeze(MILESTONE);
+Object.freeze(SG);
 
 // ** DO NOT USE ANY OF THESE EXPORTS DIRECTLY. USE `C` IN runtime-constants.js ** //
 module.exports = {
@@ -54,5 +58,6 @@ module.exports = {
   ADDRESSES,
   DECIMALS,
   ABIS,
-  MILESTONE
+  MILESTONE,
+  SG
 };

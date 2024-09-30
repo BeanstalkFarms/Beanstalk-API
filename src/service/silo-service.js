@@ -1,7 +1,6 @@
 const { C } = require('../constants/runtime-constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
 const EVM = require('../datasources/evm');
-const subgraphClient = require('../datasources/subgraph-client');
 const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
@@ -10,7 +9,7 @@ const { createNumberSpread } = require('../utils/number');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
-    const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
+    const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
     const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
 
     const siloAssets = (
@@ -53,7 +52,7 @@ class SiloService {
   }
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
-    const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
+    const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
     const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
 
     // Assumption is that the user has either migrated everything or migrated nothing.

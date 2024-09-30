@@ -1,4 +1,4 @@
-const SubgraphClient = require('../../datasources/subgraph-client');
+const { C } = require('../../constants/runtime-constants');
 const BeanstalkSubgraphRepository = require('../../repository/subgraph/beanstalk-subgraph');
 const CommonSubgraphRepository = require('../../repository/subgraph/common-subgraph');
 const { sendWebhookMessage } = require('../../utils/discord');
@@ -49,8 +49,8 @@ class OnSunriseUtil {
       const newSeasonBlock = parseInt(beanstalkSeason.sunriseBlock);
       // See if bean, basin subgraphs are ready also
       const [beanMeta, basinMeta] = await Promise.all([
-        CommonSubgraphRepository.getMeta(SubgraphClient.beanSG),
-        CommonSubgraphRepository.getMeta(SubgraphClient.basinSG)
+        CommonSubgraphRepository.getMeta(C().SG.BEAN),
+        CommonSubgraphRepository.getMeta(C().SG.BASIN)
       ]);
       return Math.min(parseInt(beanMeta.block), parseInt(basinMeta.block)) >= newSeasonBlock;
     }

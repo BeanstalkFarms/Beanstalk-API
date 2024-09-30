@@ -3,6 +3,8 @@
 const bip45Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP45.json');
 const erc20Abi = require('../../datasources/abi/ERC20.json');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
+const EnvUtil = require('../../utils/env');
+const SubgraphClients = require('../../datasources/subgraph-client');
 
 const contracts = {
   BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, bip45Abi],
@@ -37,10 +39,16 @@ const MILESTONE = {
   siloV3: 17671557
 };
 
+const SG = EnvUtil.getSG('eth');
+SG.BEANSTALK = SubgraphClients.namedSG(SG.BEANSTALK);
+SG.BEAN = SubgraphClients.namedSG(SG.BEAN);
+SG.BASIN = SubgraphClients.namedSG(SG.BASIN);
+
 Object.freeze(ADDRESSES);
 Object.freeze(DECIMALS);
 Object.freeze(ABIS);
 Object.freeze(MILESTONE);
+Object.freeze(SG);
 
 // ** DO NOT USE ANY OF THESE EXPORTS DIRECTLY. USE `C` IN runtime-constants.js ** //
 module.exports = {
@@ -48,5 +56,6 @@ module.exports = {
   ADDRESSES,
   DECIMALS,
   ABIS,
-  MILESTONE
+  MILESTONE,
+  SG
 };

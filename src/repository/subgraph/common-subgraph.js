@@ -1,8 +1,8 @@
-const SubgraphClient = require('../../datasources/subgraph-client');
+const { gql } = require('graphql-request');
 
 class CommonSubgraphRepository {
   static async getMeta(client) {
-    const meta = await client(SubgraphClient.gql`
+    const meta = await client(gql`
       {
         _meta {
           deployment
@@ -16,7 +16,8 @@ class CommonSubgraphRepository {
           chain
           versionNumber
         }
-      }`);
+      }
+    `);
     return {
       deployment: meta._meta.deployment,
       block: meta._meta.block.number,

@@ -1,12 +1,13 @@
-const SubgraphClients = require('../../datasources/subgraph-client');
+const { gql } = require('graphql-request');
+const { C } = require('../../constants/runtime-constants');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const WellDto = require('./dto/WellDto');
 
 class BasinSubgraphRepository {
-  static async getAllWells(blockNumber) {
+  static async getAllWells(blockNumber, c = C()) {
     const allWells = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      SubgraphClients.gql`
+      c.SG.BASIN,
+      gql`
       {
         wells {
           ${WellDto.subgraphFields}
@@ -26,8 +27,8 @@ class BasinSubgraphRepository {
       }, {});
   }
 
-  static async getWellSwapsForPair(tokens, fromTimestamp, toTimestamp, limit) {
-    const wellSwaps = await SubgraphClients.basinSG(SubgraphClients.gql`
+  static async getWellSwapsForPair(tokens, fromTimestamp, toTimestamp, limit, c = C()) {
+    const wellSwaps = await c.SG.BASIN(gql`
       {
         wells(where: { tokens: [${tokens.map((t) => `"${t}"`).join(', ')}] }) {
           swaps(
@@ -68,20 +69,21 @@ class BasinSubgraphRepository {
     return flattenedSwaps;
   }
 
-  static async getAllSwaps(fromTimestamp, toTimestamp) {
+  static async getAllSwaps(fromTimestamp, toTimestamp, c = C()) {
     const allSwaps = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      SubgraphClients.gql`
-      {
-        swaps {
-          well {
-            id
+      c.SG.BASIN,
+      gql`
+        {
+          swaps {
+            well {
+              id
+            }
+            tokenPrice
+            timestamp
+            logIndex
           }
-          tokenPrice
-          timestamp
-          logIndex
         }
-      }`,
+      `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
@@ -92,20 +94,21 @@ class BasinSubgraphRepository {
     return allSwaps;
   }
 
-  static async getAllDeposits(fromTimestamp, toTimestamp) {
+  static async getAllDeposits(fromTimestamp, toTimestamp, c = C()) {
     const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      SubgraphClients.gql`
-      {
-        deposits {
-          well {
-            id
+      c.SG.BASIN,
+      gql`
+        {
+          deposits {
+            well {
+              id
+            }
+            tokenPrice
+            timestamp
+            logIndex
           }
-          tokenPrice
-          timestamp
-          logIndex
         }
-      }`,
+      `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],
@@ -116,20 +119,21 @@ class BasinSubgraphRepository {
     return allDeposits;
   }
 
-  static async getAllWithdraws(fromTimestamp, toTimestamp) {
+  static async getAllWithdraws(fromTimestamp, toTimestamp, c = C()) {
     const allWithdraws = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.basinSG,
-      SubgraphClients.gql`
-      {
-        withdraws {
-          well {
-            id
+      c.SG.BASIN,
+      gql`
+        {
+          withdraws {
+            well {
+              id
+            }
+            tokenPrice
+            timestamp
+            logIndex
           }
-          tokenPrice
-          timestamp
-          logIndex
         }
-      }`,
+      `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
       ['timestamp', 'logIndex'],

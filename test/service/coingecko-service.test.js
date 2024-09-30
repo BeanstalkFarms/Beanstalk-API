@@ -1,5 +1,3 @@
-const SubgraphClients = require('../../src/datasources/subgraph-client');
-
 const BlockUtil = require('../../src/utils/block');
 jest.spyOn(BlockUtil, 'blockForSubgraphFromOptions').mockResolvedValue({ number: 19000000, timestamp: 1705173443 });
 
@@ -14,13 +12,14 @@ const {
   ADDRESSES: { BEANWETH, BEANWSTETH, WETH, BEAN }
 } = require('../../src/constants/raw/beanstalk-eth');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
+const { mockBasinSG } = require('../util/mock-sg');
 
 const testTimestamp = 1715020584;
 
 describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
     const wellsResponse = require('../mock-responses/subgraph/basin/wells.json');
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
+    jest.spyOn(mockBasinSG, 'request').mockResolvedValueOnce(wellsResponse);
     // NOTE: incomplete mocking in this test
 
     const tickers = await getTickers({ blockNumber: 19000000 });
@@ -61,7 +60,7 @@ describe('CoingeckoService', () => {
 
   test('Returns swap history', async () => {
     jest
-      .spyOn(SubgraphClients, 'basinSG')
+      .spyOn(mockBasinSG, 'request')
       .mockResolvedValueOnce(require('../mock-responses/subgraph/basin/swapHistory.json'));
 
     const options = {
@@ -107,7 +106,7 @@ describe('CoingeckoService', () => {
   // This test is for a deprecated feature, the underlying query has changed, mocking is fine
   test('(deprecated) should calculate token volume in the well (calculated directly from swaps only)', async () => {
     const wellsResponse = require('../mock-responses/subgraph/basin/swapVolume.json');
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValueOnce(wellsResponse);
+    jest.spyOn(mockBasinSG, 'request').mockResolvedValueOnce(wellsResponse);
 
     const volume = await deprecated_calcWellSwapVolume(BEANWETH, testTimestamp);
     expect(volume[BEAN].float).toBeCloseTo(71708.944062);

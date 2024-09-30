@@ -1,6 +1,5 @@
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../../src/service/silo-service');
 const BlockUtil = require('../../src/utils/block');
-const subgraphClient = require('../../src/datasources/subgraph-client');
 const {
   ADDRESSES: { BEAN, UNRIPE_BEAN, UNRIPE_LP },
   MILESTONE
@@ -10,6 +9,7 @@ const ContractGetters = require('../../src/datasources/contracts/contract-getter
 const defaultOptions = { blockNumber: 19000000 };
 
 const whitelistedSGResponse = require('../mock-responses/subgraph/silo-service/whitelistedTokens.json');
+const { mockBeanstalkSG } = require('../util/mock-sg');
 
 describe('SiloService', () => {
   beforeAll(() => {
@@ -32,7 +32,7 @@ describe('SiloService', () => {
       })
     };
 
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
     jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
@@ -46,8 +46,8 @@ describe('SiloService', () => {
     const accounts = ['0xabcd', '0x1234'];
 
     const siloSGResponse = require('../mock-responses/subgraph/silo-service/depositedBdvs.json');
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(siloSGResponse);
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(siloSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
 
     const mockBeanstalk = {
       stemTipForToken: jest.fn().mockImplementation((token, options) => {
@@ -69,7 +69,6 @@ describe('SiloService', () => {
     jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getUnmigratedGrownStalk(accounts, defaultOptions);
-    // console.log(JSON.stringify(grownStalk));
 
     expect(grownStalk.total).toEqual(155640);
     expect(grownStalk.accounts[0].total).toEqual(150505);

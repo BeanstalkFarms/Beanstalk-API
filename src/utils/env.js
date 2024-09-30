@@ -13,9 +13,9 @@ const DISCORD_NOTIFICATION_WEBHOOKS = process.env.DISCORD_NOTIFICATION_WEBHOOKS?
 );
 const DISCORD_NOTIFICATION_PREFIX = process.env.DISCORD_NOTIFICATION_PREFIX ?? '';
 
-const SG_BEANSTALK = (process.env.SG_BEANSTALK ?? '') !== '' ? process.env.SG_BEANSTALK : 'beanstalk';
-const SG_BEAN = (process.env.SG_BEAN ?? '') !== '' ? process.env.SG_BEAN : 'bean';
-const SG_BASIN = (process.env.SG_BASIN ?? '') !== '' ? process.env.SG_BASIN : 'basin';
+const SG_BEANSTALK = process.env.SG_BEANSTALK?.split(',').filter((s) => s.trim().length > 0);
+const SG_BEAN = process.env.SG_BEAN?.split(',').filter((s) => s.trim().length > 0);
+const SG_BASIN = process.env.SG_BASIN?.split(',').filter((s) => s.trim().length > 0);
 
 // Validation
 if (ENABLED_CHAINS.length === 0) {
@@ -28,7 +28,19 @@ for (const chain of ENABLED_CHAINS) {
   }
 }
 
+if (
+  SG_BEANSTALK?.length !== ENABLED_CHAINS.length ||
+  SG_BEAN?.length !== ENABLED_CHAINS.length ||
+  SG_BASIN?.length !== ENABLED_CHAINS.length
+) {
+  throw new Error(`Invalid environment configured: one subgraph name must be provided for each chain.`);
+}
+
 class EnvUtil {
+  static isChainEnabled(chain) {
+    return EnvUtil.getEnabledChains().includes(chain);
+  }
+
   static defaultChain() {
     return ENABLED_CHAINS[0];
   }
@@ -57,17 +69,13 @@ class EnvUtil {
     return DISCORD_NOTIFICATION_PREFIX;
   }
 
-  // TODO: should probably provide one of these per chain
-  static getSGBeanstalk() {
-    return SG_BEANSTALK;
-  }
-
-  static getSGBean() {
-    return SG_BEAN;
-  }
-
-  static getSGBasin() {
-    return SG_BASIN;
+  static getSG(chain) {
+    const chainIndex = EnvUtil.getEnabledChains().indexOf(chain);
+    return {
+      BEANSTALK: SG_BEANSTALK[chainIndex],
+      BEAN: SG_BEAN[chainIndex],
+      BASIN: SG_BASIN[chainIndex]
+    };
   }
 }
 

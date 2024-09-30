@@ -1,17 +1,17 @@
-const SubgraphClients = require('../datasources/subgraph-client');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
 const { runBatchPromises } = require('../utils/batch-promise');
 const LiquidityUtil = require('../utils/pool/liquidity');
 const NumberUtil = require('../utils/number');
+const { C } = require('../constants/runtime-constants');
 
 const ONE_DAY = 60 * 60 * 24;
 
 class CoingeckoService {
   static async getTickers(options = {}) {
     // Determine block
-    const block = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, options);
+    const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BASIN, options);
 
     // Retrieve all results upfront from Basin subgraph.
     // This strategy is optimized for performance/minimal load against subgraph api rate limits.

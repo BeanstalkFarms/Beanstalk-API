@@ -8,10 +8,11 @@ jest.mock('../src/datasources/alchemy', () => ({
 const alchemy = require('../src/datasources/alchemy');
 
 const { parseQuery } = require('../src/utils/rest-parsing');
-const SubgraphClients = require('../src/datasources/subgraph-client');
 const { allToBigInt, fromBigInt } = require('../src/utils/number');
 const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
 const { BigInt_applyPercent } = require('../src/utils/bigint');
+const { C } = require('../src/constants/runtime-constants');
+const { mockBeanstalkSG } = require('./util/mock-sg');
 
 describe('Utils', () => {
   test('Formats query parameters', async () => {
@@ -42,14 +43,14 @@ describe('Utils', () => {
       timestamp: 1714760417
     });
 
-    const result = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, {});
+    const result = await BlockUtil.blockForSubgraphFromOptions(C().SG_BASIN, {});
 
     expect(getBlockSpy).toHaveBeenCalledWith(19500000);
     expect(result.number).toEqual(19500000);
   });
 
   test('Find block number for a requested season', async () => {
-    jest.spyOn(SubgraphClients, 'beanstalkSG').mockResolvedValue({
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValue({
       seasons: [
         {
           sunriseBlock: 20042493
