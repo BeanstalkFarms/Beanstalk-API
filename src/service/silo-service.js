@@ -25,7 +25,7 @@ class SiloService {
     for (const account of accounts) {
       const promises = [];
       for (const asset of siloAssets) {
-        promises.push(beanstalk.callStatic.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
+        promises.push(beanstalk.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
       }
 
       // Parallelize all calls for this account
@@ -69,8 +69,8 @@ class SiloService {
     for (const asset of siloAssets) {
       const [migrationStemTip, stemTipNow] = (
         await Promise.all([
-          beanstalk.callStatic.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3 }),
-          beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number })
+          beanstalk.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3 }),
+          beanstalk.stemTipForToken(asset, { blockTag: block.number })
         ])
       ).map(BigInt);
       stemDeltas.push(Number(stemTipNow - migrationStemTip));
@@ -81,7 +81,7 @@ class SiloService {
       accounts: []
     };
     for (const account in depositedBdvs) {
-      const uncategorized = await beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, {
+      const uncategorized = await beanstalk.balanceOfGrownStalkUpToStemsDeployment(account, {
         blockTag: block.number
       });
       const uncategorizedFloat = createNumberSpread(uncategorized, 10, 2).float;
@@ -121,11 +121,11 @@ class SiloService {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
+          (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
           bs.s.ss[token].stalkEarnedPerSeason,
-          (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
-          (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
-          (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
+          (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
+          (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
+          (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
         ]);
 
         updatedTokens.push(

@@ -19,7 +19,7 @@ class RuntimeConstants {
   static makeProxyHandler(chain, block = undefined) {
     return {
       get: (target, property, receiver) => {
-        if (property === 'provider') {
+        if (property === 'RPC') {
           return AlchemyUtil.providerForChain(chain);
         }
         const constants = C_MAPPING[chain];
@@ -44,7 +44,7 @@ class RuntimeConstants {
 // C(chain).BEANSTALK
 // C(chain).ABIS[addr]
 // C(chain).DECIMALS[token]
-// C(chain).provider
+// C(chain).RPC
 const C = (opt) => {
   if (!opt) {
     let defaultChain;

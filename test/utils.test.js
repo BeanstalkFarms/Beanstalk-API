@@ -1,13 +1,9 @@
 const BlockUtil = require('../src/utils/block');
 
 // Create the provider beforehand as otherwise it would be re-created on each invocation to then
-const resolvedProvider = { getBlock: async () => {} };
+const provider = { getBlock: async () => {} };
 jest.mock('../src/datasources/alchemy', () => ({
-  providerForChain: () => ({
-    then: (resolve) => {
-      resolve(resolvedProvider);
-    }
-  })
+  providerForChain: () => provider
 }));
 const alchemy = require('../src/datasources/alchemy');
 
@@ -41,7 +37,7 @@ describe('Utils', () => {
       timestamp: 1714760417
     });
 
-    const getBlockSpy = jest.spyOn(await alchemy.providerForChain(), 'getBlock').mockResolvedValue({
+    const getBlockSpy = jest.spyOn(alchemy.providerForChain(), 'getBlock').mockResolvedValue({
       number: 19500000,
       timestamp: 1714760417
     });

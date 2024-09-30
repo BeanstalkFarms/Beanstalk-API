@@ -23,15 +23,13 @@ describe('SiloService', () => {
   it('should fetch silov3 grown stalk for requested stalkholders', async () => {
     const accounts = ['0xabcd', '0x1234'];
     const mockBeanstalk = {
-      callStatic: {
-        balanceOfGrownStalk: jest.fn().mockImplementation((account, asset) => {
-          if (account == accounts[0]) {
-            return 50n * BigInt(10 ** 10);
-          } else {
-            return 15n * BigInt(10 ** 10);
-          }
-        })
-      }
+      balanceOfGrownStalk: jest.fn().mockImplementation((account, asset) => {
+        if (account == accounts[0]) {
+          return 50n * BigInt(10 ** 10);
+        } else {
+          return 15n * BigInt(10 ** 10);
+        }
+      })
     };
 
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
@@ -52,22 +50,20 @@ describe('SiloService', () => {
     jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
 
     const mockBeanstalk = {
-      callStatic: {
-        stemTipForToken: jest.fn().mockImplementation((token, options) => {
-          if (options.blockTag == MILESTONE.siloV3 || token == UNRIPE_BEAN || token == UNRIPE_LP) {
-            return 0n;
-          } else {
-            return 10000n;
-          }
-        }),
-        balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
-          if (account == accounts[0]) {
-            return 5000n * BigInt(10 ** 10);
-          } else {
-            return 150000n * BigInt(10 ** 10);
-          }
-        })
-      }
+      stemTipForToken: jest.fn().mockImplementation((token, options) => {
+        if (options.blockTag == MILESTONE.siloV3 || token == UNRIPE_BEAN || token == UNRIPE_LP) {
+          return 0n;
+        } else {
+          return 10000n;
+        }
+      }),
+      balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
+        if (account == accounts[0]) {
+          return 5000n * BigInt(10 ** 10);
+        } else {
+          return 150000n * BigInt(10 ** 10);
+        }
+      })
     };
 
     jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);

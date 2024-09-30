@@ -8,7 +8,7 @@ class EVM {
   static async beanstalkContractAndStorage(blockNumber = 'latest') {
     return {
       beanstalk: await getBeanstalkContract(blockNumber),
-      bs: new ContractStorage(await C().provider, C().BEANSTALK, storageLayout, blockNumber)
+      bs: new ContractStorage(C().RPC, C().BEANSTALK, storageLayout, blockNumber)
     };
   }
 }

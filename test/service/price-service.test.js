@@ -16,13 +16,11 @@ describe('PriceService', () => {
 
   it('should fetch and format Bean price data correctly', async () => {
     const mockPrice = {
-      callStatic: {
-        price: jest.fn().mockResolvedValue({
-          price: 997747n,
-          liquidity: 27676822893057n,
-          deltaB: -16781104856n
-        })
-      }
+      price: jest.fn().mockResolvedValue({
+        price: 997747n,
+        liquidity: 27676822893057n,
+        deltaB: -16781104856n
+      })
     };
     jest.spyOn(ContractGetters, 'getPriceContract').mockResolvedValue(mockPrice);
 
@@ -34,10 +32,8 @@ describe('PriceService', () => {
 
   it('should fetch and format USDOracle price correctly', async () => {
     mockUsdOracle = {
-      callStatic: {
-        getUsdPrice: jest.fn().mockResolvedValue(390100082091451n),
-        getTokenUsdPrice: jest.fn().mockResolvedValue(3403121673n)
-      },
+      getUsdPrice: jest.fn().mockResolvedValue(390100082091451n),
+      getTokenUsdPrice: jest.fn().mockResolvedValue(3403121673n),
       __version: jest.fn().mockReturnValue(1)
     };
     jest.spyOn(ContractGetters, 'getUsdOracleContract').mockResolvedValue(mockUsdOracle);

@@ -19,10 +19,6 @@ class UpgradeableContract {
         if (property === 'then') {
           return undefined;
         }
-        if (property === 'callStatic') {
-          // Allows legacy invocations to not require being updated to remove callStatic property
-          return receiver;
-        }
         if (['__mapping', '__defaultBlock', '__version'].includes(property)) {
           // Don't proxy explicitly defined members on this class
           return target[property];
@@ -54,7 +50,7 @@ class UpgradeableContract {
 
         // Return the requested function with block prefilled
         const contract = Contracts.makeContract(selected.address, selected.abi, provider);
-        return (...args) => contract.callStatic[property](...args, { blockTag: block });
+        return (...args) => contract[property](...args, { blockTag: block });
       }
     };
 

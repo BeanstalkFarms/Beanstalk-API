@@ -19,14 +19,12 @@ describe('Pool Math', () => {
       }
     };
     jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
-      callStatic: {
-        calcReserveAtRatioSwap: jest
-          .fn()
-          .mockResolvedValueOnce(2194835811232559843749n)
-          .mockResolvedValueOnce(14123015691385n)
-          .mockResolvedValueOnce(2239180408272262904842n)
-          .mockResolvedValueOnce(14408357965030n)
-      }
+      calcReserveAtRatioSwap: jest
+        .fn()
+        .mockResolvedValueOnce(2194835811232559843749n)
+        .mockResolvedValueOnce(14123015691385n)
+        .mockResolvedValueOnce(2239180408272262904842n)
+        .mockResolvedValueOnce(14408357965030n)
     });
 
     const depth2 = await LiquidityUtil.calcDepth(mockWellDto);
@@ -42,10 +40,8 @@ describe('Pool Math', () => {
     const deltaLp = newLp - prevLp;
     const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
     jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
-      callStatic: {
-        calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
-        calcLPTokenUnderlying: calcLPTokenUnderlyingMock
-      }
+      calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
+      calcLPTokenUnderlying: calcLPTokenUnderlyingMock
     });
 
     const result = await WellFnUtil.calcLiquidityVolume(

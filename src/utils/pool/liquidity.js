@@ -34,10 +34,10 @@ class LiquidityUtil {
     const data = well.wellFunction.data;
     const [reserve1Buy0, reserve0Buy1, reserve1Sell0, reserve0Sell1] = (
       await Promise.all([
-        wellFn.callStatic.calcReserveAtRatioSwap(reserves, 1, ratesBuy0, data),
-        wellFn.callStatic.calcReserveAtRatioSwap(reserves, 0, ratesBuy1, data),
-        wellFn.callStatic.calcReserveAtRatioSwap(reserves, 1, ratesSell0, data),
-        wellFn.callStatic.calcReserveAtRatioSwap(reserves, 0, ratesSell1, data)
+        wellFn.calcReserveAtRatioSwap(reserves, 1, ratesBuy0, data),
+        wellFn.calcReserveAtRatioSwap(reserves, 0, ratesBuy1, data),
+        wellFn.calcReserveAtRatioSwap(reserves, 1, ratesSell0, data),
+        wellFn.calcReserveAtRatioSwap(reserves, 0, ratesSell1, data)
       ])
     ).map(BigInt);
 

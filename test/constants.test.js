@@ -17,7 +17,7 @@ describe('Chain constants', () => {
 
   test('Can access provider through C object', () => {
     const alchemySpy = jest.spyOn(AlchemyUtil, 'providerForChain').mockReturnValue(10);
-    expect(C('eth').provider).toEqual(10);
+    expect(C('eth').RPC).toEqual(10);
     expect(alchemySpy).toHaveBeenCalledWith('eth');
   });
 

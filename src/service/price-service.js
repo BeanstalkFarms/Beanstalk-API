@@ -14,7 +14,7 @@ class PriceService {
   static async getBeanPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
     const priceContract = await ContractGetters.getPriceContract(block.number);
-    const priceResult = await priceContract.callStatic.price();
+    const priceResult = await priceContract.price();
 
     // Convert from hex to a readable format. For now the pool prices are omitted
     const readable = {
@@ -34,8 +34,8 @@ class PriceService {
     const usdOracle = await ContractGetters.getUsdOracleContract(block.number);
     const result =
       usdOracle.__version() === 1
-        ? BigInt(await usdOracle.callStatic.getUsdPrice(token))
-        : BigInt(await usdOracle.callStatic.getTokenUsdPrice(token));
+        ? BigInt(await usdOracle.getUsdPrice(token))
+        : BigInt(await usdOracle.getTokenUsdPrice(token));
     // Version 1 returned a twa price, but with no lookback. Its already instantaneous but needs conversion
     const instPrice = usdOracle.__version() === 1 ? BigInt(10 ** 24) / result : result;
 

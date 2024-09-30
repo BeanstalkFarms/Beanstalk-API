@@ -29,15 +29,15 @@ module.exports = {
         const erc20 = await getERC20Contract(token);
         const [name, symbol, decimals, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] =
           await Promise.all([
-            erc20.callStatic.name(),
-            erc20.callStatic.symbol(),
-            (async () => Number(await erc20.callStatic.decimals()))(),
+            erc20.name(),
+            erc20.symbol(),
+            (async () => Number(await erc20.decimals()))(),
             bs.s.ss[token].stalkEarnedPerSeason,
-            (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
-            (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
-            (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
+            (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
           ]);
-        const bdv = BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** decimals)));
+        const bdv = BigInt(await beanstalk.bdv(token, BigInt(10 ** decimals)));
         rows.push({
           address: token,
           name,

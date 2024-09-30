@@ -10,7 +10,7 @@ class BlockUtil {
     if (options.timestamp) {
       return await BlockUtil.findBlockByTimestamp(options.timestamp);
     } else {
-      return await (await C().provider).getBlock(blockTag);
+      return await C().RPC.getBlock(blockTag);
     }
   }
 
@@ -22,12 +22,12 @@ class BlockUtil {
     const optionsBlock = await BlockUtil.blockFromOptions(options);
     const blockToUse = Math.min(subgraphMeta.block, optionsBlock.number);
 
-    return await (await C().provider).getBlock(blockToUse);
+    return await C().RPC.getBlock(blockToUse);
   }
 
   // Performs a binary search lookup to find the ethereum block number closest to this timestamp
   static async findBlockByTimestamp(timestamp) {
-    const provider = await C().provider;
+    const provider = C().RPC;
     let upper = await provider.getBlockNumber();
     let lower = 12900000; // Beanstalk did not exist prior to this block
     let bestBlock = null;

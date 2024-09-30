@@ -11,12 +11,15 @@ class AlchemyUtil {
         apiKey: EnvUtil.getAlchemyKey(),
         network: `${chain}-mainnet` // Of type alchemy-sdk.Network
       };
-      this._providers[chain] = new Alchemy(settings).config.getProvider();
+      const alchemy = new Alchemy(settings);
+      alchemy.config.getProvider().then((p) => {
+        this._providers[chain] = p;
+      });
     }
   }
 
-  static async providerForChain(chain) {
-    return await AlchemyUtil._providers[chain];
+  static providerForChain(chain) {
+    return AlchemyUtil._providers[chain];
   }
 }
 
