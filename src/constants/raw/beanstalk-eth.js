@@ -38,7 +38,9 @@ const DECIMALS = {
 };
 
 const MILESTONE = {
-  siloV3: 17671557
+  siloV3: 17671557,
+  startSeason: 0,
+  endSeason: 30000 // TODO: set this
 };
 
 const SG = EnvUtil.getSG('eth');

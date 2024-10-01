@@ -44,7 +44,10 @@ const DECIMALS = {
   optimalPercentDepositedBdv: 6
 };
 
-const MILESTONE = {};
+const MILESTONE = {
+  startSeason: 30000, // TODO: set this
+  endSeason: 99999999
+};
 
 const SG = EnvUtil.getSG('arb');
 SG.BEANSTALK = SubgraphClients.namedSG(SG.BEANSTALK);

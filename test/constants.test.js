@@ -11,7 +11,7 @@ describe('Chain constants', () => {
     expect(C('eth').DECIMALS.stalk).toEqual(10);
     expect(C('arb').DECIMALS.stalk).toEqual(16);
 
-    jest.spyOn(RuntimeConstants, 'underlying').mockReturnValue({ test: 4 });
+    jest.spyOn(RuntimeConstants, 'proxyUnderlying').mockReturnValue({ test: 4 });
     expect(C('eth').test).toEqual(4);
   });
 
@@ -28,5 +28,10 @@ describe('Chain constants', () => {
     expect(C().DECIMALS.stalk).toEqual(16);
     jest.spyOn(AsyncContext, 'get').mockReturnValue('invalid chain');
     expect(() => C().DECIMALS.stalk).toThrow();
+  });
+
+  test('Can access constants via season number', () => {
+    expect(C(2500).DECIMALS.stalk).toEqual(10);
+    expect(C(35000).DECIMALS.stalk).toEqual(16);
   });
 });
