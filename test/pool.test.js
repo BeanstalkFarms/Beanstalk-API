@@ -18,7 +18,7 @@ describe('Pool Math', () => {
         data: '0x'
       }
     };
-    jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
+    jest.spyOn(ContractGetters, 'get').mockResolvedValue({
       calcReserveAtRatioSwap: jest
         .fn()
         .mockResolvedValueOnce(2194835811232559843749n)
@@ -39,7 +39,7 @@ describe('Pool Math', () => {
     const newLp = 54772255750516611345n;
     const deltaLp = newLp - prevLp;
     const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
-    jest.spyOn(ContractGetters, 'getWellFunctionContract').mockResolvedValue({
+    jest.spyOn(ContractGetters, 'get').mockResolvedValue({
       calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
       calcLPTokenUnderlying: calcLPTokenUnderlyingMock
     });

@@ -30,7 +30,7 @@ class LiquidityUtil {
     const ratesSell0 = [BigInt_applyPercent(rates[0], 100 - percent), oneToken[1]];
     const ratesSell1 = [oneToken[0], BigInt_applyPercent(rates[1], 100 - percent)];
 
-    const wellFn = await ContractGetters.getWellFunctionContract(well.wellFunction.id);
+    const wellFn = await ContractGetters.get(well.wellFunction.id);
     const data = well.wellFunction.data;
     const [reserve1Buy0, reserve0Buy1, reserve1Sell0, reserve0Sell1] = (
       await Promise.all([

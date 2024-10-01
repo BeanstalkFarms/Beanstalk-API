@@ -10,7 +10,7 @@ const { createNumberSpread } = require('../utils/number');
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
+    const beanstalk = await ContractGetters.getBeanstalk(block.number);
 
     const siloAssets = (
       await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
@@ -53,7 +53,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
+    const beanstalk = await ContractGetters.getBeanstalk(block.number);
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.

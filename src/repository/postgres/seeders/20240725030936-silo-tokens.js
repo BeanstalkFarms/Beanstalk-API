@@ -1,6 +1,6 @@
 'use strict';
 
-const { getERC20Contract } = require('../../../datasources/contracts/contract-getters');
+const { get } = require('../../../datasources/contracts/contract-getters');
 const db = require('../models');
 const EVM = require('../../../datasources/evm');
 
@@ -26,7 +26,7 @@ module.exports = {
     if (newTokens.length > 0) {
       const rows = [];
       for (const token of newTokens) {
-        const erc20 = await getERC20Contract(token);
+        const erc20 = await get(token);
         const [name, symbol, decimals, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] =
           await Promise.all([
             erc20.name(),

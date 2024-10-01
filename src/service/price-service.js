@@ -13,7 +13,7 @@ class PriceService {
   // Gets the price of bean as returned by the canonical price contract.
   static async getBeanPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const priceContract = await ContractGetters.getPriceContract(block.number);
+    const priceContract = await ContractGetters.getPriceUpgradeable(block.number);
     const priceResult = await priceContract.price();
 
     // Convert from hex to a readable format. For now the pool prices are omitted
@@ -31,7 +31,7 @@ class PriceService {
   // In practice, current implementation of getUsdPrice can only get the wsteth/eth price
   static async getUsdOracleTokenPrice(token, options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const usdOracle = await ContractGetters.getUsdOracleContract(block.number);
+    const usdOracle = await ContractGetters.getUsdOracleUpgradeable(block.number);
     const result =
       usdOracle.__version() === 1
         ? BigInt(await usdOracle.getUsdPrice(token))

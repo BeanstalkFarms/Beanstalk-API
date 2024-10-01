@@ -33,7 +33,7 @@ describe('SiloService', () => {
     };
 
     jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
-    jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
+    jest.spyOn(ContractGetters, 'getBeanstalk').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
 
@@ -66,7 +66,7 @@ describe('SiloService', () => {
       })
     };
 
-    jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
+    jest.spyOn(ContractGetters, 'getBeanstalk').mockResolvedValue(mockBeanstalk);
 
     const grownStalk = await getUnmigratedGrownStalk(accounts, defaultOptions);
 
