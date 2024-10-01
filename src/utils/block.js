@@ -47,11 +47,6 @@ class BlockUtil {
     }
     return bestBlock;
   }
-
-  static async findBlockForSeason(season) {
-    const block = await BeanstalkSubgraphRepository.getBlockForSeason(season);
-    return block;
-  }
 }
 
 module.exports = BlockUtil;

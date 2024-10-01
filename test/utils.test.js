@@ -49,19 +49,6 @@ describe('Utils', () => {
     expect(result.number).toEqual(19500000);
   });
 
-  test('Find block number for a requested season', async () => {
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValue({
-      seasons: [
-        {
-          sunriseBlock: 20042493
-        }
-      ]
-    });
-
-    const blockForSeason = await BlockUtil.findBlockForSeason(22183);
-    expect(blockForSeason).toBe(20042493);
-  });
-
   describe('BigInt', () => {
     test('Converts all strings to BigInt', () => {
       const obj = allToBigInt({

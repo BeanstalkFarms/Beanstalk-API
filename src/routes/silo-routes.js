@@ -4,6 +4,7 @@
 
 const SiloApyService = require('../service/silo-apy');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../service/silo-service');
+const AsyncContext = require('../utils/context');
 const RestParsingUtil = require('../utils/rest-parsing');
 
 const Router = require('koa-router');
@@ -26,6 +27,13 @@ router.post('/yield', async (ctx) => {
 
   if (body.tokens && (!Array.isArray(body.tokens) || body.tokens.length === 0)) {
     ctx.body = { error: 'Invalid `tokens` property was provided.' };
+    ctx.status = 400;
+    return;
+  }
+
+  // Prevents user from requesting legacy chain; season number will dictate constants
+  if (ctx.headers['x-chain']) {
+    ctx.body = { error: 'Header `x-chain` is not compatible with this request.' };
     ctx.status = 400;
     return;
   }

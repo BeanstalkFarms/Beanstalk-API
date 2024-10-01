@@ -40,7 +40,7 @@ const DECIMALS = {
 const MILESTONE = {
   siloV3: 17671557,
   startSeason: 0,
-  endSeason: 30000 // TODO: set this
+  endSeason: 30000 // TODO: set this to the pause season +1 (the first season to occur on L2)
 };
 
 const SG = EnvUtil.getSG('eth');
