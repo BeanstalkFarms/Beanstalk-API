@@ -1,22 +1,24 @@
 // ** DO NOT USE ANY OF THESE EXPORTS DIRECTLY. USE `C` IN runtime-constants.js ** //
 
-// TODO: use bip-50
-const bip45Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP45.json');
-const erc20Abi = require('../../datasources/abi/ERC20.json');
-const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 const EnvUtil = require('../../utils/env');
+const SubgraphClients = require('../../datasources/subgraph-client');
+
+const bip50Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP50.json');
+const erc20Abi = require('../../datasources/abi/ERC20.json');
+const wellAbi = require('../../datasources/abi/basin/Well.json');
+const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
 const contracts = {
-  BEANSTALK: ['0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70', null, bip45Abi],
+  BEANSTALK: ['0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70', null, bip50Abi],
   BEAN: ['0xBEA0005B8599265D41256905A9B3073D397812E4', 6, erc20Abi],
   UNRIPE_BEAN: ['0x1BEA054dddBca12889e07B3E076f511Bf1d27543', 6, erc20Abi],
   UNRIPE_LP: ['0x1BEA059c3Ea15F6C10be1c53d70C75fD1266D788', 6, erc20Abi],
-  BEANWETH: ['0xBeA00Aa8130aCaD047E137ec68693C005f8736Ce', 18, erc20Abi],
-  BEANWSTETH: ['0xBEa00BbE8b5da39a3F57824a1a13Ec2a8848D74F', 18, erc20Abi],
-  BEANWEETH: ['0xBeA00Cc9F93E9a8aC0DFdfF2D64Ba38eb9C2e48c', 18, erc20Abi],
-  BEANWBTC: ['0xBea00DDe4b34ACDcB1a30442bD2B39CA8Be1b09c', 18, erc20Abi],
-  BEANUSDC: ['0xBea00ee04D8289aEd04f92EA122a96dC76A91bd7', 18, erc20Abi],
-  BEANUSDT: ['0xbEA00fF437ca7E8354B174339643B4d1814bED33', 18, erc20Abi],
+  BEANWETH: ['0xBeA00Aa8130aCaD047E137ec68693C005f8736Ce', 18, wellAbi],
+  BEANWSTETH: ['0xBEa00BbE8b5da39a3F57824a1a13Ec2a8848D74F', 18, wellAbi],
+  BEANWEETH: ['0xBeA00Cc9F93E9a8aC0DFdfF2D64Ba38eb9C2e48c', 18, wellAbi],
+  BEANWBTC: ['0xBea00DDe4b34ACDcB1a30442bD2B39CA8Be1b09c', 18, wellAbi],
+  BEANUSDC: ['0xBea00ee04D8289aEd04f92EA122a96dC76A91bd7', 18, wellAbi],
+  BEANUSDT: ['0xbEA00fF437ca7E8354B174339643B4d1814bED33', 18, wellAbi],
   WETH: ['0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', 18, erc20Abi],
   WSTETH: ['0x5979D7b546E38E414F7E9822514be443A4800529', 18, erc20Abi],
   WEETH: ['0x35751007a407ca6FEFfE80b3cB397736D2cf4dbe', 18, erc20Abi],
@@ -45,6 +47,9 @@ const DECIMALS = {
 const MILESTONE = {};
 
 const SG = EnvUtil.getSG('arb');
+SG.BEANSTALK = SubgraphClients.namedSG(SG.BEANSTALK);
+SG.BEAN = SubgraphClients.namedSG(SG.BEAN);
+SG.BASIN = SubgraphClients.namedSG(SG.BASIN);
 
 Object.freeze(ADDRESSES);
 Object.freeze(DECIMALS);
