@@ -1,5 +1,5 @@
 const {
-  ADDRESSES: { BEANSTALK, BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP },
+  ADDRESSES: { BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP },
   DECIMALS
 } = require('../../src/constants/raw/beanstalk-eth');
 const SiloApyService = require('../../src/service/silo-apy');
@@ -285,7 +285,7 @@ describe('SiloApyService Orchestration', () => {
       }
     });
 
-    const result = await SiloApyService.calcApy(BEANSTALK, 19000, [720], [BEAN, BEAN3CRV]);
+    const result = await SiloApyService.calcApy(19000, [720], [BEAN, BEAN3CRV]);
 
     expect(spy).toHaveBeenCalledWith(
       322227371n,
@@ -298,7 +298,6 @@ describe('SiloApyService Orchestration', () => {
       undefined
     );
 
-    expect(result.beanstalk).toEqual(BEANSTALK);
     expect(result.season).toEqual(19000);
     expect(result.yields[720][BEAN].bean).toEqual(0.1);
     expect(result.yields[720][BEAN3CRV].stalk).toEqual(5.5);
@@ -334,7 +333,7 @@ describe('SiloApyService Orchestration', () => {
       }
     });
 
-    const result = await SiloApyService.calcApy(BEANSTALK, 22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
+    const result = await SiloApyService.calcApy(22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
     // console.log('outer apy result', result);
 
     expect(spy).toHaveBeenCalledWith(
@@ -356,7 +355,6 @@ describe('SiloApyService Orchestration', () => {
       undefined
     );
 
-    expect(result.beanstalk).toEqual(BEANSTALK);
     expect(result.season).toEqual(22096);
     expect(result.yields[720][BEAN].bean).toEqual(0.1);
     expect(result.yields[720][BEAN3CRV].stalk).toEqual(5.5);

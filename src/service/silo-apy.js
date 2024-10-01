@@ -50,9 +50,9 @@ class SiloApyService {
     if (!request.options?.skipValidation) {
       request = await this.validate(request);
     }
-    let { beanstalk, season, emaWindows, tokens, options } = request;
+    let { season, emaWindows, tokens, options } = request;
     tokens = tokens.map((t) => t.toLowerCase());
-    return await this.calcApy(beanstalk, season, emaWindows, tokens, options);
+    return await this.calcApy(season, emaWindows, tokens, options);
   }
 
   /**
@@ -61,8 +61,7 @@ class SiloApyService {
    * @param {GetApyRequest}
    * @returns {GetApyRequest}
    */
-  static async validate({ beanstalk, season, emaWindows, tokens, options }) {
-    beanstalk = (beanstalk ?? C().BEANSTALK).toLowerCase();
+  static async validate({ season, emaWindows, tokens, options }) {
     emaWindows = emaWindows ?? DEFAULT_WINDOWS;
 
     // Check whether season/tokens are valid
@@ -83,20 +82,18 @@ class SiloApyService {
         }
       }
     }
-    return { beanstalk, season, emaWindows, tokens, options };
+    return { season, emaWindows, tokens, options };
   }
 
   /**
    * Calculates vAPYs.
-   * @param {string} beanstalk
    * @param {number} season
    * @param {number[]} windows
    * @param {string[]} tokens
    * @returns {Promise<CalcApysResult>}
    */
-  static async calcApy(beanstalk, season, windows, tokens, options) {
+  static async calcApy(season, windows, tokens, options) {
     const apyResults = {
-      beanstalk,
       season,
       yields: {}
     };
@@ -106,7 +103,7 @@ class SiloApyService {
       return a;
     }, {});
     if (season < GAUGE_SEASON) {
-      const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(beanstalk, season);
+      const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(season);
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
       for (const ema of windowEMAs) {
@@ -122,7 +119,7 @@ class SiloApyService {
         );
       }
     } else {
-      const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(beanstalk, season);
+      const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(season);
 
       const tokensToCalc = [];
       const gaugeLpPoints = [];

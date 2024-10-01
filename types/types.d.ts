@@ -16,7 +16,6 @@ export type WindowYieldMap = {
 };
 
 export type CalcApysResult = {
-  beanstalk: string;
   season: number;
   yields: WindowYieldMap;
 };
@@ -54,7 +53,6 @@ export type CalcApyOptions = {
 };
 
 export type GetApyRequest = {
-  beanstalk: string;
   season: number;
   emaWindows: number[];
   tokens: string[];

@@ -48,7 +48,7 @@ class BeanstalkSubgraphRepository {
         }
       `,
       '',
-      `silo: "${C().BEANSTALK}", season_lte: ${toSeason}`,
+      `silo: "${c.BEANSTALK}", season_lte: ${toSeason}`,
       // Lower bound season is applied here
       ['season'],
       [fromSeason],
@@ -62,7 +62,7 @@ class BeanstalkSubgraphRepository {
     );
   }
 
-  static async getPreGaugeApyInputs(beanstalk, season, c = C()) {
+  static async getPreGaugeApyInputs(season, c = C()) {
     const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
     const apyInputs = await c.SG.BEANSTALK(gql`
@@ -75,7 +75,7 @@ class BeanstalkSubgraphRepository {
           stalkIssuedPerBdv
         }
         silo(
-          id: "${beanstalk}",
+          id: "${c.BEANSTALK}",
           block: {number: ${blockNumber}}
         ) {
           stalk
@@ -96,7 +96,7 @@ class BeanstalkSubgraphRepository {
     });
   }
 
-  static async getGaugeApyInputs(beanstalk, season, c = C()) {
+  static async getGaugeApyInputs(season, c = C()) {
     const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
     const apyInputs = await c.SG.BEANSTALK(gql`
@@ -112,7 +112,7 @@ class BeanstalkSubgraphRepository {
           optimalPercentDepositedBdv
         }
         silo(
-          id: "${beanstalk}",
+          id: "${c.BEANSTALK}",
           block: {number: ${blockNumber}}
         ) {
           beanToMaxLpGpPerBdvRatio
@@ -120,7 +120,7 @@ class BeanstalkSubgraphRepository {
           whitelistedTokens
         }
         siloAssets(
-          where: {silo: "${beanstalk}", depositedBDV_gt: "0"}
+          where: {silo: "${c.BEANSTALK}", depositedBDV_gt: "0"}
           block: {number: ${blockNumber}}
         ) {
           token
@@ -201,7 +201,7 @@ class BeanstalkSubgraphRepository {
     const result = await c.SG.BEANSTALK(gql`
       {
         silo(
-          id: "${C().BEANSTALK}"
+          id: "${c.BEANSTALK}"
           block: {number: ${blockNumber}}
         ) {
           whitelistedTokens
