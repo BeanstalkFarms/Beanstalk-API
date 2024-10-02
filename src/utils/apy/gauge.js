@@ -7,6 +7,7 @@ const { C } = require('../../constants/runtime-constants');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 const NumberUtil = require('../number');
+const GPFunction = require('./gp-functions/gp-function');
 const LegacyDefaultGaugePointFunction = require('./gp-functions/legacy');
 
 class GaugeApyUtil {
@@ -167,8 +168,8 @@ class GaugeApyUtil {
       // Handle multiple whitelisted gauge LP, or gauge points changing during germination
       if (gaugeLpPoints.length > 1 || i < 2) {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
-          gaugeLpPointsCopy[j] = LegacyDefaultGaugePointFunction.next(
-            //TODO
+          gaugeLpPointsCopy[j] = GPFunction.forSeason(
+            season + i + 1,
             gaugeLpPointsCopy[j],
             gaugeLpOptimalPercentBdvCopy[j],
             currentPercentLpBdv[j]
