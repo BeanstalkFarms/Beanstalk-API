@@ -46,7 +46,8 @@ const DECIMALS = {
 
 const MILESTONE = {
   startSeason: 30000, // TODO: set this to the pause season +1 (the first season to occur on L2)
-  endSeason: 99999999
+  endSeason: 99999999,
+  isGaugeEnabled: ({ season, block }) => true
 };
 
 const SG = EnvUtil.getSG('arb');

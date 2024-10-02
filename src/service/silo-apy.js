@@ -15,12 +15,6 @@ const YieldModelAssembler = require('../repository/postgres/models/assemblers/yi
 const RestParsingUtil = require('../utils/rest-parsing');
 const { C } = require('../constants/runtime-constants');
 
-// TODO: move these constants elsewhere.
-// First sunrise after replant was for season 6075. The subgraph has no silo data prior to this.
-const ZERO_SEASON = 6074;
-// First sunrise after BIP-45 Seed Gauge was deployed. This is when the APY formula changes
-const GAUGE_SEASON = 21798;
-
 const DEFAULT_WINDOWS = [24, 168, 720];
 
 class SiloApyService {
@@ -101,7 +95,7 @@ class SiloApyService {
       a[c.window] = c.beansPerSeason;
       return a;
     }, {});
-    if (season < GAUGE_SEASON) {
+    if (!C(season).MILESTONE.isGaugeEnabled({ season })) {
       const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(season, C(season));
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
@@ -214,8 +208,10 @@ class SiloApyService {
    * @returns {WindowEMAResult[]}
    */
   static async calcWindowEMA(season, windows) {
-    if (season <= ZERO_SEASON) {
-      throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${ZERO_SEASON}.`);
+    // First sunrise after replant. The subgraph has no silo data prior to this.
+    const MIN_SEASON = 6075;
+    if (season < MIN_SEASON) {
+      throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${MIN_SEASON}.`);
     }
 
     if (Math.min(...windows) <= 0) {
@@ -223,20 +219,19 @@ class SiloApyService {
     }
 
     // Determine effective windows based on how many datapoints are actually available
-    const effectiveWindows = [];
+    const minSeason = Math.max(MIN_SEASON, C().MILESTONE.startSeason) - 1;
+    const numDataPoints = [];
     for (const requestedWindow of windows) {
-      // Currently no datapoints are available for season < ZERO_SEASON,
-      // eventually that subtraction will be removed.
-      effectiveWindows.push(Math.min(season - ZERO_SEASON, requestedWindow));
+      numDataPoints.push(Math.min(season - minSeason, requestedWindow));
     }
 
     // Get all results from the subgraph
-    const maxWindow = Math.max(...effectiveWindows);
+    const maxWindow = Math.max(...numDataPoints);
     const mints = await BeanstalkSubgraphRepository.getSiloHourlyRewardMints(season - maxWindow, season, C(season));
 
     // Compute the EMA for each window
     const windowResults = [];
-    for (const effectiveWindow of effectiveWindows) {
+    for (const effectiveWindow of numDataPoints) {
       const beta = 2 / (effectiveWindow + 1);
 
       let currentEMA = 0;

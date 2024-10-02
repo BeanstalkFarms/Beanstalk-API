@@ -51,7 +51,7 @@ describe('SiloService', () => {
 
     const mockBeanstalk = {
       stemTipForToken: jest.fn().mockImplementation((token, options) => {
-        if (options.blockTag == MILESTONE.siloV3 || token == UNRIPE_BEAN || token == UNRIPE_LP) {
+        if (options.blockTag == MILESTONE.siloV3Block || token == UNRIPE_BEAN || token == UNRIPE_LP) {
           return 0n;
         } else {
           return 10000n;

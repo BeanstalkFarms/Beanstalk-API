@@ -36,6 +36,7 @@ class BeanstalkSubgraphRepository {
     return retval;
   }
 
+  // From exclusive, To inclusive.
   static async getSiloHourlyRewardMints(fromSeason, toSeason, c = C()) {
     const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
       c.SG.BEANSTALK,
@@ -49,7 +50,7 @@ class BeanstalkSubgraphRepository {
       `,
       '',
       `silo: "${c.BEANSTALK}", season_lte: ${toSeason}`,
-      // Lower bound season is applied here
+      // Lower bound season is applied here (gt)
       ['season'],
       [fromSeason],
       'asc'

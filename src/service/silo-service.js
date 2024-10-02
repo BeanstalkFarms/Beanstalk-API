@@ -68,7 +68,7 @@ class SiloService {
     for (const asset of siloAssets) {
       const [migrationStemTip, stemTipNow] = (
         await Promise.all([
-          beanstalk.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3 }),
+          beanstalk.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3Block }),
           beanstalk.stemTipForToken(asset, { blockTag: block.number })
         ])
       ).map(BigInt);
