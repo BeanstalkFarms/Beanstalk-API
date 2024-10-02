@@ -1,7 +1,7 @@
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
-const { runBatchPromises } = require('../utils/batch-promise');
+const PromiseUtil = require('../utils/promise');
 const LiquidityUtil = require('../utils/pool/liquidity');
 const NumberUtil = require('../utils/number');
 const { C } = require('../constants/runtime-constants');
@@ -55,7 +55,7 @@ class CoingeckoService {
 
     // Execute the above promises. Note that subgraph rate limit can become an issue as more whitelisted pools exist.
     // This can be improved by combining many of the separated queries together, or caching results in a database
-    const results = await runBatchPromises(batchPromiseGenerators, 50);
+    const results = await PromiseUtil.runBatchPromises(batchPromiseGenerators, 50);
     return results.filter((ticker) => ticker != null);
   }
 
