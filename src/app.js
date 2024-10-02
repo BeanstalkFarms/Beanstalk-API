@@ -34,7 +34,7 @@ async function appStartup() {
   app.use(bodyParser());
 
   app.use(async (ctx, next) => {
-    const chain = ctx.headers['x-chain'] ?? EnvUtil.defaultChain();
+    const chain = ctx.query.chain ?? EnvUtil.defaultChain();
     if (!ChainUtil.isValidChain(chain)) {
       ctx.status = 400;
       ctx.body = {

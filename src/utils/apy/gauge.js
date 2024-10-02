@@ -168,6 +168,7 @@ class GaugeApyUtil {
       if (gaugeLpPoints.length > 1 || i < 2) {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
           gaugeLpPointsCopy[j] = LegacyDefaultGaugePointFunction.next(
+            //TODO
             gaugeLpPointsCopy[j],
             gaugeLpOptimalPercentBdvCopy[j],
             currentPercentLpBdv[j]

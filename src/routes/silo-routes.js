@@ -32,8 +32,8 @@ router.post('/yield', async (ctx) => {
   }
 
   // Prevents user from requesting legacy chain; season number will dictate constants
-  if (ctx.headers['x-chain']) {
-    ctx.body = { error: 'Header `x-chain` is not compatible with this request.' };
+  if (ctx.query.chain) {
+    ctx.body = { error: 'Query parameter `chain` is not compatible with this request.' };
     ctx.status = 400;
     return;
   }
