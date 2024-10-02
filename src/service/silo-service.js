@@ -1,6 +1,5 @@
 const { C } = require('../constants/runtime-constants');
 const ContractGetters = require('../datasources/contracts/contract-getters');
-const EVM = require('../datasources/evm');
 const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
@@ -10,7 +9,7 @@ const { createNumberSpread } = require('../utils/number');
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalk(block.number);
+    const beanstalk = await ContractGetters.getBeanstalk();
 
     const siloAssets = (
       await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
@@ -53,7 +52,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalk(block.number);
+    const beanstalk = await ContractGetters.getBeanstalk();
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
@@ -112,7 +111,7 @@ class SiloService {
 
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
-    const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
+    const beanstalk = await ContractGetters.getBeanstalk();
     const tokenModels = await TokenRepository.findWhitelistedTokens();
 
     const updatedTokens = [];
@@ -121,7 +120,10 @@ class SiloService {
         const token = tokenModel.address;
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
           (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
-          bs.s.ss[token].stalkEarnedPerSeason,
+          (async () => {
+            const tokenSettings = await beanstalk.tokenSettings(token);
+            return BigInt(tokenSettings.stalkEarnedPerSeason);
+          })(),
           (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
           (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
           (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()

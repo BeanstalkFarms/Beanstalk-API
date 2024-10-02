@@ -5,12 +5,12 @@ const { priceMapping, usdOracleMapping } = require('./upgradeable-mappings.js');
 
 class ContractGetters {
   // Uses the default specified abi for this address
-  static async get(address, blockNumber = 0, c = C()) {
-    return await Contracts.getContractAsync(address, blockNumber, c.RPC);
+  static async get(address, c = C()) {
+    return await Contracts.getContractAsync(address, c.RPC);
   }
 
-  static async getBeanstalk(blockNumber = 0, c = C()) {
-    return ContractGetters.get(c.BEANSTALK, blockNumber, c);
+  static async getBeanstalk(c = C()) {
+    return ContractGetters.get(c.BEANSTALK, c);
   }
 
   /// Upgradeable Contracts

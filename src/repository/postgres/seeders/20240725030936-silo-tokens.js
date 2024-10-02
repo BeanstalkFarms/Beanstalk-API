@@ -2,14 +2,19 @@
 
 const { get } = require('../../../datasources/contracts/contract-getters');
 const db = require('../models');
-const EVM = require('../../../datasources/evm');
+const ContractGetters = require('../../../datasources/contracts/contract-getters');
+const { C } = require('../../../constants/runtime-constants');
+const AlchemyUtil = require('../../../datasources/alchemy');
 
-const tokens = [C().BEAN, C().BEANWETH, C().BEANWSTETH, C().BEAN3CRV, C().UNRIPE_BEAN, C().UNRIPE_LP];
+const c = C('eth');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
+    await AlchemyUtil.ready(c.CHAIN);
+    const beanstalk = await ContractGetters.getBeanstalk(c);
+
+    const tokens = [c.BEAN, c.BEANWETH, c.BEANWSTETH, c.BEAN3CRV, c.UNRIPE_BEAN, c.UNRIPE_LP];
 
     // Gets tokens that have already been populated
     const existingTokens = await db.sequelize.models.Token.findAll({
@@ -27,12 +32,16 @@ module.exports = {
       const rows = [];
       for (const token of newTokens) {
         const erc20 = await get(token);
+        // TODO: if any of these revert, as will be the case after migration, they should be set null in the table.
         const [name, symbol, decimals, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] =
           await Promise.all([
             erc20.name(),
             erc20.symbol(),
             (async () => Number(await erc20.decimals()))(),
-            bs.s.ss[token].stalkEarnedPerSeason,
+            (async () => {
+              const tokenSettings = await beanstalk.tokenSettings(token);
+              return BigInt(tokenSettings.stalkEarnedPerSeason);
+            })(),
             (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
             (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
             (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()

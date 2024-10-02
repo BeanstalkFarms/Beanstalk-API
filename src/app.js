@@ -12,12 +12,17 @@ const { formatBigintHex } = require('./utils/bigint.js');
 const AsyncContext = require('./utils/context.js');
 const EnvUtil = require('./utils/env.js');
 const ChainUtil = require('./utils/chain.js');
+const AlchemyUtil = require('./datasources/alchemy.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
   const cronJobs = EnvUtil.getEnabledCronJobs();
   if (cronJobs.length > 0) {
     activateJobs(cronJobs);
+  }
+
+  for (const chain of EnvUtil.getEnabledChains()) {
+    await AlchemyUtil.ready(chain);
   }
 
   const app = new Koa();
