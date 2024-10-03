@@ -18,7 +18,7 @@ const SG_BEAN = process.env.SG_BEAN?.split(',').filter((s) => s.trim().length > 
 const SG_BASIN = process.env.SG_BASIN?.split(',').filter((s) => s.trim().length > 0);
 
 // Validation
-if (ENABLED_CHAINS.length === 0) {
+if (!ENABLED_CHAINS || ENABLED_CHAINS.length === 0) {
   throw new Error('Invalid environment configured: no chains were enabled.');
 }
 
