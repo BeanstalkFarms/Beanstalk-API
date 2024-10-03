@@ -1,3 +1,4 @@
+const { C } = require('../../constants/runtime-constants');
 const Contracts = require('./contracts');
 
 // Orchestration layer for managing contracts that change over time. Supports upgrading existing
@@ -72,6 +73,11 @@ class UpgradeableContract {
       }
     }
     return -1;
+  }
+
+  // This particular method exists for ease of mocking
+  static make(mapping, c = C(), block = 'latest') {
+    return new UpgradeableContract(mapping, c, block);
   }
 }
 

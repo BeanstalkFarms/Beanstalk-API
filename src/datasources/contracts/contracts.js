@@ -12,11 +12,6 @@ class Contracts {
     return Contracts.get(c.BEANSTALK, c);
   }
 
-  // This particular method exists for ease of mocking
-  static getUpgradeableContract(mapping, c = C(), block = 'latest') {
-    return new UpgradeableContract(mapping, c, block);
-  }
-
   static makeContract(address, abi, provider) {
     return new AlchemyContract(address, abi, provider);
   }

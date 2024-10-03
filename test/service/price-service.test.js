@@ -1,7 +1,7 @@
 const BlockUtil = require('../../src/utils/block');
 
 const { getBeanPrice, getUsdOracleTokenPrice } = require('../../src/service/price-service');
-const Contracts = require('../../src/datasources/contracts/contracts');
+const UpgradeableContract = require('../../src/datasources/contracts/upgradeable-contract');
 
 const defaultOptions = { blockNumber: 19000000 };
 
@@ -22,7 +22,7 @@ describe('PriceService', () => {
         deltaB: -16781104856n
       })
     };
-    jest.spyOn(Contracts, 'getUpgradeableContract').mockReturnValue(mockPrice);
+    jest.spyOn(UpgradeableContract, 'make').mockReturnValue(mockPrice);
 
     const price = await getBeanPrice(defaultOptions);
     expect(price.usdPrice).toEqual(0.9977);
@@ -36,7 +36,7 @@ describe('PriceService', () => {
       getTokenUsdPrice: jest.fn().mockResolvedValue(3403121673n),
       __version: jest.fn().mockReturnValue(1)
     };
-    jest.spyOn(Contracts, 'getUpgradeableContract').mockReturnValue(mockUsdOracle);
+    jest.spyOn(UpgradeableContract, 'make').mockReturnValue(mockUsdOracle);
 
     const price = await getUsdOracleTokenPrice(defaultOptions);
     expect(price.usdPrice).toBeCloseTo(2563.44);

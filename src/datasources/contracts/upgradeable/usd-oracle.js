@@ -1,5 +1,5 @@
 const { C } = require('../../../constants/runtime-constants');
-const Contracts = require('../contracts');
+const UpgradeableContract = require('../upgradeable-contract');
 
 const mapping = [
   {
@@ -27,7 +27,7 @@ const mapping = [
 
 class UsdOracle {
   constructor({ block = 'latest', c = C() }) {
-    this.contract = Contracts.getUpgradeableContract(mapping, c, block);
+    this.contract = UpgradeableContract.make(mapping, c, block);
   }
 
   async getTokenUsdPrice(token) {
