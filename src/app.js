@@ -1,6 +1,7 @@
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
+const snapshotRoutes = require('./routes/snapshot-routes.js');
 
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
@@ -88,6 +89,8 @@ async function appStartup() {
   app.use(coingeckoRoutes.allowedMethods());
   app.use(siloRoutes.routes());
   app.use(siloRoutes.allowedMethods());
+  app.use(snapshotRoutes.routes());
+  app.use(snapshotRoutes.allowedMethods());
 
   const router = new Router();
   router.get('/healthcheck', async (ctx) => {
