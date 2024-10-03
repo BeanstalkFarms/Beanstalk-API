@@ -8,7 +8,11 @@ class Contracts {
     const network = c.CHAIN;
     const key = JSON.stringify({ address, network });
     if (!contracts[key]) {
-      contracts[key] = this.makeContract(address, c.ABIS[address], c.RPC);
+      const abi = c.ABIS[address];
+      if (!abi) {
+        throw new Error(`There is no default ABI for contract ${address}.`);
+      }
+      contracts[key] = this.makeContract(address, abi, c.RPC);
     }
     return contracts[key];
   }

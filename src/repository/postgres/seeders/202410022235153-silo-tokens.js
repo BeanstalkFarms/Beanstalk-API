@@ -1,6 +1,5 @@
 'use strict';
 
-const { get } = require('../../../datasources/contracts/contract-getters');
 const db = require('../models');
 const ContractGetters = require('../../../datasources/contracts/contract-getters');
 const { C } = require('../../../constants/runtime-constants');
@@ -31,7 +30,7 @@ module.exports = {
     if (newTokens.length > 0) {
       const rows = [];
       for (const token of newTokens) {
-        const erc20 = await get(token);
+        const erc20 = ContractGetters.get(token, c);
         const [name, symbol, supply, decimals] = await Promise.all([
           erc20.name(),
           erc20.symbol(),
