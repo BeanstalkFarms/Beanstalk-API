@@ -1,7 +1,6 @@
 const { C } = require('../../../constants/runtime-constants');
 const Contracts = require('../contracts');
 
-// TODO: add chain/beanstalk 3
 const mapping = [
   {
     chain: 'eth',
@@ -13,9 +12,16 @@ const mapping = [
   {
     chain: 'eth',
     start: 20334284,
-    end: 'latest',
+    end: 'latest', //
     address: '0xb24a70b71e4cca41eb114c2f61346982aa774180',
     abi: require('../../abi/UsdOracle2.json')
+  },
+  {
+    chain: 'arb',
+    start: 202981420, //
+    end: 'latest',
+    address: '0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70',
+    abi: require('../../abi/beanstalk/Beanstalk-BIP50.json')
   }
 ];
 

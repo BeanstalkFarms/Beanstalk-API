@@ -10,6 +10,7 @@ class UpgradeableContract {
    * @returns a Proxy wrapping an UpgradeableContract instance
    */
   constructor(mapping, c, defaultBlock) {
+    this.__c = c;
     this.__defaultBlock = defaultBlock;
     this.__mapping = mapping;
 
@@ -18,7 +19,7 @@ class UpgradeableContract {
         if (property === 'then') {
           return undefined;
         }
-        if (['__mapping', '__defaultBlock', '__version'].includes(property)) {
+        if (property.startsWith('__')) {
           // Don't proxy explicitly defined members on this class
           return target[property];
         }
@@ -36,7 +37,7 @@ class UpgradeableContract {
 
         // Find the contract corresponding to the input block
         const selected = mapping.find((entry) => {
-          if (entry.chain !== c.CHAIN) {
+          if (entry.chain !== this.__c.CHAIN) {
             return false;
           }
           if (block === 'latest') {
@@ -51,7 +52,7 @@ class UpgradeableContract {
         }
 
         // Return the requested function with block prefilled
-        const contract = Contracts.makeContract(selected.address, selected.abi, c.RPC);
+        const contract = Contracts.makeContract(selected.address, selected.abi, this.__c.RPC);
         return (...args) => contract[property](...args, { blockTag: block });
       }
     };
@@ -60,9 +61,13 @@ class UpgradeableContract {
   }
 
   // Returns a version number for this contract at the requested block
-  __version(block = this.__defaultBlock) {
+  __version(c = this.__c, block = this.__defaultBlock) {
     for (let i = 0; i < this.__mapping.length; ++i) {
-      if (this.__mapping[i].start <= block && (this.__mapping[i].end > block || this.__mapping[i].end === 'latest')) {
+      if (
+        this.__mapping[i].chain === c.CHAIN &&
+        (this.__mapping[i].start <= block || block === 'latest') &&
+        (this.__mapping[i].end > block || this.__mapping[i].end === 'latest')
+      ) {
         return i + 1;
       }
     }
