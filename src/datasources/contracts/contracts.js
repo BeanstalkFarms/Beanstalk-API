@@ -4,11 +4,11 @@ const { C } = require('../../constants/runtime-constants');
 const contracts = {};
 
 class Contracts {
-  static async getContractAsync(address, provider) {
-    const network = (await provider.detectNetwork()).name;
+  static getDefaultContract(address, c = C()) {
+    const network = c.CHAIN;
     const key = JSON.stringify({ address, network });
     if (!contracts[key]) {
-      contracts[key] = this.makeContract(address, C().ABIS[address], provider);
+      contracts[key] = this.makeContract(address, c.ABIS[address], c.RPC);
     }
     return contracts[key];
   }

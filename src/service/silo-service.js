@@ -9,7 +9,7 @@ const { createNumberSpread } = require('../utils/number');
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalk();
+    const beanstalk = ContractGetters.getBeanstalk();
 
     const siloAssets = (
       await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
@@ -52,7 +52,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = await ContractGetters.getBeanstalk();
+    const beanstalk = ContractGetters.getBeanstalk();
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
@@ -111,14 +111,15 @@ class SiloService {
 
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
-    const beanstalk = await ContractGetters.getBeanstalk();
+    const beanstalk = ContractGetters.getBeanstalk();
     const tokenModels = await TokenRepository.findWhitelistedTokens();
 
     const updatedTokens = [];
     await sequelize.transaction(async (transaction) => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
-        const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
+        const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
+          (async () => BigInt(await ContractGetters.get(token).totalSupply()))(),
           (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
           (async () => {
             const tokenSettings = await beanstalk.tokenSettings(token);
@@ -133,6 +134,7 @@ class SiloService {
           ...(await TokenRepository.updateToken(
             token,
             {
+              supply,
               bdv,
               stalkEarnedPerSeason,
               stemTip,

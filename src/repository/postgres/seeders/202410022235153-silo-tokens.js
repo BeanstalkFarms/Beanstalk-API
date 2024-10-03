@@ -14,7 +14,7 @@ const tokens = [c.BEAN, c.BEANWETH, c.BEANWSTETH, c.BEAN3CRV, c.UNRIPE_BEAN, c.U
 module.exports = {
   async up(queryInterface, Sequelize) {
     await AlchemyUtil.ready(c.CHAIN);
-    const beanstalk = await ContractGetters.getBeanstalk(c);
+    const beanstalk = ContractGetters.getBeanstalk(c);
 
     // Gets tokens that have already been populated
     const existingTokens = await db.sequelize.models.Token.findAll({
@@ -32,9 +32,10 @@ module.exports = {
       const rows = [];
       for (const token of newTokens) {
         const erc20 = await get(token);
-        const [name, symbol, decimals] = await Promise.all([
+        const [name, symbol, supply, decimals] = await Promise.all([
           erc20.name(),
           erc20.symbol(),
+          (async () => BigInt(await erc20.totalSupply()))(),
           (async () => Number(await erc20.decimals()))()
         ]);
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
@@ -52,8 +53,10 @@ module.exports = {
         );
         rows.push({
           address: token,
+          chain: c.CHAIN,
           name,
           symbol,
+          supply,
           decimals,
           isWhitelisted: true,
           bdv,

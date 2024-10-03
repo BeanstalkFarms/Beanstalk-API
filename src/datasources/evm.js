@@ -7,7 +7,7 @@ class EVM {
   // Future work may involve using upgradeable contract/storage layout by block/chain
   static async beanstalkContractAndStorage(blockNumber = 'latest') {
     return {
-      beanstalk: await ContractGetters.getBeanstalk(),
+      beanstalk: ContractGetters.getBeanstalk(),
       bs: new ContractStorage(C().RPC, C().BEANSTALK, storageLayout, blockNumber)
     };
   }
