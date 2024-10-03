@@ -13,6 +13,8 @@ const {
 } = require('../../src/constants/raw/beanstalk-eth');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 const { mockBasinSG } = require('../util/mock-sg');
+const LiquidityUtil = require('../../src/utils/pool/liquidity');
+const CoingeckoService = require('../../src/service/coingecko-service');
 
 const testTimestamp = 1715020584;
 
@@ -20,7 +22,25 @@ describe('CoingeckoService', () => {
   it('should return all Basin tickers in the expected format', async () => {
     const wellsResponse = require('../mock-responses/subgraph/basin/wells.json');
     jest.spyOn(mockBasinSG, 'request').mockResolvedValueOnce(wellsResponse);
-    // NOTE: incomplete mocking in this test
+    // In practice this value is not necessary since the subsequent getWellPriceRange is also mocked.
+    jest.spyOn(CoingeckoService, 'getAllPriceChanges').mockResolvedValueOnce(undefined);
+    jest.spyOn(LiquidityUtil, 'calcWellLiquidityUSD').mockResolvedValueOnce(27491579.59267346);
+    jest.spyOn(LiquidityUtil, 'calcDepth').mockResolvedValueOnce({
+      buy: {
+        float: [135736.220357, 52.83352694098683]
+      },
+      sell: {
+        float: [139870.493345, 54.44273966436485]
+      }
+    });
+    jest.spyOn(CoingeckoService, 'getWellPriceRange').mockReturnValueOnce({
+      high: {
+        float: [2544.664349, 0.000392979136931714]
+      },
+      low: {
+        float: [2606.608683, 0.000383640247389837]
+      }
+    });
 
     const tickers = await getTickers({ blockNumber: 19000000 });
 
