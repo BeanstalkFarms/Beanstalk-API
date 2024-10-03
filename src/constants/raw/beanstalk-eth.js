@@ -45,9 +45,9 @@ const MILESTONE = {
 };
 
 const SG = EnvUtil.getSG('eth');
-SG.BEANSTALK = SubgraphClients.namedSG(SG.BEANSTALK);
-SG.BEAN = SubgraphClients.namedSG(SG.BEAN);
-SG.BASIN = SubgraphClients.namedSG(SG.BASIN);
+SG.BEANSTALK = SubgraphClients.named(SG.BEANSTALK);
+SG.BEAN = SubgraphClients.named(SG.BEAN);
+SG.BASIN = SubgraphClients.named(SG.BASIN);
 
 Object.freeze(ADDRESSES);
 Object.freeze(DECIMALS);

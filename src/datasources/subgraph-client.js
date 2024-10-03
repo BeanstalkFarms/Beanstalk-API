@@ -6,19 +6,12 @@ const BASE_URL = 'https://graph.bean.money/';
 class SubgraphClients {
   static _clients = {};
 
-  static namedSG(name) {
-    return SubgraphClients._clientBuilder(BASE_URL + name);
-  }
-
-  static _getClient(url) {
-    if (!this._clients[url]) {
-      this._clients[url] = new GraphQLClient(url);
-    }
-    return this._clients[url];
+  static named(name) {
+    return SubgraphClients.fromUrl(BASE_URL + name);
   }
 
   // let callNumber = 1;
-  static _clientBuilder(url) {
+  static fromUrl(url) {
     return async (query) => {
       const client = this._getClient(url);
       const response = await client.request(query);
@@ -33,6 +26,13 @@ class SubgraphClients {
       // }
       return response;
     };
+  }
+
+  static _getClient(url) {
+    if (!this._clients[url]) {
+      this._clients[url] = new GraphQLClient(url);
+    }
+    return this._clients[url];
   }
 }
 

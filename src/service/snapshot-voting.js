@@ -1,5 +1,6 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
+const SnapshotSubgraphRepository = require('../repository/subgraph/snapshot-subgraph');
 
 class SnapshotVotingService {
   // Returns a list of voting powers by requested address
@@ -7,6 +8,8 @@ class SnapshotVotingService {
     const results = [];
     const beanstalk = Contracts.getBeanstalk();
     for (const address of addresses) {
+      const delegators = await SnapshotSubgraphRepository.getDelegations(address, blockNumber);
+
       const accountStalk = BigInt(await beanstalk.balanceOfStalk(address, { blockTag: blockNumber }));
       console.log(accountStalk);
       results.push({

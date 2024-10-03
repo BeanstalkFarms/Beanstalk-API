@@ -2,6 +2,7 @@ require('dotenv').config();
 const ChainUtil = require('./chain');
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
+const GRAPH_API_KEY = process.env.GRAPH_API_KEY;
 
 const ENABLED_CHAINS = process.env.ENABLED_CHAINS?.split(',').filter((s) => s.trim().length > 0);
 const ENABLED_CRON_JOBS = process.env.ENABLED_CRON_JOBS?.split(',').filter((s) => s.trim().length > 0);
@@ -47,6 +48,10 @@ class EnvUtil {
 
   static getAlchemyKey() {
     return ALCHEMY_API_KEY;
+  }
+
+  static getGraphKey() {
+    return GRAPH_API_KEY;
   }
 
   static getEnabledChains() {
