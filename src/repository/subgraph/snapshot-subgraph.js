@@ -10,12 +10,10 @@ const IDS = {
 };
 
 class SnapshotSubgraphRepository {
-  // Returns all addresses who have delegated to the given delegate.
-  // Results are pooled across both ethereum/arbitrum delegations and any duplicates are removed.
-  static async getDelegations(delegate, blockNumber) {
-    // TODO: multichain
+  // Returns all addresses who have delegated to the given delegate on the requested chain.
+  static async getDelegations(delegate, chain, blockNumber) {
     const delegations = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.fromUrl(BASE_URL + IDS['eth']),
+      SubgraphClients.fromUrl(BASE_URL + IDS[chain]),
       gql`
         {
           delegations {
@@ -24,14 +22,13 @@ class SnapshotSubgraphRepository {
           }
         }
       `,
-      `block: {number: ${blockNumber}}`,
+      blockNumber ? `block: {number: ${blockNumber}}` : '',
       `delegate: "${delegate.toLowerCase()}", space: "beanstalkdao.eth"`,
       ['timestamp'],
       [0],
       'asc'
     );
-    const accounts = delegations.map((d) => d.delegator);
-    return new Set(accounts);
+    return delegations.map((d) => d.delegator);
   }
 }
 

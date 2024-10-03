@@ -12,7 +12,9 @@ class SnapshotVotingService {
     // Determine all accounts for which the stalk balance needs to be queried
     const allRelevantAccounts = [];
     for (const address of addresses) {
-      const delegators = await SnapshotSubgraphRepository.getDelegations(address, blockNumber);
+      const ethDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined);
+      const arbDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber);
+      const delegators = new Set([...ethDelegators, ...arbDelegators]);
       voterAccounts[address] = [address, ...delegators];
       allRelevantAccounts.push(...voterAccounts[address]);
     }
