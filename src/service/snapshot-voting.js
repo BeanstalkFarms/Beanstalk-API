@@ -29,7 +29,7 @@ class SnapshotVotingService {
       }, 0n);
       results.push({
         address,
-        score: votingPower / BigInt(10 ** C().DECIMALS.stalk)
+        score: Number(votingPower / BigInt(10 ** C().DECIMALS.stalk))
       });
     }
     return results;
