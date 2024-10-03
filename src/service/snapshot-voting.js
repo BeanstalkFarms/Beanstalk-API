@@ -12,13 +12,19 @@ class SnapshotVotingService {
 
     // Determine all accounts for which the stalk balance needs to be queried
     const allRelevantAccounts = [];
+    const functions = [];
     for (const address of addresses) {
-      // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
-      const ethDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined);
-      const arbDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber);
-      voterAccounts[address] = [...new Set([address, ...ethDelegators, ...arbDelegators])];
-      allRelevantAccounts.push(...voterAccounts[address]);
+      functions.push(async () => {
+        // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
+        const [ethDelegators, arbDelegators] = await Promise.all([
+          SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined),
+          SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber)
+        ]);
+        voterAccounts[address] = [...new Set([address, ...ethDelegators, ...arbDelegators])];
+        allRelevantAccounts.push(...voterAccounts[address]);
+      });
     }
+    await PromiseUtil.runBatchPromises(functions, 20);
 
     // Get stalk balance of all relevant accounts
     const stalkBalances = await SnapshotVotingService._getStalkBalances(allRelevantAccounts, blockNumber);
