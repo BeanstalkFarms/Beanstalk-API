@@ -23,7 +23,7 @@ class SnapshotSubgraphRepository {
         }
       `,
       blockNumber ? `block: {number: ${blockNumber}}` : '',
-      `delegate: "${delegate.toLowerCase()}", space: "beanstalkdao.eth"`,
+      `delegate: "${delegate}", space: "beanstalkdao.eth"`,
       ['timestamp'],
       [0],
       'asc'

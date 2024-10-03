@@ -8,14 +8,15 @@ class SnapshotVotingService {
   static async getVotingPower(addresses, blockNumber) {
     const results = [];
     const voterAccounts = {};
+    addresses = addresses.map((a) => a.toLowerCase());
 
     // Determine all accounts for which the stalk balance needs to be queried
     const allRelevantAccounts = [];
     for (const address of addresses) {
+      // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
       const ethDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined);
       const arbDelegators = await SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber);
-      const delegators = new Set([...ethDelegators, ...arbDelegators]);
-      voterAccounts[address] = [address, ...delegators];
+      voterAccounts[address] = [...new Set([address, ...ethDelegators, ...arbDelegators])];
       allRelevantAccounts.push(...voterAccounts[address]);
     }
 
