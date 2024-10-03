@@ -1,9 +1,24 @@
 const ContractGetters = require('../src/datasources/contracts/contract-getters');
+const WellDto = require('../src/repository/subgraph/dto/WellDto');
+const PriceService = require('../src/service/price-service');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
 const LiquidityUtil = require('../src/utils/pool/liquidity');
 const WellFnUtil = require('../src/utils/pool/well-fn');
 
 describe('Pool Math', () => {
+  test('Pool Liquidity USD', async () => {
+    const sampleWell = require('./mock-responses/subgraph/entities/well.json');
+    const well = new WellDto(sampleWell);
+
+    jest
+      .spyOn(PriceService, 'getTokenPrice')
+      .mockResolvedValueOnce({ usdPrice: 0.98 })
+      .mockResolvedValueOnce({ usdPrice: 2800 });
+
+    const liquidity = await LiquidityUtil.calcWellLiquidityUSD(well, 20800000);
+
+    expect(liquidity).toBeCloseTo(51184.59741693586);
+  });
   test('Liquidity depth', async () => {
     const mockWellDto = {
       reserves: {
