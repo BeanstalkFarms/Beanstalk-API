@@ -5,6 +5,7 @@ const { C } = require('../../../constants/runtime-constants');
 const AlchemyUtil = require('../../../datasources/alchemy');
 const PromiseUtil = require('../../../utils/promise');
 const Contracts = require('../../../datasources/contracts/contracts');
+const EnvUtil = require('../../../utils/env');
 
 const c = C('arb');
 const tokens = [
@@ -22,7 +23,11 @@ const tokens = [
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Null silo data on existing eth tokens
+    if (!EnvUtil.isChainEnabled(c.CHAIN)) {
+      console.log(`Skipping seeder: chain '${c.CHAIN}' is not enabled.`);
+      return;
+    }
+    // Null silo data on any existing eth tokens
     await queryInterface.bulkUpdate(
       'token',
       {

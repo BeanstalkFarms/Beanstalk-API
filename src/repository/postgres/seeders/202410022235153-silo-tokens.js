@@ -5,6 +5,7 @@ const Contracts = require('../../../datasources/contracts/contracts');
 const { C } = require('../../../constants/runtime-constants');
 const AlchemyUtil = require('../../../datasources/alchemy');
 const PromiseUtil = require('../../../utils/promise');
+const EnvUtil = require('../../../utils/env');
 
 const c = C('eth');
 const tokens = [c.BEAN, c.BEANWETH, c.BEANWSTETH, c.BEAN3CRV, c.UNRIPE_BEAN, c.UNRIPE_LP];
@@ -12,6 +13,11 @@ const tokens = [c.BEAN, c.BEANWETH, c.BEANWSTETH, c.BEAN3CRV, c.UNRIPE_BEAN, c.U
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    if (!EnvUtil.isChainEnabled(c.CHAIN)) {
+      console.log(`Skipping seeder: chain '${c.CHAIN}' is not enabled.`);
+      return;
+    }
+
     await AlchemyUtil.ready(c.CHAIN);
     const beanstalk = Contracts.getBeanstalk(c);
 
