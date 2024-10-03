@@ -1,7 +1,8 @@
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
-const ContractGetters = require('../datasources/contracts/contract-getters');
 const { C } = require('../constants/runtime-constants');
+const BeanstalkPrice = require('../datasources/contracts/upgradeable/beanstalk-price');
+const UsdOracle = require('../datasources/contracts/upgradeable/usd-oracle');
 
 class PriceService {
   // Gets the price of the requested token
@@ -13,8 +14,8 @@ class PriceService {
   // Gets the price of bean as returned by the canonical price contract.
   static async getBeanPrice(options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const priceContract = await ContractGetters.getPriceUpgradeable(block.number);
-    const priceResult = await priceContract.price();
+    const beanstalkPrice = new BeanstalkPrice({ block: block.number });
+    const priceResult = await beanstalkPrice.price();
 
     // Convert from hex to a readable format. For now the pool prices are omitted
     const readable = {
@@ -31,13 +32,8 @@ class PriceService {
   // In practice, current implementation of getUsdPrice can only get the wsteth/eth price
   static async getUsdOracleTokenPrice(token, options = {}) {
     const block = await BlockUtil.blockFromOptions(options);
-    const usdOracle = await ContractGetters.getUsdOracleUpgradeable(block.number);
-    const result =
-      usdOracle.__version() === 1
-        ? BigInt(await usdOracle.getUsdPrice(token))
-        : BigInt(await usdOracle.getTokenUsdPrice(token));
-    // Version 1 returned a twa price, but with no lookback. Its already instantaneous but needs conversion
-    const instPrice = usdOracle.__version() === 1 ? BigInt(10 ** 24) / result : result;
+    const usdOracle = new UsdOracle({ block: block.number });
+    const instPrice = await usdOracle.getTokenUsdPrice(token);
 
     const readable = {
       block: block.number,

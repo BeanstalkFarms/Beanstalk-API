@@ -1,7 +1,7 @@
 'use strict';
 
 const db = require('../models');
-const ContractGetters = require('../../../datasources/contracts/contract-getters');
+const Contracts = require('../../../datasources/contracts/contracts');
 const { C } = require('../../../constants/runtime-constants');
 const AlchemyUtil = require('../../../datasources/alchemy');
 const PromiseUtil = require('../../../utils/promise');
@@ -13,7 +13,7 @@ const tokens = [c.BEAN, c.BEANWETH, c.BEANWSTETH, c.BEAN3CRV, c.UNRIPE_BEAN, c.U
 module.exports = {
   async up(queryInterface, Sequelize) {
     await AlchemyUtil.ready(c.CHAIN);
-    const beanstalk = ContractGetters.getBeanstalk(c);
+    const beanstalk = Contracts.getBeanstalk(c);
 
     // Gets tokens that have already been populated
     const existingTokens = await db.sequelize.models.Token.findAll({
@@ -30,7 +30,7 @@ module.exports = {
     if (newTokens.length > 0) {
       const rows = [];
       for (const token of newTokens) {
-        const erc20 = ContractGetters.get(token, c);
+        const erc20 = Contracts.get(token, c);
         const [name, symbol, supply, decimals] = await Promise.all([
           erc20.name(),
           erc20.symbol(),

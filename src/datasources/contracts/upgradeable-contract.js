@@ -4,13 +4,12 @@ const Contracts = require('./contracts');
 // contracts with new ABIs or switching to use a new contract address.
 class UpgradeableContract {
   /**
-   *
    * @param {*} mapping - used to determine which contract/abi to invoke per specified block
-   * @param {*} provider - rpc provider to use
+   * @param {*} c - the chain constants to use
    * @param {*} defaultBlock - the default block to use
-   * @returns
+   * @returns a Proxy wrapping an UpgradeableContract instance
    */
-  constructor(mapping, provider, defaultBlock = 'latest') {
+  constructor(mapping, c, defaultBlock) {
     this.__defaultBlock = defaultBlock;
     this.__mapping = mapping;
 
@@ -37,6 +36,9 @@ class UpgradeableContract {
 
         // Find the contract corresponding to the input block
         const selected = mapping.find((entry) => {
+          if (entry.chain !== c.CHAIN) {
+            return false;
+          }
           if (block === 'latest') {
             return entry.end === 'latest';
           } else {
@@ -49,7 +51,7 @@ class UpgradeableContract {
         }
 
         // Return the requested function with block prefilled
-        const contract = Contracts.makeContract(selected.address, selected.abi, provider);
+        const contract = Contracts.makeContract(selected.address, selected.abi, c.RPC);
         return (...args) => contract[property](...args, { blockTag: block });
       }
     };

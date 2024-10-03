@@ -4,12 +4,11 @@ const {
   ADDRESSES: { BEAN, UNRIPE_BEAN, UNRIPE_LP },
   MILESTONE
 } = require('../../src/constants/raw/beanstalk-eth');
-const ContractGetters = require('../../src/datasources/contracts/contract-getters');
-
-const defaultOptions = { blockNumber: 19000000 };
-
+const Contracts = require('../../src/datasources/contracts/contracts');
 const whitelistedSGResponse = require('../mock-responses/subgraph/silo-service/whitelistedTokens.json');
 const { mockBeanstalkSG } = require('../util/mock-sg');
+
+const defaultOptions = { blockNumber: 19000000 };
 
 describe('SiloService', () => {
   beforeAll(() => {
@@ -33,7 +32,7 @@ describe('SiloService', () => {
     };
 
     jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
-    jest.spyOn(ContractGetters, 'getBeanstalk').mockReturnValue(mockBeanstalk);
+    jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
 
@@ -66,7 +65,7 @@ describe('SiloService', () => {
       })
     };
 
-    jest.spyOn(ContractGetters, 'getBeanstalk').mockReturnValue(mockBeanstalk);
+    jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
 
     const grownStalk = await getUnmigratedGrownStalk(accounts, defaultOptions);
 

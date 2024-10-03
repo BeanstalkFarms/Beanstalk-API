@@ -1,4 +1,4 @@
-const ContractGetters = require('../src/datasources/contracts/contract-getters');
+const Contracts = require('../src/datasources/contracts/contracts');
 const WellDto = require('../src/repository/subgraph/dto/WellDto');
 const PriceService = require('../src/service/price-service');
 const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
@@ -33,7 +33,7 @@ describe('Pool Math', () => {
         data: '0x'
       }
     };
-    jest.spyOn(ContractGetters, 'get').mockReturnValue({
+    jest.spyOn(Contracts, 'get').mockReturnValue({
       calcReserveAtRatioSwap: jest
         .fn()
         .mockResolvedValueOnce(2194835811232559843749n)
@@ -54,7 +54,7 @@ describe('Pool Math', () => {
     const newLp = 54772255750516611345n;
     const deltaLp = newLp - prevLp;
     const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
-    jest.spyOn(ContractGetters, 'get').mockReturnValue({
+    jest.spyOn(Contracts, 'get').mockReturnValue({
       calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
       calcLPTokenUnderlying: calcLPTokenUnderlyingMock
     });

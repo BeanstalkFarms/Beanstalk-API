@@ -40,7 +40,7 @@ async function appStartup() {
 
   app.use(async (ctx, next) => {
     const chain = ctx.query.chain ?? EnvUtil.defaultChain();
-    if (!ChainUtil.isValidChain(chain)) {
+    if (!ChainUtil.isValidChain(chain) || !EnvUtil.isChainEnabled(chain)) {
       ctx.status = 400;
       ctx.body = {
         message: `Invalid chain '${chain}' was requested.`

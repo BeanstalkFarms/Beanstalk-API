@@ -1,5 +1,5 @@
 const { C } = require('../constants/runtime-constants');
-const ContractGetters = require('../datasources/contracts/contract-getters');
+const Contracts = require('../datasources/contracts/contracts');
 const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
@@ -9,7 +9,7 @@ const { createNumberSpread } = require('../utils/number');
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = ContractGetters.getBeanstalk();
+    const beanstalk = Contracts.getBeanstalk();
 
     const siloAssets = (
       await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
@@ -52,7 +52,7 @@ class SiloService {
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
     const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
-    const beanstalk = ContractGetters.getBeanstalk();
+    const beanstalk = Contracts.getBeanstalk();
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
@@ -112,7 +112,7 @@ class SiloService {
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
     const chain = C().CHAIN;
-    const beanstalk = ContractGetters.getBeanstalk();
+    const beanstalk = Contracts.getBeanstalk();
     const tokenModels = await TokenRepository.findWhitelistedTokens({ chain });
 
     const updatedTokens = [];
@@ -120,7 +120,7 @@ class SiloService {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
         const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await ContractGetters.get(token).totalSupply()))(),
+          (async () => BigInt(await Contracts.get(token).totalSupply()))(),
           (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
           (async () => {
             const tokenSettings = await beanstalk.tokenSettings(token);
