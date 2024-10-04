@@ -15,7 +15,7 @@ class AlchemyUtil {
         network: `${chain}-mainnet` // Of type alchemy-sdk.Network
       };
       const alchemy = new Alchemy(settings);
-      this._providerPromises = alchemy.config.getProvider().then((p) => {
+      this._providerPromises[chain] = alchemy.config.getProvider().then((p) => {
         this._providers[chain] = p;
       });
     }
