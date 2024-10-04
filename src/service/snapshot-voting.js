@@ -30,12 +30,16 @@ class SnapshotVotingService {
     const stalkBalances = await SnapshotVotingService._getStalkBalances(allRelevantAccounts, blockNumber);
 
     for (const address of addresses) {
-      let votingPower = voterAccounts[address].reduce((acc, next) => {
+      const votingPower = voterAccounts[address].reduce((acc, next) => {
         return acc + stalkBalances[next];
       }, 0n);
+      const stalkholders = Object.fromEntries(
+        voterAccounts[address].map((a) => [a, Number(stalkBalances[a] / BigInt(10 ** C().DECIMALS.stalk))])
+      );
       results.push({
         address,
-        score: Number(votingPower / BigInt(10 ** C().DECIMALS.stalk))
+        score: Number(votingPower / BigInt(10 ** C().DECIMALS.stalk)),
+        stalkholders
       });
     }
     return results;
