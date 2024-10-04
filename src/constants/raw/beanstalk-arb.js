@@ -9,7 +9,7 @@ const wellAbi = require('../../datasources/abi/basin/Well.json');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
 const contracts = {
-  BEANSTALK: ['0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70', null, bip50Abi],
+  BEANSTALK: ['0xabcbe50Ebb77b0Ae1256Ee444A6163652708F3a0', null, bip50Abi],
   BEAN: ['0xBEA0005B8599265D41256905A9B3073D397812E4', 6, erc20Abi],
   UNRIPE_BEAN: ['0x1BEA054dddBca12889e07B3E076f511Bf1d27543', 6, erc20Abi],
   UNRIPE_LP: ['0x1BEA059c3Ea15F6C10be1c53d70C75fD1266D788', 6, erc20Abi],
