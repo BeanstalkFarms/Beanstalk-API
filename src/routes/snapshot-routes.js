@@ -18,9 +18,9 @@ router.get('/voting-power', async (ctx) => {
   }
 
   // Prevents user from requesting legacy chain, can only vote on the latest chain
-  if (ctx.query.chain) {
-    throw new InputError('Query parameter `chain` is not compatible with this request.');
-  }
+  // if (ctx.query.chain) {
+  //   throw new InputError('Query parameter `chain` is not compatible with this request.');
+  // }
 
   const votingPowerList = await SnapshotVotingService.getVotingPower(options.addresses, options.snapshot);
   ctx.body = {

@@ -17,8 +17,8 @@ class SnapshotVotingService {
       functions.push(async () => {
         // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
         const [ethDelegators, arbDelegators] = await Promise.all([
-          SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined),
-          SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber)
+          SnapshotSubgraphRepository.getDelegations(address, 'eth', blockNumber),
+          SnapshotSubgraphRepository.getDelegations(address, 'arb', undefined)
         ]);
         voterAccounts[address] = [...new Set([address, ...ethDelegators, ...arbDelegators])];
         allRelevantAccounts.push(...voterAccounts[address]);
@@ -29,6 +29,7 @@ class SnapshotVotingService {
 
     // Get stalk balance of all relevant accounts
     const stalkBalances = await SnapshotVotingService._getStalkBalances(allRelevantAccounts, blockNumber);
+    console.log(stalkBalances);
 
     for (const address of addresses) {
       let votingPower = voterAccounts[address].reduce((acc, next) => {
