@@ -26,7 +26,7 @@ const mapping = [
 ];
 
 class UsdOracle {
-  constructor({ block = 'latest', c = C() }) {
+  constructor({ block = 'latest', c = C() } = {}) {
     this.contract = UpgradeableContract.make(mapping, c, block);
   }
 
