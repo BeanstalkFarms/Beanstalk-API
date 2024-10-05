@@ -12,8 +12,8 @@ class SnapshotVotingService {
 
     // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
     const [ethDelegations, arbDelegations] = await Promise.all([
-      SnapshotSubgraphRepository.getDelegations('eth', undefined),
-      SnapshotSubgraphRepository.getDelegations('arb', blockNumber)
+      SnapshotSubgraphRepository.getDelegations('eth', C().CHAIN === 'eth' ? blockNumber : undefined),
+      SnapshotSubgraphRepository.getDelegations('arb', C().CHAIN === 'arb' ? blockNumber : undefined)
     ]);
     const allDelegations = [...ethDelegations, ...arbDelegations];
 

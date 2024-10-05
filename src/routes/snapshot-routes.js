@@ -17,11 +17,6 @@ router.get('/voting-power', async (ctx) => {
     throw new InputError('Invalid request: missing required parameter(s)');
   }
 
-  // Prevents user from requesting legacy chain, can only vote on the latest chain
-  if (ctx.query.chain) {
-    throw new InputError('Query parameter `chain` is not compatible with this request.');
-  }
-
   const votingPowerList = await SnapshotVotingService.getVotingPower(options.addresses, options.snapshot);
   ctx.body = {
     score: votingPowerList
