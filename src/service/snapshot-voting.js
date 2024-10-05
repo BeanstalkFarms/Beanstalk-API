@@ -10,17 +10,21 @@ class SnapshotVotingService {
     const voterAccounts = {};
     addresses = addresses.map((a) => a.toLowerCase());
 
+    // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
+    const [ethDelegations, arbDelegations] = await Promise.all([
+      SnapshotSubgraphRepository.getDelegations('eth', undefined),
+      SnapshotSubgraphRepository.getDelegations('arb', blockNumber)
+    ]);
+    const allDelegations = [...ethDelegations, ...arbDelegations];
+
     // Determine all accounts for which the stalk balance needs to be queried
     const allRelevantAccounts = [];
     const functions = [];
     for (const address of addresses) {
       functions.push(async () => {
-        // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
-        const [ethDelegators, arbDelegators] = await Promise.all([
-          SnapshotSubgraphRepository.getDelegations(address, 'eth', undefined),
-          SnapshotSubgraphRepository.getDelegations(address, 'arb', blockNumber)
-        ]);
-        voterAccounts[address] = [...new Set([address, ...ethDelegators, ...arbDelegators])];
+        const delegators = allDelegations.filter((d) => d.delegate === address);
+        const isDelegator = allDelegations.some((d) => d.delegator === address);
+        voterAccounts[address] = [...new Set([...(isDelegator ? [] : [address]), ...delegators])];
         allRelevantAccounts.push(...voterAccounts[address]);
       });
     }

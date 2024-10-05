@@ -11,24 +11,25 @@ const IDS = {
 
 class SnapshotSubgraphRepository {
   // Returns all addresses who have delegated to the given delegate on the requested chain.
-  static async getDelegations(delegate, chain, blockNumber) {
+  static async getDelegations(chain, blockNumber) {
     const delegations = await SubgraphQueryUtil.allPaginatedSG(
       SubgraphClients.fromUrl(BASE_URL + IDS[chain]),
       gql`
         {
           delegations {
+            delegate
             delegator
             timestamp
           }
         }
       `,
       blockNumber ? `block: {number: ${blockNumber}}` : '',
-      `delegate: "${delegate}", space: "beanstalkdao.eth"`,
+      `space: "beanstalkdao.eth"`,
       ['timestamp'],
       [0],
       'asc'
     );
-    return delegations.map((d) => d.delegator);
+    return delegations.map((d) => ({ delegate: d.delgate, delegator: d.delegator }));
   }
 }
 
