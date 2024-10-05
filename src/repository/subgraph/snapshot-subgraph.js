@@ -29,7 +29,7 @@ class SnapshotSubgraphRepository {
       [0],
       'asc'
     );
-    return delegations.map((d) => ({ delegate: d.delgate, delegator: d.delegator }));
+    return delegations.map((d) => ({ delegate: d.delegate, delegator: d.delegator }));
   }
 }
 

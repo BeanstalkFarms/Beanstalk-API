@@ -22,7 +22,7 @@ class SnapshotVotingService {
     const functions = [];
     for (const address of addresses) {
       functions.push(async () => {
-        const delegators = allDelegations.filter((d) => d.delegate === address);
+        const delegators = allDelegations.filter((d) => d.delegate === address).map((d) => d.delegator);
         const isDelegator = allDelegations.some((d) => d.delegator === address);
         voterAccounts[address] = [...new Set([...(isDelegator ? [] : [address]), ...delegators])];
         allRelevantAccounts.push(...voterAccounts[address]);
