@@ -14,6 +14,7 @@ const AsyncContext = require('./utils/context.js');
 const EnvUtil = require('./utils/env.js');
 const ChainUtil = require('./utils/chain.js');
 const AlchemyUtil = require('./datasources/alchemy.js');
+const StartupSeeder = require('./repository/postgres/startup-seeders/startup-seeder.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -26,10 +27,13 @@ async function appStartup() {
     await AlchemyUtil.ready(chain);
   }
 
-  const app = new Koa();
-
   // This can be useful for local development, though migrations should be used instead
   // sequelize.sync();
+
+  // Long-running async seeder process, the api will come online before this is complete.
+  StartupSeeder.seedDatabase();
+
+  const app = new Koa();
 
   app.use(
     cors({

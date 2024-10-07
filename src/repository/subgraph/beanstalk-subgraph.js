@@ -214,6 +214,32 @@ class BeanstalkSubgraphRepository {
       all: [...result.silo.whitelistedTokens, ...result.silo.dewhitelistedTokens]
     };
   }
+
+  static async getAllDeposits(blockNumber, c = C()) {
+    const deposits = await SubgraphQueryUtil.allPaginatedSG(
+      c.SG.BEANSTALK,
+      gql`
+        {
+          siloDeposits {
+            farmer {
+              id
+            }
+            token
+            stemV31
+            depositedAmount
+            depositedBDV
+            createdBlock
+          }
+        }
+      `,
+      `block: {number: ${blockNumber}}`,
+      '',
+      ['createdBlock', 'depositedAmount'],
+      [0, 0],
+      'asc'
+    );
+    console.log(deposits[0], deposits.length);
+  }
 }
 
 module.exports = BeanstalkSubgraphRepository;
