@@ -221,6 +221,7 @@ class BeanstalkSubgraphRepository {
       gql`
         {
           siloDeposits {
+            id
             farmer {
               id
             }
@@ -234,9 +235,11 @@ class BeanstalkSubgraphRepository {
       `,
       `block: {number: ${blockNumber}}`,
       '',
-      ['createdBlock', 'depositedAmount'],
-      [0, 0],
-      'asc'
+      {
+        field: 'createdBlock',
+        lastValue: 0,
+        direction: 'asc'
+      }
     );
     console.log(deposits[0], deposits.length);
   }
