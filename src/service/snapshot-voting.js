@@ -10,11 +10,15 @@ class SnapshotVotingService {
     const voterAccounts = {};
     addresses = addresses.map((a) => a.toLowerCase());
 
-    // Assumption is that arb is the active chain - switch the undefined/blockNumber to change this.
-    const [ethDelegations, arbDelegations] = await Promise.all([
-      SnapshotSubgraphRepository.getDelegations('eth', C().CHAIN === 'eth' ? blockNumber : undefined),
-      SnapshotSubgraphRepository.getDelegations('arb', C().CHAIN === 'arb' ? blockNumber : undefined)
-    ]);
+    // Always pull eth delegatations, only pull arb delegations if arb chain is requested
+    const ethDelegations = await SnapshotSubgraphRepository.getDelegations(
+      'eth',
+      C().CHAIN === 'eth' ? blockNumber : undefined
+    );
+    let arbDelegations = [];
+    if (C().CHAIN === 'arb') {
+      arbDelegations = SnapshotSubgraphRepository.getDelegations('arb', blockNumber);
+    }
     const allDelegations = [...ethDelegations, ...arbDelegations];
 
     // Determine all accounts for which the stalk balance needs to be queried
@@ -38,11 +42,11 @@ class SnapshotVotingService {
         return acc + stalkBalances[next];
       }, 0n);
       const stalkholders = Object.fromEntries(
-        voterAccounts[address].map((a) => [a, Number(stalkBalances[a] / BigInt(10 ** C().DECIMALS.stalk))])
+        voterAccounts[address].map((a) => [a, Number(stalkBalances[a] / BigInt(10 ** (C().DECIMALS.stalk - 2))) / 100])
       );
       results.push({
         address,
-        score: Number(votingPower / BigInt(10 ** C().DECIMALS.stalk)),
+        score: Number(votingPower / BigInt(10 ** (C().DECIMALS.stalk - 2)) / 100),
         stalkholders
       });
     }
