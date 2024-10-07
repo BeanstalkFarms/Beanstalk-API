@@ -37,6 +37,9 @@ class SubgraphQueryUtil {
       });
       const result = await subgraphClient(paginatedQuery);
       // console.log(JSON.stringify(result), paginatedQuery);
+      if (result[entityName].length === 0) {
+        return [];
+      }
 
       if (!result[entityName][0][idColumn]) {
         throw new Error(`The result did not include the identity column '${idColumn}'.`);

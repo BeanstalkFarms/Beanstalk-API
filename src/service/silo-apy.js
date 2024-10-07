@@ -227,7 +227,7 @@ class SiloApyService {
 
     // Get all results from the subgraph
     const maxWindow = Math.max(...numDataPoints);
-    const mints = await BeanstalkSubgraphRepository.getSiloHourlyRewardMints(season - maxWindow, season, C(season));
+    const mints = await BeanstalkSubgraphRepository.getSiloHourlyRewardMints(season - maxWindow + 1, season, C(season));
 
     // Compute the EMA for each window
     const windowResults = [];

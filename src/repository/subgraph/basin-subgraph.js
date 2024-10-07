@@ -15,9 +15,11 @@ class BasinSubgraphRepository {
       }`,
       `block: {number: ${blockNumber}}`,
       '',
-      ['symbol'],
-      [' '],
-      'asc'
+      {
+        field: 'symbol',
+        lastValue: ' ',
+        direction: 'asc'
+      }
     );
     return allWells
       .map((w) => new WellDto(w))
@@ -75,6 +77,7 @@ class BasinSubgraphRepository {
       gql`
         {
           swaps {
+            id
             well {
               id
             }
@@ -86,9 +89,11 @@ class BasinSubgraphRepository {
       `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
-      ['timestamp', 'logIndex'],
-      [fromTimestamp.toFixed(0), 0],
-      'asc'
+      {
+        field: 'timestamp',
+        lastValue: fromTimestamp.toFixed(0),
+        direction: 'asc'
+      }
     );
     allSwaps.forEach((s) => (s.tokenPrice = s.tokenPrice.map(BigInt)));
     return allSwaps;
@@ -100,6 +105,7 @@ class BasinSubgraphRepository {
       gql`
         {
           deposits {
+            id
             well {
               id
             }
@@ -111,9 +117,11 @@ class BasinSubgraphRepository {
       `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
-      ['timestamp', 'logIndex'],
-      [fromTimestamp.toFixed(0), 0],
-      'asc'
+      {
+        field: 'timestamp',
+        lastValue: fromTimestamp.toFixed(0),
+        direction: 'asc'
+      }
     );
     allDeposits.forEach((d) => (d.tokenPrice = d.tokenPrice.map(BigInt)));
     return allDeposits;
@@ -125,6 +133,7 @@ class BasinSubgraphRepository {
       gql`
         {
           withdraws {
+            id
             well {
               id
             }
@@ -136,9 +145,11 @@ class BasinSubgraphRepository {
       `,
       '',
       `timestamp_lte: "${toTimestamp}"`,
-      ['timestamp', 'logIndex'],
-      [fromTimestamp.toFixed(0), 0],
-      'asc'
+      {
+        field: 'timestamp',
+        lastValue: fromTimestamp.toFixed(0),
+        direction: 'asc'
+      }
     );
     allWithdraws.forEach((w) => (w.tokenPrice = w.tokenPrice.map(BigInt)));
     return allWithdraws;
