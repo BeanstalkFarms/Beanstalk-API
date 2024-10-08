@@ -12,7 +12,7 @@ const mapping = [
   {
     chain: 'eth',
     start: 20334284,
-    end: 'latest', // TODO: pause block on L1
+    end: 20921738,
     address: '0xb24a70b71e4cca41eb114c2f61346982aa774180',
     abi: require('../../abi/UsdOracle2.json')
   },

@@ -12,7 +12,7 @@ const mapping = [
   {
     chain: 'eth',
     start: 20298142,
-    end: 'latest', // TODO: pause block on L1
+    end: 20921738,
     address: '0x4bed6cb142b7d474242d87f4796387deb9e1e1b4',
     abi: require('../../abi/BeanstalkPrice.json')
   },

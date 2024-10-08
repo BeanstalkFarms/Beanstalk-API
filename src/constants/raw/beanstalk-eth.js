@@ -39,7 +39,7 @@ const DECIMALS = {
 
 const MILESTONE = {
   startSeason: 1,
-  endSeason: 30000, // TODO: set this to the pause season +1 (the first season to occur on L2)
+  endSeason: 25130, // The first season to occur on L2
   siloV3Block: 17671557,
   isGaugeEnabled: ({ season, block }) => (season ? season >= 21798 : block >= 19927634)
 };
