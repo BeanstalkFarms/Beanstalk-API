@@ -60,7 +60,7 @@ class SnapshotVotingService {
     for (const account of accounts) {
       functions.push(async () => ({
         account,
-        stalk: BigInt(await beanstalk.balanceOfStalk(account, { blockTag: blockNumber }))
+        stalk: await beanstalk.balanceOfStalk(account, { blockTag: blockNumber })
       }));
     }
     const results = {};

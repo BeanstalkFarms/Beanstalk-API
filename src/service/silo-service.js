@@ -120,15 +120,15 @@ class SiloService {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
         const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await Contracts.get(token).totalSupply()))(),
-          (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
+          Contracts.get(token).totalSupply(),
+          beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals)),
           (async () => {
             const tokenSettings = await beanstalk.tokenSettings(token);
-            return BigInt(tokenSettings.stalkEarnedPerSeason);
+            return tokenSettings.stalkEarnedPerSeason;
           })(),
-          (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
-          (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
-          (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
+          beanstalk.stemTipForToken(token),
+          beanstalk.getTotalDeposited(token),
+          beanstalk.getTotalDepositedBdv(token)
         ]);
 
         updatedTokens.push(

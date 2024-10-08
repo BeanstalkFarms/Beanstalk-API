@@ -21,8 +21,8 @@ class WellFnUtil {
     const wellFn = Contracts.get(well.wellFunction.id);
     const data = well.wellFunction.data;
 
-    const initialLp = BigInt(await wellFn.calcLpTokenSupply(prevReserves, data));
-    const newLp = BigInt(await wellFn.calcLpTokenSupply(newReserves, data));
+    const initialLp = await wellFn.calcLpTokenSupply(prevReserves, data);
+    const newLp = await wellFn.calcLpTokenSupply(newReserves, data);
     const deltaLp = newLp - initialLp;
 
     // Determines how much of the liquidity operation was double sided.
