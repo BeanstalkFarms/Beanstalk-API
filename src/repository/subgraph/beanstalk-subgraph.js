@@ -2,6 +2,7 @@ const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
 const { C } = require('../../constants/runtime-constants');
 const { gql } = require('graphql-request');
+const DepositDto = require('./dto/DepositDto');
 
 class BeanstalkSubgraphRepository {
   static async getDepositedBdvs(accounts, blockNumber, c = C()) {
@@ -221,19 +222,13 @@ class BeanstalkSubgraphRepository {
   }
 
   static async getAllDeposits(blockNumber, c = C()) {
-    const deposits = await SubgraphQueryUtil.allPaginatedSG(
+    const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
       c.SG.BEANSTALK,
       gql`
         {
           siloDeposits {
+            ${DepositDto.subgraphFields}
             id
-            farmer {
-              id
-            }
-            token
-            stemV31
-            depositedAmount
-            depositedBDV
             createdBlock
           }
         }
@@ -246,7 +241,7 @@ class BeanstalkSubgraphRepository {
         direction: 'asc'
       }
     );
-    console.log(deposits[0], deposits.length);
+    return allDeposits.map((d) => new DepositDto(d));
   }
 }
 

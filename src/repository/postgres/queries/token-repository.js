@@ -8,8 +8,8 @@ class TokenRepository {
     options = { ...DEFAULT_OPTIONS, ...options };
 
     const optionalWhere = {};
-    if (options.chain) {
-      optionalWhere.chain = options.chain;
+    if (options.where.chain) {
+      optionalWhere.chain = options.where.chain;
     }
 
     const rows = await sequelize.models.Token.findAll({

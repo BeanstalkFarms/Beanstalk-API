@@ -113,7 +113,7 @@ class SiloService {
   static async updateWhitelistedTokenInfo() {
     const chain = C().CHAIN;
     const beanstalk = Contracts.getBeanstalk();
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ chain });
+    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain } });
 
     const updatedTokens = [];
     await sequelize.transaction(async (transaction) => {

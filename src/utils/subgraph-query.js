@@ -1,8 +1,4 @@
 class SubgraphQueryUtil {
-  // FIXME: this implementation is not correct for firstValues.
-  // The issue is that it is incorrectly applying secondary values globally rather
-  // than just within the context of the prior value.
-
   /**
    * Paginates a given subgraph query according to Graph Protocol's GraphQL API spec.
    * Only a single entity type should be requested at a time.

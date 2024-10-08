@@ -18,13 +18,13 @@ class YieldRepository {
     options = { ...DEFAULT_OPTIONS, ...options };
 
     const optionalWhere = {};
-    if (options.emaWindows) {
+    if (options.where.emaWindows) {
       optionalWhere.emaWindow = {
-        [Sequelize.Op.in]: options.emaWindows
+        [Sequelize.Op.in]: options.where.emaWindows
       };
     }
-    if (options.initType) {
-      optionalWhere.initType = options.initType;
+    if (options.where.initType) {
+      optionalWhere.initType = options.where.initType;
     }
 
     const rows = await sequelize.models.Yield.findAll({

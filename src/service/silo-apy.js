@@ -31,8 +31,10 @@ class SiloApyService {
     ) {
       const season = request.season ?? (await BeanstalkSubgraphRepository.getLatestSeason()).season;
       const yields = await YieldRepository.findSeasonYields(season, {
-        emaWindows: request.emaWindows ?? DEFAULT_WINDOWS,
-        initType: request.options?.initType ?? ApyInitType.AVERAGE
+        where: {
+          emaWindows: request.emaWindows ?? DEFAULT_WINDOWS,
+          initType: request.options?.initType ?? ApyInitType.AVERAGE
+        }
       });
       if (yields.length > 0) {
         return YieldModelAssembler.fromModels(yields);
