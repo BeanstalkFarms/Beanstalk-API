@@ -72,6 +72,18 @@ describe('Utils', () => {
       expect(obj.p3.p8).toEqual(null);
     });
 
+    test('Works on mix of arrays and objects', () => {
+      const obj = allToBigInt({
+        p1: '123456',
+        p2: [10, '55', '0x10', 'string']
+      });
+      expect(obj.p1).toEqual(123456n);
+      expect(obj.p2[0]).toEqual(10n);
+      expect(obj.p2[1]).toEqual(55n);
+      expect(obj.p2[2]).toEqual(16n);
+      expect(obj.p2[3]).toEqual('string');
+    });
+
     test('Retain some precision on string conversion', () => {
       const n1 = fromBigInt(123456789n, 6, 2);
       expect(n1).toEqual(123.45);

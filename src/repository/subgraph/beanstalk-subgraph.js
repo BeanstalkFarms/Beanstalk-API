@@ -234,14 +234,14 @@ class BeanstalkSubgraphRepository {
         }
       `,
       `block: {number: ${blockNumber}}`,
-      '',
+      'depositedBDV_gt: 10000000000', // temp for faster testing
       {
         field: 'createdBlock',
         lastValue: 0,
         direction: 'asc'
       }
     );
-    return allDeposits.map((d) => new DepositDto(d));
+    return allDeposits.map((d) => DepositDto.fromSubgraph(d));
   }
 }
 

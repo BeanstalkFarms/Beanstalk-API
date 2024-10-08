@@ -1,3 +1,4 @@
+const { BigNumber } = require('alchemy-sdk');
 const { formatUnits } = require('ethers');
 
 class NumberUtil {
@@ -37,18 +38,33 @@ class NumberUtil {
     };
   }
 
+  // Converts `obj` and any subproperties into BigInt. Handles the various types of BigNumber.
   static allToBigInt(obj, ignoreList = []) {
-    for (let key in obj) {
-      if (ignoreList.includes(key)) {
-        continue;
+    if (obj) {
+      if (obj.type === 'BigNumber') {
+        return BigInt(BigNumber.from(obj.hex));
+      } else if (BigNumber.isBigNumber(obj)) {
+        return BigInt(obj);
+      } else if (typeof obj === 'string' || typeof obj === 'number') {
+        try {
+          return BigInt(obj);
+        } catch (e) {
+          return obj;
+        }
       }
-      if (obj.hasOwnProperty(key)) {
-        if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
-          try {
-            obj[key] = BigInt(obj[key]);
-          } catch (e) {}
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          NumberUtil.allToBigInt(obj[key], ignoreList);
+    }
+
+    if (Array.isArray(obj)) {
+      for (let i = 0; i < obj.length; ++i) {
+        obj[i] = NumberUtil.allToBigInt(obj[i], ignoreList);
+      }
+    } else {
+      for (let key in obj) {
+        if (ignoreList.includes(key)) {
+          continue;
+        }
+        if (obj.hasOwnProperty(key)) {
+          obj[key] = NumberUtil.allToBigInt(obj[key], ignoreList);
         }
       }
     }

@@ -11,7 +11,7 @@ describe('DTO Objects', () => {
   });
   test('Creates DepositDto from subgraph data', async () => {
     const sampleDeposit = require('../mock-responses/subgraph/entities/siloDeposit.json');
-    const deposit = new DepositDto(sampleDeposit);
+    const deposit = DepositDto.fromSubgraph(sampleDeposit);
     expect(deposit.account).toEqual('0x0000002e4f99cb1e699042699b91623b1334d2f7');
     expect(deposit.token).toEqual('0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab');
     expect(deposit.stem).toEqual(-12474000000n);

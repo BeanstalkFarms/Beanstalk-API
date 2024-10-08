@@ -1,5 +1,7 @@
 const { C } = require('../../../../constants/runtime-constants');
 
+// TODO: change to use dto?
+
 class YieldModelAssembler {
   static toModels(yieldResults, apyInitType, tokenModels) {
     const yieldModels = [];
