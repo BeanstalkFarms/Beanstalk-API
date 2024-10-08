@@ -17,13 +17,18 @@ class BigIntContract {
           } else {
             // The raw result is frozen
             const transformed = allToBigInt(JSON.parse(JSON.stringify(rawResult)));
-            // Re assign the convenience names
-            const retval = {};
-            const keys = Object.keys(rawResult).filter(isNaN);
-            for (let i = 0; i < keys.length; ++i) {
-              retval[keys[i]] = transformed[i];
+            // Re assign the convenience names if the return value was tuple
+            const namedKeys = Object.keys(rawResult).filter(isNaN);
+            if (namedKeys.length > 0) {
+              const retval = {};
+              for (let i = 0; i < keys.length; ++i) {
+                retval[keys[i]] = transformed[i];
+              }
+              return retval;
+            } else {
+              // expected result is an array
+              return transformed;
             }
-            return retval;
           }
         };
       }
