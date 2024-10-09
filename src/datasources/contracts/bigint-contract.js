@@ -12,29 +12,35 @@ class BigIntContract {
 
         return async (...args) => {
           const rawResult = await contract[property](...args);
-          if (!Array.isArray(rawResult)) {
-            return allToBigInt(rawResult);
-          } else {
-            // The raw result is frozen
-            const transformed = allToBigInt(JSON.parse(JSON.stringify(rawResult)));
-            // Re assign the convenience names if the return value was tuple
-            const namedKeys = Object.keys(rawResult).filter(isNaN);
-            if (namedKeys.length > 0) {
-              const retval = {};
-              for (let i = 0; i < keys.length; ++i) {
-                retval[keys[i]] = transformed[i];
-              }
-              return retval;
-            } else {
-              // expected result is an array
-              return transformed;
-            }
-          }
+          return BigIntContract._transformAll(rawResult);
         };
       }
     };
 
     return new Proxy(this, proxyHandler);
+  }
+
+  // Transforms everything in this result to be a BigInt.
+  // Handles arrays/tuples (with named fields), and single values
+  static _transformAll(rawResult) {
+    if (!Array.isArray(rawResult)) {
+      return allToBigInt(rawResult);
+    } else {
+      // The raw result is frozen
+      const transformed = allToBigInt(JSON.parse(JSON.stringify(rawResult)));
+      // Re assign the convenience names if the return value was tuple
+      const namedKeys = Object.keys(rawResult).filter(isNaN);
+      if (namedKeys.length > 0) {
+        const retval = {};
+        for (let i = 0; i < keys.length; ++i) {
+          retval[keys[i]] = transformed[i];
+        }
+        return retval;
+      } else {
+        // expected result is an array
+        return transformed;
+      }
+    }
   }
 }
 
