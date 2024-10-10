@@ -49,31 +49,37 @@ describe('Pool Math', () => {
     expect(depth2.sell.float[0]).toBeCloseTo(144811.293059);
     expect(depth2.sell.float[1]).toBeCloseTo(22.504897083713395);
   });
-  test('Liquidity event volume', async () => {
-    const prevLp = 38729833462074168851n;
-    const newLp = 54772255750516611345n;
-    const deltaLp = newLp - prevLp;
-    const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
-    jest.spyOn(Contracts, 'get').mockReturnValue({
-      calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
-      calcLPTokenUnderlying: calcLPTokenUnderlyingMock
+  describe('Liquidity event volume', async () => {
+    test('Add Liquidity', async () => {
+      const prevLp = 38729833462074168851n;
+      const newLp = 54772255750516611345n;
+      const deltaLp = newLp - prevLp;
+      const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([878679656n, 292893218813452475n]);
+      jest.spyOn(Contracts, 'get').mockReturnValue({
+        calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
+        calcLPTokenUnderlying: calcLPTokenUnderlyingMock
+      });
+
+      const result = await WellFnUtil.calcLiquidityVolume(
+        {
+          wellFunction: {
+            id: 'abc',
+            data: '0x'
+          }
+        },
+        [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+        [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)]
+      );
+
+      expect(calcLPTokenUnderlyingMock).toHaveBeenCalledWith(deltaLp, expect.any(Array), newLp, expect.any(String));
+      expect(result[0]).toEqual(-621320344n);
+      expect(result[1]).toEqual(292893218813452475n);
     });
-
-    const result = await WellFnUtil.calcLiquidityVolume(
-      {
-        wellFunction: {
-          id: 'abc',
-          data: '0x'
-        }
-      },
-      [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
-      [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)]
-    );
-
-    expect(calcLPTokenUnderlyingMock).toHaveBeenCalledWith(deltaLp, expect.any(Array), newLp, expect.any(String));
-    expect(result[0]).toEqual(-621320344n);
-    expect(result[1]).toEqual(292893218813452475n);
+    test('Remove Liquidity', async () => {
+      // TODO
+    });
   });
+
   describe('Off-chain calculations', () => {
     test('Constant product rate', async () => {
       const prices = ConstantProductWellUtil.calcRate([13834969782037n, 4519904117717436850412n], [6, 18]);
