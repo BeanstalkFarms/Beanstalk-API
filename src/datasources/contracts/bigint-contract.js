@@ -32,8 +32,8 @@ class BigIntContract {
       const namedKeys = Object.keys(rawResult).filter(isNaN);
       if (namedKeys.length > 0) {
         const retval = {};
-        for (let i = 0; i < keys.length; ++i) {
-          retval[keys[i]] = transformed[i];
+        for (let i = 0; i < namedKeys.length; ++i) {
+          retval[namedKeys[i]] = transformed[i];
         }
         return retval;
       } else {

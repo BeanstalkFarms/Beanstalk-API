@@ -1,5 +1,6 @@
 const { C } = require('../../../constants/runtime-constants');
 const Contracts = require('../../../datasources/contracts/contracts');
+const SiloService = require('../../../service/silo-service');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const DepositRepository = require('../queries/deposit-repository');
@@ -15,6 +16,7 @@ class DepositSeeder {
     }
 
     const seedBlock = (await C().RPC.getBlock()).number;
+    const beanstalk = Contracts.getBeanstalk();
 
     // Initial deposits list comes directly from subgraph
     const allDeposits = await BeanstalkSubgraphRepository.getAllDeposits(seedBlock);
@@ -28,14 +30,8 @@ class DepositSeeder {
       accounts[deposit.account][deposit.token] ||= [];
       accounts[deposit.account][deposit.token].push(deposit);
     }
-    ////
-    const beanstalk = Contracts.getBeanstalk();
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain: C().CHAIN } });
-    const tokenSettings = {};
-    for (const token of tokenModels) {
-      tokenSettings[token.address] = await beanstalk.tokenSettings(token.address, { blockTag: seedBlock });
-    }
-    ////
+
+    const tokenSettings = await SiloService.getWhitelistedTokenSettings({ block: seedBlock, chain: C().CHAIN });
     console.log(tokenSettings);
 
     for (const account in accounts) {
