@@ -141,8 +141,9 @@ class SiloApyService {
         if (tokenInfo.depositedBDV === 0n) {
           // Do not calculate yields on tokens with no deposits
           continue;
+        } else if (tokens.includes(token)) {
+          tokenLabels.push(token);
         }
-        tokenLabels.push(token);
 
         if (!tokenInfo.isWhitelisted) {
           nonGaugeDepositedBdv += tokenInfo.depositedBDV;
