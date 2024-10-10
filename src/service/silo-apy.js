@@ -115,6 +115,7 @@ class SiloApyService {
     } else {
       const sgResult = await BeanstalkSubgraphRepository.getGaugeApyInputs(season, c);
 
+      const tokenLabels = [];
       const tokensToCalc = [];
       const gaugeLpPoints = [];
       const gaugeLpDepositedBdv = [];
@@ -136,6 +137,12 @@ class SiloApyService {
         if (!tokenInfo) {
           throw new InputError(`Unrecognized token ${token}`);
         }
+
+        if (tokenInfo.depositedBDV === 0n) {
+          // Do not calculate yields on tokens with no deposits
+          continue;
+        }
+        tokenLabels.push(token);
 
         if (!tokenInfo.isWhitelisted) {
           nonGaugeDepositedBdv += tokenInfo.depositedBDV;
@@ -181,7 +188,7 @@ class SiloApyService {
       for (const ema of windowEMAs) {
         apyResults.yields[ema.window] = GaugeApyUtil.calcApy(
           ema.beansPerSeason,
-          tokens,
+          tokenLabels,
           tokensToCalc,
           gaugeLpPoints,
           gaugeLpDepositedBdv,
