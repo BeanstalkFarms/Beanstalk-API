@@ -1,4 +1,4 @@
-const { BEANSTALK } = require('../../../../constants/addresses');
+const { C } = require('../../../../constants/runtime-constants');
 
 class YieldModelAssembler {
   static toModels(yieldResults, apyInitType, tokenModels) {
@@ -23,7 +23,7 @@ class YieldModelAssembler {
   // The model is expected to also have Token association loaded, so the token address can be used
   static fromModels(yieldModels) {
     const yieldResult = {
-      beanstalk: BEANSTALK,
+      beanstalk: C().BEANSTALK,
       season: yieldModels[0].season,
       yields: {},
       emaBeans: {}

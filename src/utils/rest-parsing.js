@@ -10,7 +10,9 @@ const standardMapping = {
   },
   limit: parseInt,
   start_time: (p) => new Date(p),
-  end_time: (p) => new Date(p)
+  end_time: (p) => new Date(p),
+  addresses: (p) => p.split(','),
+  snapshot: parseInt
 };
 
 class RestParsingUtil {

@@ -1,0 +1,2079 @@
+{
+  "storage": [
+    {
+      "astId": 16555,
+      "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+      "label": "s",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_struct(AppStorage)40684_storage"
+    }
+  ],
+  "types": {
+    "t_address": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    },
+    "t_array(t_bytes32)144_storage": {
+      "base": "t_bytes32",
+      "encoding": "inplace",
+      "label": "bytes32[144]",
+      "numberOfBytes": "4608"
+    },
+    "t_array(t_bytes32)16_storage": {
+      "base": "t_bytes32",
+      "encoding": "inplace",
+      "label": "bytes32[16]",
+      "numberOfBytes": "512"
+    },
+    "t_array(t_bytes32)4_storage": {
+      "base": "t_bytes32",
+      "encoding": "inplace",
+      "label": "bytes32[4]",
+      "numberOfBytes": "128"
+    },
+    "t_array(t_bytes32)8_storage": {
+      "base": "t_bytes32",
+      "encoding": "inplace",
+      "label": "bytes32[8]",
+      "numberOfBytes": "256"
+    },
+    "t_array(t_struct(ShipmentRoute)41049_storage)dyn_storage": {
+      "base": "t_struct(ShipmentRoute)41049_storage",
+      "encoding": "dynamic_array",
+      "label": "struct ShipmentRoute[]",
+      "numberOfBytes": "32"
+    },
+    "t_array(t_struct(WhitelistStatus)40980_storage)dyn_storage": {
+      "base": "t_struct(WhitelistStatus)40980_storage",
+      "encoding": "dynamic_array",
+      "label": "struct WhitelistStatus[]",
+      "numberOfBytes": "32"
+    },
+    "t_array(t_uint256)dyn_storage": {
+      "base": "t_uint256",
+      "encoding": "dynamic_array",
+      "label": "uint256[]",
+      "numberOfBytes": "32"
+    },
+    "t_bool": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    },
+    "t_bytes1": {
+      "encoding": "inplace",
+      "label": "bytes1",
+      "numberOfBytes": "1"
+    },
+    "t_bytes32": {
+      "encoding": "inplace",
+      "label": "bytes32",
+      "numberOfBytes": "32"
+    },
+    "t_bytes4": {
+      "encoding": "inplace",
+      "label": "bytes4",
+      "numberOfBytes": "4"
+    },
+    "t_bytes_storage": {
+      "encoding": "bytes",
+      "label": "bytes",
+      "numberOfBytes": "32"
+    },
+    "t_contract(IERC20)4980": {
+      "encoding": "inplace",
+      "label": "contract IERC20",
+      "numberOfBytes": "20"
+    },
+    "t_enum(GerminationSide)41134": {
+      "encoding": "inplace",
+      "label": "enum GerminationSide",
+      "numberOfBytes": "1"
+    },
+    "t_enum(ShipmentRecipient)41140": {
+      "encoding": "inplace",
+      "label": "enum ShipmentRecipient",
+      "numberOfBytes": "1"
+    },
+    "t_int32": {
+      "encoding": "inplace",
+      "label": "int32",
+      "numberOfBytes": "4"
+    },
+    "t_int96": {
+      "encoding": "inplace",
+      "label": "int96",
+      "numberOfBytes": "12"
+    },
+    "t_mapping(t_address,t_bool)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => bool)",
+      "numberOfBytes": "32",
+      "value": "t_bool"
+    },
+    "t_mapping(t_address,t_bytes_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => bytes)",
+      "numberOfBytes": "32",
+      "value": "t_bytes_storage"
+    },
+    "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => mapping(address => uint256))",
+      "numberOfBytes": "32",
+      "value": "t_mapping(t_address,t_uint256)"
+    },
+    "t_mapping(t_address,t_mapping(t_contract(IERC20)4980,t_uint256))": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => mapping(contract IERC20 => uint256))",
+      "numberOfBytes": "32",
+      "value": "t_mapping(t_contract(IERC20)4980,t_uint256)"
+    },
+    "t_mapping(t_address,t_struct(Account)40597_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct Account)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Account)40597_storage"
+    },
+    "t_mapping(t_address,t_struct(AssetSettings)41006_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct AssetSettings)",
+      "numberOfBytes": "32",
+      "value": "t_struct(AssetSettings)41006_storage"
+    },
+    "t_mapping(t_address,t_struct(AssetSilo)40968_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct AssetSilo)",
+      "numberOfBytes": "32",
+      "value": "t_struct(AssetSilo)40968_storage"
+    },
+    "t_mapping(t_address,t_struct(DepositListData)40668_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct DepositListData)",
+      "numberOfBytes": "32",
+      "value": "t_struct(DepositListData)40668_storage"
+    },
+    "t_mapping(t_address,t_struct(Deposited)41024_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct Deposited)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Deposited)41024_storage"
+    },
+    "t_mapping(t_address,t_struct(Implementation)41086_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct Implementation)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Implementation)41086_storage"
+    },
+    "t_mapping(t_address,t_struct(MigrationData)41076_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct MigrationData)",
+      "numberOfBytes": "32",
+      "value": "t_struct(MigrationData)41076_storage"
+    },
+    "t_mapping(t_address,t_struct(MowStatus)40659_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct MowStatus)",
+      "numberOfBytes": "32",
+      "value": "t_struct(MowStatus)40659_storage"
+    },
+    "t_mapping(t_address,t_struct(PerWellPlenty)40641_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct PerWellPlenty)",
+      "numberOfBytes": "32",
+      "value": "t_struct(PerWellPlenty)40641_storage"
+    },
+    "t_mapping(t_address,t_struct(TwaReserves)41018_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct TwaReserves)",
+      "numberOfBytes": "32",
+      "value": "t_struct(TwaReserves)41018_storage"
+    },
+    "t_mapping(t_address,t_struct(UnripeSettings)41012_storage)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => struct UnripeSettings)",
+      "numberOfBytes": "32",
+      "value": "t_struct(UnripeSettings)41012_storage"
+    },
+    "t_mapping(t_address,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_bytes32,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_bytes32",
+      "label": "mapping(bytes32 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_contract(IERC20)4980,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_contract(IERC20)4980",
+      "label": "mapping(contract IERC20 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_enum(GerminationSide)41134,t_mapping(t_address,t_struct(Deposited)41024_storage))": {
+      "encoding": "mapping",
+      "key": "t_enum(GerminationSide)41134",
+      "label": "mapping(enum GerminationSide => mapping(address => struct Deposited))",
+      "numberOfBytes": "32",
+      "value": "t_mapping(t_address,t_struct(Deposited)41024_storage)"
+    },
+    "t_mapping(t_enum(GerminationSide)41134,t_uint128)": {
+      "encoding": "mapping",
+      "key": "t_enum(GerminationSide)41134",
+      "label": "mapping(enum GerminationSide => uint128)",
+      "numberOfBytes": "32",
+      "value": "t_uint128"
+    },
+    "t_mapping(t_uint128,t_uint128)": {
+      "encoding": "mapping",
+      "key": "t_uint128",
+      "label": "mapping(uint128 => uint128)",
+      "numberOfBytes": "32",
+      "value": "t_uint128"
+    },
+    "t_mapping(t_uint128,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_uint128",
+      "label": "mapping(uint128 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_uint256,t_bytes32)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => bytes32)",
+      "numberOfBytes": "32",
+      "value": "t_bytes32"
+    },
+    "t_mapping(t_uint256,t_mapping(t_uint256,t_bytes32))": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => mapping(uint256 => bytes32))",
+      "numberOfBytes": "32",
+      "value": "t_mapping(t_uint256,t_bytes32)"
+    },
+    "t_mapping(t_uint256,t_struct(ConvertCapacity)41032_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct ConvertCapacity)",
+      "numberOfBytes": "32",
+      "value": "t_struct(ConvertCapacity)41032_storage"
+    },
+    "t_mapping(t_uint256,t_struct(Deposit)40647_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct Deposit)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Deposit)40647_storage"
+    },
+    "t_mapping(t_uint256,t_struct(Field)40618_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct Field)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Field)40618_storage"
+    },
+    "t_mapping(t_uint256,t_struct(Field)40864_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => struct Field)",
+      "numberOfBytes": "32",
+      "value": "t_struct(Field)40864_storage"
+    },
+    "t_mapping(t_uint256,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_uint256",
+      "label": "mapping(uint256 => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_mapping(t_uint32,t_mapping(t_address,t_uint256))": {
+      "encoding": "mapping",
+      "key": "t_uint32",
+      "label": "mapping(uint32 => mapping(address => uint256))",
+      "numberOfBytes": "32",
+      "value": "t_mapping(t_address,t_uint256)"
+    },
+    "t_mapping(t_uint32,t_struct(GerminatingSilo)41038_storage)": {
+      "encoding": "mapping",
+      "key": "t_uint32",
+      "label": "mapping(uint32 => struct GerminatingSilo)",
+      "numberOfBytes": "32",
+      "value": "t_struct(GerminatingSilo)41038_storage"
+    },
+    "t_struct(Account)40597_storage": {
+      "encoding": "inplace",
+      "label": "struct Account",
+      "members": [
+        {
+          "astId": 40526,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "roots",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40528,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stalk",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40530,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "depositPermitNonces",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40532,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "tokenPermitNonces",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40534,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastUpdate",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40536,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastSop",
+          "offset": 4,
+          "slot": "4",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40538,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastRain",
+          "offset": 8,
+          "slot": "4",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40542,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer_0",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_array(t_bytes32)16_storage"
+        },
+        {
+          "astId": 40547,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "deposits",
+          "offset": 0,
+          "slot": "21",
+          "type": "t_mapping(t_uint256,t_struct(Deposit)40647_storage)"
+        },
+        {
+          "astId": 40552,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "depositIdList",
+          "offset": 0,
+          "slot": "22",
+          "type": "t_mapping(t_address,t_struct(DepositListData)40668_storage)"
+        },
+        {
+          "astId": 40557,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fields",
+          "offset": 0,
+          "slot": "23",
+          "type": "t_mapping(t_uint256,t_struct(Field)40618_storage)"
+        },
+        {
+          "astId": 40563,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "depositAllowances",
+          "offset": 0,
+          "slot": "24",
+          "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))"
+        },
+        {
+          "astId": 40570,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "tokenAllowances",
+          "offset": 0,
+          "slot": "25",
+          "type": "t_mapping(t_address,t_mapping(t_contract(IERC20)4980,t_uint256))"
+        },
+        {
+          "astId": 40575,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "mowStatuses",
+          "offset": 0,
+          "slot": "26",
+          "type": "t_mapping(t_address,t_struct(MowStatus)40659_storage)"
+        },
+        {
+          "astId": 40579,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "isApprovedForAll",
+          "offset": 0,
+          "slot": "27",
+          "type": "t_mapping(t_address,t_bool)"
+        },
+        {
+          "astId": 40584,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "germinatingStalk",
+          "offset": 0,
+          "slot": "28",
+          "type": "t_mapping(t_enum(GerminationSide)41134,t_uint128)"
+        },
+        {
+          "astId": 40589,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "internalTokenBalance",
+          "offset": 0,
+          "slot": "29",
+          "type": "t_mapping(t_contract(IERC20)4980,t_uint256)"
+        },
+        {
+          "astId": 40593,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer_1",
+          "offset": 0,
+          "slot": "30",
+          "type": "t_array(t_bytes32)16_storage"
+        },
+        {
+          "astId": 40596,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "sop",
+          "offset": 0,
+          "slot": "46",
+          "type": "t_struct(SeasonOfPlenty)40631_storage"
+        }
+      ],
+      "numberOfBytes": "1664"
+    },
+    "t_struct(AppStorage)40684_storage": {
+      "encoding": "inplace",
+      "label": "struct AppStorage",
+      "members": [
+        {
+          "astId": 40680,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "accts",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_address,t_struct(Account)40597_storage)"
+        },
+        {
+          "astId": 40683,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "sys",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_struct(System)40798_storage"
+        }
+      ],
+      "numberOfBytes": "9120"
+    },
+    "t_struct(AssetSettings)41006_storage": {
+      "encoding": "inplace",
+      "label": "struct AssetSettings",
+      "members": [
+        {
+          "astId": 40983,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "selector",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_bytes4"
+        },
+        {
+          "astId": 40985,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stalkEarnedPerSeason",
+          "offset": 4,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40987,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stalkIssuedPerBdv",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint48"
+        },
+        {
+          "astId": 40989,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "milestoneSeason",
+          "offset": 14,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40991,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "milestoneStem",
+          "offset": 18,
+          "slot": "0",
+          "type": "t_int96"
+        },
+        {
+          "astId": 40993,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "encodeType",
+          "offset": 30,
+          "slot": "0",
+          "type": "t_bytes1"
+        },
+        {
+          "astId": 40995,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "deltaStalkEarnedPerSeason",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_int32"
+        },
+        {
+          "astId": 40997,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "gaugePoints",
+          "offset": 4,
+          "slot": "1",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40999,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "optimalPercentDepositedBdv",
+          "offset": 20,
+          "slot": "1",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 41002,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "gaugePointImplementation",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_struct(Implementation)41086_storage"
+        },
+        {
+          "astId": 41005,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "liquidityWeightImplementation",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_struct(Implementation)41086_storage"
+        }
+      ],
+      "numberOfBytes": "192"
+    },
+    "t_struct(AssetSilo)40968_storage": {
+      "encoding": "inplace",
+      "label": "struct AssetSilo",
+      "members": [
+        {
+          "astId": 40965,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "deposited",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40967,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "depositedBdv",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint128"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(ConvertCapacity)41032_storage": {
+      "encoding": "inplace",
+      "label": "struct ConvertCapacity",
+      "members": [
+        {
+          "astId": 41027,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "overallConvertCapacityUsed",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41031,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "wellConvertCapacityUsed",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_address,t_uint256)"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(Deposit)40647_storage": {
+      "encoding": "inplace",
+      "label": "struct Deposit",
+      "members": [
+        {
+          "astId": 40644,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "amount",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40646,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "bdv",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint128"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(DepositListData)40668_storage": {
+      "encoding": "inplace",
+      "label": "struct DepositListData",
+      "members": [
+        {
+          "astId": 40663,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "depositIds",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_array(t_uint256)dyn_storage"
+        },
+        {
+          "astId": 40667,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "idIndex",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_uint256,t_uint256)"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(Deposited)41024_storage": {
+      "encoding": "inplace",
+      "label": "struct Deposited",
+      "members": [
+        {
+          "astId": 41021,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "amount",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 41023,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "bdv",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint128"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(EvaluationParameters)41117_storage": {
+      "encoding": "inplace",
+      "label": "struct EvaluationParameters",
+      "members": [
+        {
+          "astId": 41088,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "maxBeanMaxLpGpPerBdvRatio",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41090,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "minBeanMaxLpGpPerBdvRatio",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41092,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "targetSeasonsToCatchUp",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41094,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podRateLowerBound",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41096,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podRateOptimal",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41098,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podRateUpperBound",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41100,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "deltaPodDemandLowerBound",
+          "offset": 0,
+          "slot": "6",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41102,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "deltaPodDemandUpperBound",
+          "offset": 0,
+          "slot": "7",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41104,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lpToSupplyRatioUpperBound",
+          "offset": 0,
+          "slot": "8",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41106,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lpToSupplyRatioOptimal",
+          "offset": 0,
+          "slot": "9",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41108,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lpToSupplyRatioLowerBound",
+          "offset": 0,
+          "slot": "10",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41110,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "excessivePriceThreshold",
+          "offset": 0,
+          "slot": "11",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41112,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "soilCoefficientHigh",
+          "offset": 0,
+          "slot": "12",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41114,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "soilCoefficientLow",
+          "offset": 0,
+          "slot": "13",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41116,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "baseReward",
+          "offset": 0,
+          "slot": "14",
+          "type": "t_uint256"
+        }
+      ],
+      "numberOfBytes": "480"
+    },
+    "t_struct(Fertilizer)40896_storage": {
+      "encoding": "inplace",
+      "label": "struct Fertilizer",
+      "members": [
+        {
+          "astId": 40869,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertilizer",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_uint128,t_uint256)"
+        },
+        {
+          "astId": 40873,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "nextFid",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_uint128,t_uint128)"
+        },
+        {
+          "astId": 40875,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "activeFertilizer",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40877,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertilizedIndex",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40879,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "unfertilizedIndex",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40881,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertilizedPaidIndex",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40883,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertFirst",
+          "offset": 0,
+          "slot": "6",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40885,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertLast",
+          "offset": 16,
+          "slot": "6",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40887,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "bpf",
+          "offset": 0,
+          "slot": "7",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40889,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "recapitalized",
+          "offset": 0,
+          "slot": "8",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40891,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "leftoverBeans",
+          "offset": 0,
+          "slot": "9",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40895,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "10",
+          "type": "t_array(t_bytes32)8_storage"
+        }
+      ],
+      "numberOfBytes": "576"
+    },
+    "t_struct(Field)40618_storage": {
+      "encoding": "inplace",
+      "label": "struct Field",
+      "members": [
+        {
+          "astId": 40602,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "plots",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_uint256,t_uint256)"
+        },
+        {
+          "astId": 40606,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podAllowances",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_address,t_uint256)"
+        },
+        {
+          "astId": 40609,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "plotIndexes",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_array(t_uint256)dyn_storage"
+        },
+        {
+          "astId": 40613,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "piIndex",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_mapping(t_uint256,t_uint256)"
+        },
+        {
+          "astId": 40617,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "256"
+    },
+    "t_struct(Field)40864_storage": {
+      "encoding": "inplace",
+      "label": "struct Field",
+      "members": [
+        {
+          "astId": 40855,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "pods",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40857,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "harvested",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40859,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "harvestable",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40863,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_array(t_bytes32)8_storage"
+        }
+      ],
+      "numberOfBytes": "352"
+    },
+    "t_struct(GerminatingSilo)41038_storage": {
+      "encoding": "inplace",
+      "label": "struct GerminatingSilo",
+      "members": [
+        {
+          "astId": 41035,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stalk",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41037,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "roots",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(Implementation)41086_storage": {
+      "encoding": "inplace",
+      "label": "struct Implementation",
+      "members": [
+        {
+          "astId": 41079,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "target",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 41081,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "selector",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_bytes4"
+        },
+        {
+          "astId": 41083,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "encodeType",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_bytes1"
+        },
+        {
+          "astId": 41085,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "data",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_bytes_storage"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(L2Migration)41062_storage": {
+      "encoding": "inplace",
+      "label": "struct L2Migration",
+      "members": [
+        {
+          "astId": 41052,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedL1Beans",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 41057,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "account",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_address,t_struct(MigrationData)41076_storage)"
+        },
+        {
+          "astId": 41061,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer_",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "192"
+    },
+    "t_struct(MigrationData)41076_storage": {
+      "encoding": "inplace",
+      "label": "struct MigrationData",
+      "members": [
+        {
+          "astId": 41065,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "receiver",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 41067,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedDeposits",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 41069,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedPlots",
+          "offset": 21,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 41071,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedFert",
+          "offset": 22,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 41073,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedInternalBalances",
+          "offset": 23,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 41075,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "migratedPodOrders",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_bool"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(MowStatus)40659_storage": {
+      "encoding": "inplace",
+      "label": "struct MowStatus",
+      "members": [
+        {
+          "astId": 40656,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastStem",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_int96"
+        },
+        {
+          "astId": 40658,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "bdv",
+          "offset": 12,
+          "slot": "0",
+          "type": "t_uint128"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(PerWellPlenty)40641_storage": {
+      "encoding": "inplace",
+      "label": "struct PerWellPlenty",
+      "members": [
+        {
+          "astId": 40634,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "plentyPerRoot",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40636,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "plenty",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40640,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "192"
+    },
+    "t_struct(Rain)40962_storage": {
+      "encoding": "inplace",
+      "label": "struct Rain",
+      "members": [
+        {
+          "astId": 40955,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "pods",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40957,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "roots",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40961,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "192"
+    },
+    "t_struct(Season)40928_storage": {
+      "encoding": "inplace",
+      "label": "struct Season",
+      "members": [
+        {
+          "astId": 40899,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "current",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40901,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastSop",
+          "offset": 4,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40903,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastSopSeason",
+          "offset": 8,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40905,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "rainStart",
+          "offset": 12,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40907,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "raining",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40909,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertilizing",
+          "offset": 17,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40911,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "sunriseBlock",
+          "offset": 18,
+          "slot": "0",
+          "type": "t_uint64"
+        },
+        {
+          "astId": 40913,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "abovePeg",
+          "offset": 26,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40915,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stemStartSeason",
+          "offset": 27,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 40917,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stemScaleSeason",
+          "offset": 29,
+          "slot": "0",
+          "type": "t_uint16"
+        },
+        {
+          "astId": 40919,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "start",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40921,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "period",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40923,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "timestamp",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40927,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_array(t_bytes32)8_storage"
+        }
+      ],
+      "numberOfBytes": "384"
+    },
+    "t_struct(SeasonOfPlenty)40631_storage": {
+      "encoding": "inplace",
+      "label": "struct SeasonOfPlenty",
+      "members": [
+        {
+          "astId": 40621,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "rainRoots",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40626,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "perWellPlenty",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_address,t_struct(PerWellPlenty)40641_storage)"
+        },
+        {
+          "astId": 40630,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "192"
+    },
+    "t_struct(SeasonOfPlenty)41129_storage": {
+      "encoding": "inplace",
+      "label": "struct SeasonOfPlenty",
+      "members": [
+        {
+          "astId": 41122,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "plentyPerSopToken",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_mapping(t_address,t_uint256)"
+        },
+        {
+          "astId": 41128,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "sops",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_mapping(t_uint32,t_mapping(t_address,t_uint256))"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(SeedGauge)40952_storage": {
+      "encoding": "inplace",
+      "label": "struct SeedGauge",
+      "members": [
+        {
+          "astId": 40945,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "averageGrownStalkPerBdvPerSeason",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40947,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "beanToMaxLpGpPerBdvRatio",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40951,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "160"
+    },
+    "t_struct(ShipmentRoute)41049_storage": {
+      "encoding": "inplace",
+      "label": "struct ShipmentRoute",
+      "members": [
+        {
+          "astId": 41041,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "planContract",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 41043,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "planSelector",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_bytes4"
+        },
+        {
+          "astId": 41046,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "recipient",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_enum(ShipmentRecipient)41140"
+        },
+        {
+          "astId": 41048,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "data",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_bytes_storage"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(Silo)40852_storage": {
+      "encoding": "inplace",
+      "label": "struct Silo",
+      "members": [
+        {
+          "astId": 40811,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "stalk",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40813,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "roots",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40815,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "earnedBeans",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40820,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "balances",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_mapping(t_address,t_struct(AssetSilo)40968_storage)"
+        },
+        {
+          "astId": 40825,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "assetSettings",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_mapping(t_address,t_struct(AssetSettings)41006_storage)"
+        },
+        {
+          "astId": 40830,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "unripeSettings",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_mapping(t_address,t_struct(UnripeSettings)41012_storage)"
+        },
+        {
+          "astId": 40834,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "whitelistStatuses",
+          "offset": 0,
+          "slot": "6",
+          "type": "t_array(t_struct(WhitelistStatus)40980_storage)dyn_storage"
+        },
+        {
+          "astId": 40842,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "germinating",
+          "offset": 0,
+          "slot": "7",
+          "type": "t_mapping(t_enum(GerminationSide)41134,t_mapping(t_address,t_struct(Deposited)41024_storage))"
+        },
+        {
+          "astId": 40847,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "unclaimedGerminating",
+          "offset": 0,
+          "slot": "8",
+          "type": "t_mapping(t_uint32,t_struct(GerminatingSilo)41038_storage)"
+        },
+        {
+          "astId": 40851,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "9",
+          "type": "t_array(t_bytes32)8_storage"
+        }
+      ],
+      "numberOfBytes": "544"
+    },
+    "t_struct(System)40798_storage": {
+      "encoding": "inplace",
+      "label": "struct System",
+      "members": [
+        {
+          "astId": 40690,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "paused",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40692,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "pausedAt",
+          "offset": 1,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40694,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "reentrantStatus",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40696,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "farmingStatus",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40698,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "ownerCandidate",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_address"
+        },
+        {
+          "astId": 40700,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "soil",
+          "offset": 0,
+          "slot": "4",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40702,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "beanSown",
+          "offset": 16,
+          "slot": "4",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40704,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "activeField",
+          "offset": 0,
+          "slot": "5",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40706,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fieldCount",
+          "offset": 0,
+          "slot": "6",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40708,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "orderLockedBeans",
+          "offset": 0,
+          "slot": "7",
+          "type": "t_uint256"
+        },
+        {
+          "astId": 40712,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer_0",
+          "offset": 0,
+          "slot": "8",
+          "type": "t_array(t_bytes32)16_storage"
+        },
+        {
+          "astId": 40718,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podListings",
+          "offset": 0,
+          "slot": "24",
+          "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_bytes32))"
+        },
+        {
+          "astId": 40722,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "podOrders",
+          "offset": 0,
+          "slot": "25",
+          "type": "t_mapping(t_bytes32,t_uint256)"
+        },
+        {
+          "astId": 40727,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "internalTokenBalanceTotal",
+          "offset": 0,
+          "slot": "26",
+          "type": "t_mapping(t_contract(IERC20)4980,t_uint256)"
+        },
+        {
+          "astId": 40731,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "wellOracleSnapshots",
+          "offset": 0,
+          "slot": "27",
+          "type": "t_mapping(t_address,t_bytes_storage)"
+        },
+        {
+          "astId": 40736,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "twaReserves",
+          "offset": 0,
+          "slot": "28",
+          "type": "t_mapping(t_address,t_struct(TwaReserves)41018_storage)"
+        },
+        {
+          "astId": 40740,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "usdTokenPrice",
+          "offset": 0,
+          "slot": "29",
+          "type": "t_mapping(t_address,t_uint256)"
+        },
+        {
+          "astId": 40745,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fields",
+          "offset": 0,
+          "slot": "30",
+          "type": "t_mapping(t_uint256,t_struct(Field)40864_storage)"
+        },
+        {
+          "astId": 40750,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "convertCapacity",
+          "offset": 0,
+          "slot": "31",
+          "type": "t_mapping(t_uint256,t_struct(ConvertCapacity)41032_storage)"
+        },
+        {
+          "astId": 40755,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "oracleImplementation",
+          "offset": 0,
+          "slot": "32",
+          "type": "t_mapping(t_address,t_struct(Implementation)41086_storage)"
+        },
+        {
+          "astId": 40759,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "shipmentRoutes",
+          "offset": 0,
+          "slot": "33",
+          "type": "t_array(t_struct(ShipmentRoute)41049_storage)dyn_storage"
+        },
+        {
+          "astId": 40763,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer_1",
+          "offset": 0,
+          "slot": "34",
+          "type": "t_array(t_bytes32)16_storage"
+        },
+        {
+          "astId": 40767,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "casesV2",
+          "offset": 0,
+          "slot": "50",
+          "type": "t_array(t_bytes32)144_storage"
+        },
+        {
+          "astId": 40770,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "tokens",
+          "offset": 0,
+          "slot": "194",
+          "type": "t_struct(Tokens)40808_storage"
+        },
+        {
+          "astId": 40773,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "silo",
+          "offset": 0,
+          "slot": "198",
+          "type": "t_struct(Silo)40852_storage"
+        },
+        {
+          "astId": 40776,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fert",
+          "offset": 0,
+          "slot": "215",
+          "type": "t_struct(Fertilizer)40896_storage"
+        },
+        {
+          "astId": 40779,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "season",
+          "offset": 0,
+          "slot": "233",
+          "type": "t_struct(Season)40928_storage"
+        },
+        {
+          "astId": 40782,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "weather",
+          "offset": 0,
+          "slot": "245",
+          "type": "t_struct(Weather)40942_storage"
+        },
+        {
+          "astId": 40785,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "seedGauge",
+          "offset": 0,
+          "slot": "250",
+          "type": "t_struct(SeedGauge)40952_storage"
+        },
+        {
+          "astId": 40788,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "rain",
+          "offset": 0,
+          "slot": "255",
+          "type": "t_struct(Rain)40962_storage"
+        },
+        {
+          "astId": 40791,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "l2Migration",
+          "offset": 0,
+          "slot": "261",
+          "type": "t_struct(L2Migration)41062_storage"
+        },
+        {
+          "astId": 40794,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "evaluationParameters",
+          "offset": 0,
+          "slot": "267",
+          "type": "t_struct(EvaluationParameters)41117_storage"
+        },
+        {
+          "astId": 40797,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "sop",
+          "offset": 0,
+          "slot": "282",
+          "type": "t_struct(SeasonOfPlenty)41129_storage"
+        }
+      ],
+      "numberOfBytes": "9088"
+    },
+    "t_struct(Tokens)40808_storage": {
+      "encoding": "inplace",
+      "label": "struct Tokens",
+      "members": [
+        {
+          "astId": 40801,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "bean",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 40803,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "fertilizer",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_address"
+        },
+        {
+          "astId": 40805,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "urBean",
+          "offset": 0,
+          "slot": "2",
+          "type": "t_address"
+        },
+        {
+          "astId": 40807,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "urLp",
+          "offset": 0,
+          "slot": "3",
+          "type": "t_address"
+        }
+      ],
+      "numberOfBytes": "128"
+    },
+    "t_struct(TwaReserves)41018_storage": {
+      "encoding": "inplace",
+      "label": "struct TwaReserves",
+      "members": [
+        {
+          "astId": 41015,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "reserve0",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 41017,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "reserve1",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint128"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_struct(UnripeSettings)41012_storage": {
+      "encoding": "inplace",
+      "label": "struct UnripeSettings",
+      "members": [
+        {
+          "astId": 41009,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "underlyingToken",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 41011,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "balanceOfUnderlying",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_uint256"
+        }
+      ],
+      "numberOfBytes": "64"
+    },
+    "t_struct(Weather)40942_storage": {
+      "encoding": "inplace",
+      "label": "struct Weather",
+      "members": [
+        {
+          "astId": 40931,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastDeltaSoil",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint128"
+        },
+        {
+          "astId": 40933,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "lastSowTime",
+          "offset": 16,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40935,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "thisSowTime",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40937,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "temp",
+          "offset": 24,
+          "slot": "0",
+          "type": "t_uint32"
+        },
+        {
+          "astId": 40941,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "_buffer",
+          "offset": 0,
+          "slot": "1",
+          "type": "t_array(t_bytes32)4_storage"
+        }
+      ],
+      "numberOfBytes": "160"
+    },
+    "t_struct(WhitelistStatus)40980_storage": {
+      "encoding": "inplace",
+      "label": "struct WhitelistStatus",
+      "members": [
+        {
+          "astId": 40971,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "token",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_address"
+        },
+        {
+          "astId": 40973,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "isWhitelisted",
+          "offset": 20,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40975,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "isWhitelistedLp",
+          "offset": 21,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40977,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "isWhitelistedWell",
+          "offset": 22,
+          "slot": "0",
+          "type": "t_bool"
+        },
+        {
+          "astId": 40979,
+          "contract": "contracts/beanstalk/Diamond.sol:Diamond",
+          "label": "isSoppable",
+          "offset": 23,
+          "slot": "0",
+          "type": "t_bool"
+        }
+      ],
+      "numberOfBytes": "32"
+    },
+    "t_uint128": {
+      "encoding": "inplace",
+      "label": "uint128",
+      "numberOfBytes": "16"
+    },
+    "t_uint16": {
+      "encoding": "inplace",
+      "label": "uint16",
+      "numberOfBytes": "2"
+    },
+    "t_uint256": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    },
+    "t_uint32": {
+      "encoding": "inplace",
+      "label": "uint32",
+      "numberOfBytes": "4"
+    },
+    "t_uint48": {
+      "encoding": "inplace",
+      "label": "uint48",
+      "numberOfBytes": "6"
+    },
+    "t_uint64": {
+      "encoding": "inplace",
+      "label": "uint64",
+      "numberOfBytes": "8"
+    }
+  }
+}

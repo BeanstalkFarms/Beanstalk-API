@@ -1,0 +1,158 @@
+{
+  "wells": [
+    {
+      "swaps": [
+        {
+          "amountIn": "5000000000",
+          "amountOut": "1627986324056845061",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714705907",
+          "blockNumber": "19786824",
+          "logIndex": 334
+        },
+        {
+          "amountIn": "17587084351",
+          "amountOut": "5735653111300472776",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714701743",
+          "blockNumber": "19786480",
+          "logIndex": 358
+        },
+        {
+          "amountIn": "3351405114",
+          "amountOut": "1094643603804553368",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714701515",
+          "blockNumber": "19786461",
+          "logIndex": 194
+        },
+        {
+          "amountIn": "10000000000",
+          "amountOut": "3269377213099025460",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714687691",
+          "blockNumber": "19785315",
+          "logIndex": 417
+        },
+        {
+          "amountIn": "95676849",
+          "amountOut": "31303213763521321",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714685627",
+          "blockNumber": "19785144",
+          "logIndex": 166
+        },
+        {
+          "amountIn": "1026995528",
+          "amountOut": "336002541531334128",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714669619",
+          "blockNumber": "19783823",
+          "logIndex": 348
+        },
+        {
+          "amountIn": "947804302",
+          "amountOut": "310137813044956371",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714656515",
+          "blockNumber": "19782738",
+          "logIndex": 377
+        },
+        {
+          "amountIn": "1856781829",
+          "amountOut": "607694116854445958",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714647803",
+          "blockNumber": "19782016",
+          "logIndex": 119
+        },
+        {
+          "amountIn": "462377515790747244",
+          "amountOut": "1412728161",
+          "fromToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "toToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "timestamp": "1714613735",
+          "blockNumber": "19779197",
+          "logIndex": 270
+        },
+        {
+          "amountIn": "1419390950",
+          "amountOut": "464558430713920015",
+          "fromToken": {
+            "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+            "decimals": 6
+          },
+          "toToken": {
+            "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "decimals": 18
+          },
+          "timestamp": "1714611683",
+          "blockNumber": "19779029",
+          "logIndex": 255
+        }
+      ]
+    }
+  ]
+}

@@ -16,6 +16,17 @@ class YieldRepository {
   // Returns the yields for the requested season
   static async findSeasonYields(season, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
+
+    const optionalWhere = {};
+    if (options.emaWindows) {
+      optionalWhere.emaWindow = {
+        [Sequelize.Op.in]: options.emaWindows
+      };
+    }
+    if (options.initType) {
+      optionalWhere.initType = options.initType;
+    }
+
     const rows = await sequelize.models.Yield.findAll({
       include: [
         {
@@ -24,15 +35,8 @@ class YieldRepository {
         }
       ],
       where: {
-        season: {
-          [Sequelize.Op.eq]: season
-        },
-        emaWindow: {
-          [Sequelize.Op.in]: options.emaWindows
-        },
-        initType: {
-          [Sequelize.Op.eq]: options.initType
-        }
+        season,
+        ...optionalWhere
       },
       transaction: options.transaction
     });

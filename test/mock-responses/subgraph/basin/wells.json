@@ -1,0 +1,38 @@
+{
+  "wells": [
+    {
+      "id": "0xbea0e11282e2bb5893bece110cf199501e872bad",
+      "tokens": [
+        {
+          "id": "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+          "decimals": 6
+        },
+        {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "decimals": 18
+        }
+      ],
+      "tokenOrder": [
+        "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      ],
+      "reserves": [
+        "13776890377201",
+        "5362472327552046319200"
+      ],
+      "symbol": "BEANWETHCP2w",
+      "tokenPrice": [
+        "2569130344",
+        "389236771196659"
+      ],
+      "rollingDailyBiTradeVolumeReserves": [
+        "362621652657",
+        "141018008931221259484"
+      ],
+      "wellFunction": {
+        "id": "0xba150c2ae0f8450d4b832beefa3338d4b5982d26",
+        "data": "0x"
+      }
+    }
+  ]
+}

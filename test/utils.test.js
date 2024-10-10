@@ -1,26 +1,21 @@
 const BlockUtil = require('../src/utils/block');
 
 // Create the provider beforehand as otherwise it would be re-created on each invocation to then
-const resolvedProvider = { getBlock: async () => {} };
+const provider = { getBlock: async () => {} };
 jest.mock('../src/datasources/alchemy', () => ({
-  ...jest.requireActual('../src/datasources/alchemy'),
-  providerThenable: {
-    then: (resolve) => {
-      resolve(resolvedProvider);
-    }
-  }
+  providerForChain: () => provider
 }));
 const alchemy = require('../src/datasources/alchemy');
 
-const { BigNumber } = require('alchemy-sdk');
-const ConstantProductUtil = require('../src/utils/pool/constant-product');
 const { parseQuery } = require('../src/utils/rest-parsing');
-const SubgraphClients = require('../src/datasources/subgraph-client');
-const { BEANSTALK } = require('../src/constants/addresses');
 const { allToBigInt, fromBigInt } = require('../src/utils/number');
+const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
+const { BigInt_applyPercent } = require('../src/utils/bigint');
+const { C } = require('../src/constants/runtime-constants');
+const { mockBeanstalkSG } = require('./util/mock-sg');
 
 describe('Utils', () => {
-  it('should format query parameters correctly', async () => {
+  test('Formats query parameters', async () => {
     const query = {
       blockNumber: '18275926',
       timestamp: '1714694855000',
@@ -33,13 +28,9 @@ describe('Utils', () => {
     expect(parsed.token).toEqual('beans!');
   });
 
-  it('should maximally use block number that the subgraph has indexed', async () => {
-    jest.spyOn(SubgraphClients, 'basinSG').mockResolvedValue({
-      _meta: {
-        block: {
-          number: 19500000
-        }
-      }
+  test('Maximally uses block number that the subgraph has indexed', async () => {
+    jest.spyOn(CommonSubgraphRepository, 'getMeta').mockResolvedValue({
+      block: 19500000
     });
 
     jest.spyOn(BlockUtil, 'blockFromOptions').mockResolvedValue({
@@ -47,96 +38,50 @@ describe('Utils', () => {
       timestamp: 1714760417
     });
 
-    const getBlockSpy = jest.spyOn(await alchemy.providerThenable, 'getBlock').mockResolvedValue({
+    const getBlockSpy = jest.spyOn(alchemy.providerForChain(), 'getBlock').mockResolvedValue({
       number: 19500000,
       timestamp: 1714760417
     });
 
-    const result = await BlockUtil.blockForSubgraphFromOptions(SubgraphClients.basinSG, {});
+    const result = await BlockUtil.blockForSubgraphFromOptions(C().SG_BASIN, {});
 
     expect(getBlockSpy).toHaveBeenCalledWith(19500000);
     expect(result.number).toEqual(19500000);
   });
 
-  it('should calculate correct token prices in constant product pool', async () => {
-    const prices = ConstantProductUtil.calcPrice(
-      ['13834969782037', '4519904117717436850412'].map(BigNumber.from),
-      [6, 18]
-    );
-
-    expect(prices.bn[0]).toEqual(BigNumber.from(326701408743658));
-    expect(prices.bn[1]).toEqual(BigNumber.from(3060898953));
-    expect(prices.float[0]).toBeCloseTo(0.000326701408743658);
-    expect(prices.float[1]).toBeCloseTo(3060.898953);
-  });
-
-  it('should calculate liquidity depth in constant product pool', async () => {
-    const reserves = ['14327543308971', '3915916427871363595968'].map(BigNumber.from);
-    const decimals = [6, 18];
-    const percent = 40;
-    const buyMultiple = (100 + percent) / 100;
-    const sellMultiple = (100 - percent) / 100;
-
-    const priceBefore = ConstantProductUtil.calcPrice(reserves, decimals);
-    const depth = ConstantProductUtil.calcDepth(reserves, decimals, percent);
-
-    const priceAfterBuy0 = ConstantProductUtil.calcPrice(
-      [
-        reserves[0].sub(depth.buy.bn[0]),
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[0].sub(depth.buy.bn[0]))
-      ],
-      decimals
-    );
-    const priceAfterSell1 = ConstantProductUtil.calcPrice(
-      [
-        ConstantProductUtil.calcMissingReserve(reserves, reserves[1].add(depth.sell.bn[1])),
-        reserves[1].add(depth.sell.bn[1])
-      ],
-      decimals
-    );
-
-    expect(priceBefore.float[0] * buyMultiple).toBeCloseTo(priceAfterBuy0.float[0], 10);
-    expect(priceBefore.float[1] * sellMultiple).toBeCloseTo(priceAfterSell1.float[1]);
-  });
-
-  it('should find block number for a requested season', async () => {
-    jest.spyOn(SubgraphClients, 'beanstalkSG').mockResolvedValue({
-      seasons: [
-        {
-          sunriseBlock: 20042493
+  describe('BigInt', () => {
+    test('Converts all strings to BigInt', () => {
+      const obj = allToBigInt({
+        p1: '123456',
+        p2: 10,
+        p3: {
+          p4: '7890',
+          p5: '0x1234',
+          p6: 9275n,
+          p7: 'yes',
+          p8: null
         }
-      ]
+      });
+
+      expect(obj.p1).toEqual(123456n);
+      expect(obj.p2).toEqual(10n);
+      expect(obj.p3.p4).toEqual(7890n);
+      expect(obj.p3.p5).toEqual(4660n);
+      expect(obj.p3.p6).toEqual(9275n);
+      expect(obj.p3.p7).toEqual('yes');
+      expect(obj.p3.p8).toEqual(null);
     });
 
-    const blockForSeason = await BlockUtil.findBlockForSeason(BEANSTALK, 22183);
-    expect(blockForSeason).toBe(20042493);
-  });
-
-  it('should convert all strings to BigInt', () => {
-    const obj = allToBigInt({
-      p1: '123456',
-      p2: 10,
-      p3: {
-        p4: '7890',
-        p5: '0x1234',
-        p6: 9275n,
-        p7: 'yes',
-        p8: null
-      }
+    test('Retain some precision on string conversion', () => {
+      const n1 = fromBigInt(123456789n, 6, 2);
+      expect(n1).toEqual(123.45);
+      expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
     });
 
-    expect(obj.p1).toEqual(123456n);
-    expect(obj.p2).toEqual(10n);
-    expect(obj.p3.p4).toEqual(7890n);
-    expect(obj.p3.p5).toEqual(4660n);
-    expect(obj.p3.p6).toEqual(9275n);
-    expect(obj.p3.p7).toEqual('yes');
-    expect(obj.p3.p8).toEqual(null);
-  });
-
-  it('should retain some precision', () => {
-    const n1 = fromBigInt(123456789n, 6, 2);
-    expect(n1).toEqual(123.45);
-    expect(() => fromBigInt(123456789n, 6, -2)).toThrow();
+    test('Applies percentage', () => {
+      expect(BigInt_applyPercent(100n, 102)).toEqual(102n);
+      expect(BigInt_applyPercent(100n, 95)).toEqual(95n);
+      expect(BigInt_applyPercent(10000n, 105.371)).toEqual(10537n);
+    });
   });
 });

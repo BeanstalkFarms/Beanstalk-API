@@ -3,7 +3,7 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { PRECISION } = require('../../constants/constants');
+const { C } = require('../../constants/runtime-constants');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const { fromBigInt } = require('../number');
 
@@ -30,6 +30,8 @@ class PreGaugeApyUtil {
     totalSeeds,
     options
   ) {
+    const PRECISION = C('eth').DECIMALS;
+
     const duration = options?.duration ?? 8760;
 
     // Initialization

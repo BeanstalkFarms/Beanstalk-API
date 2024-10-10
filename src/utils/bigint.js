@@ -23,10 +23,17 @@ function BigInt_max(a) {
   return a.reduce((r, c) => (c > r ? c : r), a[0]);
 }
 
+function BigInt_applyPercent(bi, percent) {
+  const numerator = BigInt(Math.floor(percent * 100));
+  const denominator = BigInt(100 * 100);
+  return (bi * numerator) / denominator;
+}
+
 module.exports = {
   formatBigintHex,
   formatBigintDecimal,
   BigInt_abs,
   BigInt_sum,
-  BigInt_max
+  BigInt_max,
+  BigInt_applyPercent
 };

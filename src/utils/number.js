@@ -1,37 +1,37 @@
 const { formatUnits } = require('ethers');
 
 class NumberUtil {
-  // For the given BigNumber/decimal precision, spread into bn, string, and float result.
-  // bns/decimals can either be a single value, or an array
-  static createNumberSpread(bns, decimals, floatPrecision = undefined) {
-    if (!Array.isArray(bns)) {
-      return NumberUtil.#getSpread(bns, decimals, floatPrecision);
+  // For the given BigInt/decimal precision, spread into BigInt, string, and float result.
+  // values/decimals can either be a single value, or an array
+  static createNumberSpread(values, decimals, floatPrecision = undefined) {
+    if (!Array.isArray(values)) {
+      return NumberUtil.#getSpread(values, decimals, floatPrecision);
     }
 
     const retval = {
-      bn: [],
+      raw: [],
       string: [],
       float: []
     };
-    for (let i = 0; i < bns.length; ++i) {
-      const { bn, string, float } = NumberUtil.#getSpread(bns[i], decimals[i], floatPrecision?.[i]);
-      retval.bn.push(bn);
+    for (let i = 0; i < values.length; ++i) {
+      const { raw, string, float } = NumberUtil.#getSpread(values[i], decimals[i], floatPrecision?.[i]);
+      retval.raw.push(raw);
       retval.string.push(string);
       retval.float.push(float);
     }
     return retval;
   }
 
-  // Internal function for spreading an individual BigNumber
-  static #getSpread(bn, decimals, floatPrecision) {
-    let string = formatUnits(bn.toString(), decimals);
-    let float = parseFloat(formatUnits(bn.toString(), decimals));
+  // Internal function for spreading an individual BigInt
+  static #getSpread(value, decimals, floatPrecision) {
+    let string = formatUnits(value.toString(), decimals);
+    let float = parseFloat(formatUnits(value.toString(), decimals));
     if (floatPrecision != undefined) {
       string = float.toFixed(floatPrecision);
       float = parseFloat(string);
     }
     return {
-      bn,
+      raw: value,
       string,
       float
     };

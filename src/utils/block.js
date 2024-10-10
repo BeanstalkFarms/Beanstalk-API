@@ -1,7 +1,6 @@
-const { BEANSTALK } = require('../constants/addresses');
-const { providerThenable } = require('../datasources/alchemy');
-const { gql } = require('../datasources/subgraph-client');
+const { C } = require('../constants/runtime-constants');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
+const CommonSubgraphRepository = require('../repository/subgraph/common-subgraph');
 
 class BlockUtil {
   // Returns the block data to use for the given options.
@@ -11,34 +10,24 @@ class BlockUtil {
     if (options.timestamp) {
       return await BlockUtil.findBlockByTimestamp(options.timestamp);
     } else {
-      return await (await providerThenable).getBlock(blockTag);
+      return await C().RPC.getBlock(blockTag);
     }
   }
 
   // Returns the block data to use for the given options,
   // constrained by the maximal indexed block of the given subgraph.
   static async blockForSubgraphFromOptions(subgraphClient, options) {
-    const subgraphBlock = (
-      await subgraphClient(gql`
-        {
-          _meta {
-            block {
-              number
-            }
-          }
-        }
-      `)
-    )._meta.block.number;
+    const subgraphMeta = await CommonSubgraphRepository.getMeta(subgraphClient);
 
     const optionsBlock = await BlockUtil.blockFromOptions(options);
-    const blockToUse = Math.min(subgraphBlock, optionsBlock.number);
+    const blockToUse = Math.min(subgraphMeta.block, optionsBlock.number);
 
-    return await (await providerThenable).getBlock(blockToUse);
+    return await C().RPC.getBlock(blockToUse);
   }
 
   // Performs a binary search lookup to find the ethereum block number closest to this timestamp
   static async findBlockByTimestamp(timestamp) {
-    const provider = await providerThenable;
+    const provider = C().RPC;
     let upper = await provider.getBlockNumber();
     let lower = 12900000; // Beanstalk did not exist prior to this block
     let bestBlock = null;
@@ -57,11 +46,6 @@ class BlockUtil {
       }
     }
     return bestBlock;
-  }
-
-  static async findBlockForSeason(beanstalk, season) {
-    const block = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
-    return block;
   }
 }
 

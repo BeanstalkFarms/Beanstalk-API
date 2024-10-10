@@ -2,6 +2,7 @@
  * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
  */
 
+const InputError = require('../error/input-error');
 const SiloApyService = require('../service/silo-apy');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../service/silo-service');
 const RestParsingUtil = require('../utils/rest-parsing');
@@ -19,15 +20,16 @@ router.post('/yield', async (ctx) => {
   const body = ctx.request.body;
 
   if (body.emaWindows && (!Array.isArray(body.emaWindows) || body.emaWindows.length === 0)) {
-    ctx.body = { error: 'Invalid `emaWindows` property was provided.' };
-    ctx.status = 400;
-    return;
+    throw new InputError('Invalid `emaWindows` property was provided.');
   }
 
   if (body.tokens && (!Array.isArray(body.tokens) || body.tokens.length === 0)) {
-    ctx.body = { error: 'Invalid `tokens` property was provided.' };
-    ctx.status = 400;
-    return;
+    throw new InputError('Invalid `tokens` property was provided.');
+  }
+
+  // Prevents user from requesting legacy chain; season number will dictate constants
+  if (ctx.query.chain) {
+    throw new InputError('Query parameter `chain` is not compatible with this request.');
   }
 
   const results = await SiloApyService.getApy(body);

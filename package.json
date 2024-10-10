@@ -9,6 +9,7 @@
     "docker:stop": "./docker/stop.sh local",
     "docker:db": "./docker/start.sh local 3000 5432 postgres",
     "test": "jest",
+    "debug": "node --inspect ./src/app.js",
     "prettier": "prettier --write .",
     "migrate": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
@@ -19,7 +20,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFiles": ["<rootDir>/test/jest.setup.js"]
+    "setupFiles": [
+      "<rootDir>/test/jest.setup.js"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -27,7 +30,7 @@
   "dependencies": {
     "@beanstalk/contract-storage": "^1.1.0",
     "@koa/cors": "^5.0.0",
-    "alchemy-sdk": "^3.3.0",
+    "alchemy-sdk": "^3.4.2",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "ethers": "^6.12.1",
