@@ -156,8 +156,8 @@ class BeanstalkSubgraphRepository {
     const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
       const { id, ...rest } = nextToken;
       result[id] = {
-        depositedBDV: depositAmounts[id].depositedBDV,
-        germinatingBDV: germinationInfo[id],
+        depositedBDV: depositAmounts[id]?.depositedBDV ?? 0n,
+        germinatingBDV: germinationInfo?.[id] ?? [0n, 0n],
         isWhitelisted: apyInputs.silo.whitelistedTokens.includes(id),
         ...rest
       };
