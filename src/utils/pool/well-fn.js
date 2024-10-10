@@ -26,24 +26,21 @@ class WellFnUtil {
     const newLp = BigInt(await wellFn.calcLpTokenSupply(newReserves, data));
     const deltaLp = newLp - initialLp;
 
+    // Determines how much of the liquidity operation was double sided.
+    // Can then calculate how much was single sided.
+    const deltaReserves = [newReserves[0] - prevReserves[0], newReserves[1] - prevReserves[1]].map(BigInt_abs);
     if (deltaLp > 0n) {
       // Add liquidity
-      // Determines how much of the liquidity operation was double sided.
-      // Can then calculate how much was single sided.
       const doubleSided = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, data)).map(
         BigInt
       );
-      const deltaReserves = [newReserves[0] - prevReserves[0], newReserves[1] - prevReserves[1]];
       return [doubleSided[0] - deltaReserves[0], doubleSided[1] - deltaReserves[1]];
     } else {
       // Remove liquidity
-      const volume = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), prevReserves, initialLp, data)).map(
+      const doubleSided = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), prevReserves, initialLp, data)).map(
         BigInt
       );
-      return [
-        newReserves[0] >= prevReserves[0] ? -volume[0] : volume[0],
-        newReserves[1] >= prevReserves[1] ? -volume[1] : volume[1]
-      ];
+      return [deltaReserves[0] - doubleSided[0], deltaReserves[1] - doubleSided[1]];
     }
   }
 
@@ -76,8 +73,8 @@ if (require.main === module) {
           data: '0x'
         }
       },
-      [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
-      [1n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+      [3000n * BigInt(10 ** 6), 10n * BigInt(10 ** 18)],
+      [1500n * BigInt(10 ** 6), 9n * BigInt(10 ** 18)],
       C('eth')
     );
     console.log(result);

@@ -1,3 +1,4 @@
+const { C } = require('../src/constants/runtime-constants');
 const Contracts = require('../src/datasources/contracts/contracts');
 const WellDto = require('../src/repository/subgraph/dto/WellDto');
 const PriceService = require('../src/service/price-service');
@@ -49,7 +50,7 @@ describe('Pool Math', () => {
     expect(depth2.sell.float[0]).toBeCloseTo(144811.293059);
     expect(depth2.sell.float[1]).toBeCloseTo(22.504897083713395);
   });
-  describe('Liquidity event volume', async () => {
+  describe('Liquidity event volume', () => {
     test('Add Liquidity', async () => {
       const prevLp = 38729833462074168851n;
       const newLp = 54772255750516611345n;
@@ -76,7 +77,29 @@ describe('Pool Math', () => {
       expect(result[1]).toEqual(292893218813452475n);
     });
     test('Remove Liquidity', async () => {
-      // TODO
+      const prevLp = 173205080756887729352n;
+      const newLp = 116189500386222506555n;
+      const deltaLp = prevLp - newLp;
+      const calcLPTokenUnderlyingMock = jest.fn().mockResolvedValueOnce([987538820n, 3291796067500630910n]);
+      jest.spyOn(Contracts, 'get').mockReturnValue({
+        calcLpTokenSupply: jest.fn().mockResolvedValueOnce(prevLp).mockResolvedValueOnce(newLp),
+        calcLPTokenUnderlying: calcLPTokenUnderlyingMock
+      });
+
+      const result = await WellFnUtil.calcLiquidityVolume(
+        {
+          wellFunction: {
+            id: 'xyz',
+            data: '0x'
+          }
+        },
+        [3000n * BigInt(10 ** 6), 10n * BigInt(10 ** 18)],
+        [1500n * BigInt(10 ** 6), 9n * BigInt(10 ** 18)]
+      );
+
+      expect(calcLPTokenUnderlyingMock).toHaveBeenCalledWith(deltaLp, expect.any(Array), prevLp, expect.any(String));
+      expect(result[0]).toEqual(512461180n);
+      expect(result[1]).toEqual(-2291796067500630910n);
     });
   });
 
