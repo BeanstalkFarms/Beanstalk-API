@@ -5,6 +5,7 @@ const TokenRepository = require('../repository/postgres/queries/token-repository
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
+const PromiseUtil = require('../utils/promise');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
@@ -119,17 +120,19 @@ class SiloService {
     await sequelize.transaction(async (transaction) => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
-        const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await Contracts.get(token).totalSupply()))(),
-          (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
-          (async () => {
-            const tokenSettings = await beanstalk.tokenSettings(token);
-            return BigInt(tokenSettings.stalkEarnedPerSeason);
-          })(),
-          (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
-          (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
-          (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
-        ]);
+        const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
+          [
+            (async () => BigInt(await Contracts.get(token).totalSupply()))(),
+            (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
+            (async () => {
+              const tokenSettings = await beanstalk.tokenSettings(token);
+              return BigInt(tokenSettings.stalkEarnedPerSeason);
+            })(),
+            (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
+          ].map(PromiseUtil.nullOnReject)
+        );
 
         updatedTokens.push(
           ...(await TokenRepository.updateToken(
