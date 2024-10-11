@@ -1,27 +1,24 @@
-const SubgraphClients = require('../../datasources/subgraph-client');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
-const SubgraphRepository = require('./common-subgraph');
+const { C } = require('../../constants/runtime-constants');
+const { gql } = require('graphql-request');
 
 class BeanstalkSubgraphRepository {
-  static async getMeta() {
-    return await SubgraphRepository.getMeta(SubgraphClients.beanstalkSG);
-  }
-
-  static async getDepositedBdvs(accounts, blockNumber) {
+  static async getDepositedBdvs(accounts, blockNumber, c = C()) {
     const silos = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.beanstalkSG,
-      SubgraphClients.gql`
-      {
-        silos {
-          id
-          stalk
-          assets {
-            token
-            depositedBDV
+      c.SG.BEANSTALK,
+      gql`
+        {
+          silos {
+            id
+            stalk
+            assets {
+              token
+              depositedBDV
+            }
           }
         }
-      }`,
+      `,
       `block: {number: ${blockNumber}}`,
       `id_in: [${accounts.map((a) => `"${a}"`).join(', ')}]`,
       ['stalk'],
@@ -39,19 +36,21 @@ class BeanstalkSubgraphRepository {
     return retval;
   }
 
-  static async getSiloHourlyRewardMints(beanstalk, fromSeason, toSeason) {
+  // From exclusive, To inclusive.
+  static async getSiloHourlyRewardMints(fromSeason, toSeason, c = C()) {
     const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
-      SubgraphClients.beanstalkSG,
-      SubgraphClients.gql`
-      {
-        siloHourlySnapshots {
-          season
-          deltaBeanMints
+      c.SG.BEANSTALK,
+      gql`
+        {
+          siloHourlySnapshots {
+            season
+            deltaBeanMints
+          }
         }
-      }`,
+      `,
       '',
-      `silo: "${beanstalk}", season_lte: ${toSeason}`,
-      // Lower bound season is applied here
+      `silo: "${c.BEANSTALK}", season_lte: ${toSeason}`,
+      // Lower bound season is applied here (gt)
       ['season'],
       [fromSeason],
       'asc'
@@ -64,10 +63,10 @@ class BeanstalkSubgraphRepository {
     );
   }
 
-  static async getPreGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+  static async getPreGaugeApyInputs(season, c = C()) {
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
-    const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+    const apyInputs = await c.SG.BEANSTALK(gql`
       {
         whitelistTokenSettings(
           block: {number: ${blockNumber}}
@@ -77,11 +76,11 @@ class BeanstalkSubgraphRepository {
           stalkIssuedPerBdv
         }
         silo(
-          id: "${beanstalk}",
+          id: "${c.BEANSTALK}",
           block: {number: ${blockNumber}}
         ) {
-          seeds
           stalk
+          grownStalkPerSeason
           depositedBDV
         }
       }`);
@@ -98,10 +97,10 @@ class BeanstalkSubgraphRepository {
     });
   }
 
-  static async getGaugeApyInputs(beanstalk, season) {
-    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(beanstalk, season);
+  static async getGaugeApyInputs(season, c = C()) {
+    const blockNumber = await BeanstalkSubgraphRepository.getBlockForSeason(season, c);
 
-    const apyInputs = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+    const apyInputs = await c.SG.BEANSTALK(gql`
       {
         whitelistTokenSettings(
           block: {number: ${blockNumber}}
@@ -109,21 +108,20 @@ class BeanstalkSubgraphRepository {
           id
           stalkEarnedPerSeason
           stalkIssuedPerBdv
-          gpSelector
+          isGaugeEnabled
           gaugePoints
           optimalPercentDepositedBdv
         }
         silo(
-          id: "${beanstalk}",
+          id: "${c.BEANSTALK}",
           block: {number: ${blockNumber}}
         ) {
           beanToMaxLpGpPerBdvRatio
-          seeds
           stalk
           whitelistedTokens
         }
         siloAssets(
-          where: {silo: "${beanstalk}", depositedBDV_gt: "0"}
+          where: {silo: "${c.BEANSTALK}", depositedBDV_gt: "0"}
           block: {number: ${blockNumber}}
         ) {
           token
@@ -156,12 +154,11 @@ class BeanstalkSubgraphRepository {
     }
 
     const tokens = apyInputs.whitelistTokenSettings.reduce((result, nextToken) => {
-      const { id, gpSelector, ...rest } = nextToken;
+      const { id, ...rest } = nextToken;
       result[id] = {
-        depositedBDV: depositAmounts[id].depositedBDV,
-        germinatingBDV: germinationInfo[id],
+        depositedBDV: depositAmounts[id]?.depositedBDV ?? 0n,
+        germinatingBDV: germinationInfo?.[id] ?? [0n, 0n],
         isWhitelisted: apyInputs.silo.whitelistedTokens.includes(id),
-        isGauge: gpSelector != null,
         ...rest
       };
       return result;
@@ -172,44 +169,40 @@ class BeanstalkSubgraphRepository {
         silo: apyInputs.silo,
         tokens
       },
-      ['whitelistedTokens', 'gpSelector']
+      ['whitelistedTokens']
     );
   }
 
-  static async getBlockForSeason(beanstalk, season) {
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getBlockForSeason(season, c = C()) {
+    const result = await c.SG.BEANSTALK(gql`
       {
-        seasons(where: {beanstalk: "${beanstalk}", season: ${season}}) {
+        seasons(where: {season: ${season}}) {
           sunriseBlock
         }
       }`);
     return result.seasons[0]?.sunriseBlock;
   }
 
-  static async getLatestSeason(beanstalk) {
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getLatestSeason(c = C()) {
+    const result = await c.SG.BEANSTALK(gql`
       {
-        seasons(
-          where: {beanstalk: "${beanstalk.toLowerCase()}"}
-          orderBy: season
-          orderDirection: desc
-          first: 1
-        ) {
+        seasons(orderBy: season, orderDirection: desc, first: 1) {
           season
           sunriseBlock
           createdAt
         }
-      }`);
+      }
+    `);
     return result.seasons[0];
   }
 
   // Returns all tokens that have been whitelisted prior to the given block or season.
-  static async getPreviouslyWhitelistedTokens(beanstalk, { block, season }) {
-    const blockNumber = block ?? (await this.getBlockForSeason(beanstalk, season));
-    const result = await SubgraphClients.beanstalkSG(SubgraphClients.gql`
+  static async getPreviouslyWhitelistedTokens({ block, season }, c = C()) {
+    const blockNumber = block ?? (await BeanstalkSubgraphRepository.getBlockForSeason(season, c));
+    const result = await c.SG.BEANSTALK(gql`
       {
         silo(
-          id: "${beanstalk.toLowerCase()}"
+          id: "${c.BEANSTALK}"
           block: {number: ${blockNumber}}
         ) {
           whitelistedTokens

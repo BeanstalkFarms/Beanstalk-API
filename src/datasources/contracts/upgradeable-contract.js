@@ -1,16 +1,17 @@
+const { C } = require('../../constants/runtime-constants');
 const Contracts = require('./contracts');
 
 // Orchestration layer for managing contracts that change over time. Supports upgrading existing
 // contracts with new ABIs or switching to use a new contract address.
 class UpgradeableContract {
   /**
-   *
    * @param {*} mapping - used to determine which contract/abi to invoke per specified block
-   * @param {*} provider - rpc provider to use
+   * @param {*} c - the chain constants to use
    * @param {*} defaultBlock - the default block to use
-   * @returns
+   * @returns a Proxy wrapping an UpgradeableContract instance
    */
-  constructor(mapping, provider, defaultBlock = 'latest') {
+  constructor(mapping, c, defaultBlock) {
+    this.__c = c;
     this.__defaultBlock = defaultBlock;
     this.__mapping = mapping;
 
@@ -19,11 +20,7 @@ class UpgradeableContract {
         if (property === 'then') {
           return undefined;
         }
-        if (property === 'callStatic') {
-          // Allows legacy invocations to not require being updated to remove callStatic property
-          return receiver;
-        }
-        if (['__mapping', '__defaultBlock', '__version'].includes(property)) {
+        if (property.startsWith('__')) {
           // Don't proxy explicitly defined members on this class
           return target[property];
         }
@@ -41,6 +38,9 @@ class UpgradeableContract {
 
         // Find the contract corresponding to the input block
         const selected = mapping.find((entry) => {
+          if (entry.chain !== this.__c.CHAIN) {
+            return false;
+          }
           if (block === 'latest') {
             return entry.end === 'latest';
           } else {
@@ -53,8 +53,8 @@ class UpgradeableContract {
         }
 
         // Return the requested function with block prefilled
-        const contract = Contracts.makeContract(selected.address, selected.abi, provider);
-        return (...args) => contract.callStatic[property](...args, { blockTag: block });
+        const contract = Contracts.makeContract(selected.address, selected.abi, this.__c.RPC);
+        return (...args) => contract[property](...args, { blockTag: block });
       }
     };
 
@@ -62,13 +62,22 @@ class UpgradeableContract {
   }
 
   // Returns a version number for this contract at the requested block
-  __version(block = this.__defaultBlock) {
+  __version(c = this.__c, block = this.__defaultBlock) {
     for (let i = 0; i < this.__mapping.length; ++i) {
-      if (this.__mapping[i].start <= block && (this.__mapping[i].end > block || this.__mapping[i].end === 'latest')) {
+      if (
+        this.__mapping[i].chain === c.CHAIN &&
+        (this.__mapping[i].start <= block || block === 'latest') &&
+        (this.__mapping[i].end > block || this.__mapping[i].end === 'latest')
+      ) {
         return i + 1;
       }
     }
     return -1;
+  }
+
+  // This particular method exists for ease of mocking
+  static make(mapping, c = C(), block = 'latest') {
+    return new UpgradeableContract(mapping, c, block);
   }
 }
 

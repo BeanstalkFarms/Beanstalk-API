@@ -1,13 +1,13 @@
 function bigintToDecStr(bi) {
-  return bi.toString();
+  return bi !== null ? bi.toString() : null;
 }
 
 function bigintToHexStr(bi) {
-  return `0x${bi.toString(16)}`;
+  return bi !== null ? `0x${bi.toString(16)}` : null;
 }
 
 function bigintFrom(decOrHex) {
-  return BigInt(decOrHex);
+  return decOrHex !== null ? BigInt(decOrHex) : null;
 }
 
 // Includes Getters/Setters for transforming between BigInt/string in runtime models

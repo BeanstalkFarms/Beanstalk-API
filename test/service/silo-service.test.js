@@ -1,14 +1,14 @@
-const { BigNumber } = require('alchemy-sdk');
-const { TEN_BN, MILESTONE, ZERO_BN } = require('../../src/constants/constants');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../../src/service/silo-service');
 const BlockUtil = require('../../src/utils/block');
-const subgraphClient = require('../../src/datasources/subgraph-client');
-const { BEAN, UNRIPE_BEAN, UNRIPE_LP } = require('../../src/constants/addresses');
-const ContractGetters = require('../../src/datasources/contracts/contract-getters');
+const {
+  ADDRESSES: { BEAN, UNRIPE_BEAN, UNRIPE_LP },
+  MILESTONE
+} = require('../../src/constants/raw/beanstalk-eth');
+const Contracts = require('../../src/datasources/contracts/contracts');
+const whitelistedSGResponse = require('../mock-responses/subgraph/silo-service/whitelistedTokens.json');
+const { mockBeanstalkSG } = require('../util/mock-sg');
 
 const defaultOptions = { blockNumber: 19000000 };
-
-const whitelistedSGResponse = require('../mock-responses/subgraph/silo-service/whitelistedTokens.json');
 
 describe('SiloService', () => {
   beforeAll(() => {
@@ -22,19 +22,17 @@ describe('SiloService', () => {
   it('should fetch silov3 grown stalk for requested stalkholders', async () => {
     const accounts = ['0xabcd', '0x1234'];
     const mockBeanstalk = {
-      callStatic: {
-        balanceOfGrownStalk: jest.fn().mockImplementation((account, asset) => {
-          if (account == accounts[0]) {
-            return BigNumber.from(50).mul(TEN_BN.pow(10));
-          } else {
-            return BigNumber.from(15).mul(TEN_BN.pow(10));
-          }
-        })
-      }
+      balanceOfGrownStalk: jest.fn().mockImplementation((account, asset) => {
+        if (account == accounts[0]) {
+          return 50n * BigInt(10 ** 10);
+        } else {
+          return 15n * BigInt(10 ** 10);
+        }
+      })
     };
 
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
-    jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
 
@@ -47,32 +45,29 @@ describe('SiloService', () => {
     const accounts = ['0xabcd', '0x1234'];
 
     const siloSGResponse = require('../mock-responses/subgraph/silo-service/depositedBdvs.json');
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(siloSGResponse);
-    jest.spyOn(subgraphClient, 'beanstalkSG').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(siloSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
 
     const mockBeanstalk = {
-      callStatic: {
-        stemTipForToken: jest.fn().mockImplementation((token, options) => {
-          if (options.blockTag == MILESTONE.siloV3 || token == UNRIPE_BEAN || token == UNRIPE_LP) {
-            return ZERO_BN;
-          } else {
-            return BigNumber.from(10000);
-          }
-        }),
-        balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
-          if (account == accounts[0]) {
-            return BigNumber.from(5000).mul(TEN_BN.pow(10));
-          } else {
-            return BigNumber.from(150000).mul(TEN_BN.pow(10));
-          }
-        })
-      }
+      stemTipForToken: jest.fn().mockImplementation((token, options) => {
+        if (options.blockTag == MILESTONE.siloV3Block || token == UNRIPE_BEAN || token == UNRIPE_LP) {
+          return 0n;
+        } else {
+          return 10000n;
+        }
+      }),
+      balanceOfGrownStalkUpToStemsDeployment: jest.fn().mockImplementation((account) => {
+        if (account == accounts[0]) {
+          return 5000n * BigInt(10 ** 10);
+        } else {
+          return 150000n * BigInt(10 ** 10);
+        }
+      })
     };
 
-    jest.spyOn(ContractGetters, 'getBeanstalkContract').mockResolvedValue(mockBeanstalk);
+    jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
 
     const grownStalk = await getUnmigratedGrownStalk(accounts, defaultOptions);
-    // console.log(JSON.stringify(grownStalk));
 
     expect(grownStalk.total).toEqual(155640);
     expect(grownStalk.accounts[0].total).toEqual(150505);

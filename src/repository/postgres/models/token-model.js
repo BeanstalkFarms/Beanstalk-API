@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true
       },
+      chain: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -22,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       },
+      ...bigintStringColumn('supply', DataTypes, { allowNull: false }),
       decimals: {
         type: DataTypes.INTEGER,
         allowNull: false
@@ -37,7 +42,13 @@ module.exports = (sequelize, DataTypes) => {
       ...bigintStringColumn('totalDepositedBdv', DataTypes)
     },
     {
-      tableName: 'token'
+      tableName: 'token',
+      indexes: [
+        {
+          unique: true,
+          fields: ['address', 'chain']
+        }
+      ]
     }
   );
 

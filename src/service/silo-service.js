@@ -1,21 +1,19 @@
-const { BEANSTALK } = require('../constants/addresses');
-const { MILESTONE } = require('../constants/constants');
-const ContractGetters = require('../datasources/contracts/contract-getters');
-const EVM = require('../datasources/evm');
-const subgraphClient = require('../datasources/subgraph-client');
+const { C } = require('../constants/runtime-constants');
+const Contracts = require('../datasources/contracts/contracts');
 const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
+const PromiseUtil = require('../utils/promise');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
-    const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
+    const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
+    const beanstalk = Contracts.getBeanstalk();
 
     const siloAssets = (
-      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
         block: block.number
       })
     ).all;
@@ -26,11 +24,11 @@ class SiloService {
     for (const account of accounts) {
       const promises = [];
       for (const asset of siloAssets) {
-        promises.push(beanstalk.callStatic.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
+        promises.push(beanstalk.balanceOfGrownStalk(account, asset, { blockTag: block.number }));
       }
 
       // Parallelize all calls for this account
-      const grownStalkResults = (await Promise.all(promises)).map((bn) => createNumberSpread(bn, 10, 2));
+      const grownStalkResults = (await Promise.all(promises)).map((bi) => createNumberSpread(bi, 10, 2));
 
       // Compute total and by asset breakdown
       let total = 0;
@@ -54,25 +52,27 @@ class SiloService {
   }
 
   static async getUnmigratedGrownStalk(accounts, options = {}) {
-    const block = await BlockUtil.blockForSubgraphFromOptions(subgraphClient.beanstalkSG, options);
-    const beanstalk = await ContractGetters.getBeanstalkContract(block.number);
+    const block = await BlockUtil.blockForSubgraphFromOptions(C().SG.BEANSTALK, options);
+    const beanstalk = Contracts.getBeanstalk();
 
     // Assumption is that the user has either migrated everything or migrated nothing.
     // In practice this should always be true because the ui does not allow partial migration.
     const depositedBdvs = await BeanstalkSubgraphRepository.getDepositedBdvs(accounts, block.number);
     const siloAssets = (
-      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens(BEANSTALK, {
+      await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({
         block: block.number
       })
     ).all;
 
     const stemDeltas = [];
     for (const asset of siloAssets) {
-      const [migrationStemTip, stemTipNow] = await Promise.all([
-        beanstalk.callStatic.stemTipForToken(asset, { blockTag: MILESTONE.siloV3 }),
-        beanstalk.callStatic.stemTipForToken(asset, { blockTag: block.number })
-      ]);
-      stemDeltas.push(stemTipNow.sub(migrationStemTip).toNumber());
+      const [migrationStemTip, stemTipNow] = (
+        await Promise.all([
+          beanstalk.stemTipForToken(asset, { blockTag: C().MILESTONE.siloV3Block }),
+          beanstalk.stemTipForToken(asset, { blockTag: block.number })
+        ])
+      ).map(BigInt);
+      stemDeltas.push(Number(stemTipNow - migrationStemTip));
     }
 
     const retval = {
@@ -80,7 +80,7 @@ class SiloService {
       accounts: []
     };
     for (const account in depositedBdvs) {
-      const uncategorized = await beanstalk.callStatic.balanceOfGrownStalkUpToStemsDeployment(account, {
+      const uncategorized = await beanstalk.balanceOfGrownStalkUpToStemsDeployment(account, {
         blockTag: block.number
       });
       const uncategorizedFloat = createNumberSpread(uncategorized, 10, 2).float;
@@ -112,25 +112,34 @@ class SiloService {
 
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
-    const { beanstalk, bs } = await EVM.beanstalkContractAndStorage();
-    const tokenModels = await TokenRepository.findWhitelistedTokens();
+    const chain = C().CHAIN;
+    const beanstalk = Contracts.getBeanstalk();
+    const tokenModels = await TokenRepository.findWhitelistedTokens({ chain });
 
     const updatedTokens = [];
     await sequelize.transaction(async (transaction) => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
-        const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all([
-          (async () => BigInt(await beanstalk.callStatic.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
-          bs.s.ss[token].stalkEarnedPerSeason,
-          (async () => BigInt(await beanstalk.callStatic.stemTipForToken(token)))(),
-          (async () => BigInt(await beanstalk.callStatic.getTotalDeposited(token)))(),
-          (async () => BigInt(await beanstalk.callStatic.getTotalDepositedBdv(token)))()
-        ]);
+        const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
+          [
+            (async () => BigInt(await Contracts.get(token).totalSupply()))(),
+            (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
+            (async () => {
+              const tokenSettings = await beanstalk.tokenSettings(token);
+              return BigInt(tokenSettings.stalkEarnedPerSeason);
+            })(),
+            (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
+            (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
+          ].map(PromiseUtil.nullOnReject)
+        );
 
         updatedTokens.push(
           ...(await TokenRepository.updateToken(
             token,
+            chain,
             {
+              supply,
               bdv,
               stalkEarnedPerSeason,
               stemTip,

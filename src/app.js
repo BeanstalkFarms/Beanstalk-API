@@ -1,8 +1,7 @@
-require('dotenv').config();
 const priceRoutes = require('./routes/price-routes.js');
 const coingeckoRoutes = require('./routes/coingecko-routes.js');
 const siloRoutes = require('./routes/silo-routes.js');
-const migrationRoutes = require('./routes/migration-routes.js');
+const snapshotRoutes = require('./routes/snapshot-routes.js');
 
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
@@ -11,12 +10,20 @@ const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
 const { formatBigintHex } = require('./utils/bigint.js');
+const AsyncContext = require('./utils/context.js');
+const EnvUtil = require('./utils/env.js');
+const ChainUtil = require('./utils/chain.js');
+const AlchemyUtil = require('./datasources/alchemy.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
-  const cronJobs = process.env.ENABLED_CRON_JOBS?.split(',');
-  if (cronJobs && (cronJobs.length > 1 || cronJobs[0] != '')) {
+  const cronJobs = EnvUtil.getEnabledCronJobs();
+  if (cronJobs.length > 0) {
     activateJobs(cronJobs);
+  }
+
+  for (const chain of EnvUtil.getEnabledChains()) {
+    await AlchemyUtil.ready(chain);
   }
 
   const app = new Koa();
@@ -31,6 +38,19 @@ async function appStartup() {
   );
 
   app.use(bodyParser());
+
+  app.use(async (ctx, next) => {
+    const chain = ctx.query.chain ?? EnvUtil.defaultChain();
+    if (!ChainUtil.isValidChain(chain) || !EnvUtil.isChainEnabled(chain)) {
+      ctx.status = 400;
+      ctx.body = {
+        message: `Invalid chain '${chain}' was requested.`
+      };
+      return;
+    }
+    // Stores chain in the async context
+    await AsyncContext.run({ chain }, next);
+  });
 
   app.use(async (ctx, next) => {
     if (!ctx.originalUrl.includes('healthcheck')) {
@@ -69,8 +89,8 @@ async function appStartup() {
   app.use(coingeckoRoutes.allowedMethods());
   app.use(siloRoutes.routes());
   app.use(siloRoutes.allowedMethods());
-  app.use(migrationRoutes.routes());
-  app.use(migrationRoutes.allowedMethods());
+  app.use(snapshotRoutes.routes());
+  app.use(snapshotRoutes.allowedMethods());
 
   const router = new Router();
   router.get('/healthcheck', async (ctx) => {

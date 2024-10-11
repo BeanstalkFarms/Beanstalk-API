@@ -1,17 +1,17 @@
-require('dotenv').config();
 const axios = require('axios');
+const EnvUtil = require('./env');
 
 // Sends a discord webhook message if any channels are configured here
 async function sendWebhookMessage(message) {
-  const webhookUrls = process.env.DISCORD_NOTIFICATION_WEBHOOKS?.split(',');
+  const webhookUrls = EnvUtil.getDiscordWebhooks();
   if (webhookUrls) {
-    let prefix = process.env.DISCORD_NOTIFICATION_PREFIX ? process.env.DISCORD_NOTIFICATION_PREFIX + '\n' : '';
+    let prefix = EnvUtil.getDiscordPrefix() !== '' ? EnvUtil.getDiscordPrefix() + '\n' : '';
     await Promise.all(
       webhookUrls.map(async (url) => {
         await axios.post(url, {
           // avatar_url: '',
           username: 'Beanstalk API',
-          content: `${prefix}[${process.env.NODE_ENV}] - ${message}`
+          content: `${prefix}[${EnvUtil.getDeploymentEnv()}] - ${message}`
         });
       })
     );

@@ -1,20 +1,32 @@
-const { Contract } = require('alchemy-sdk');
-const { ABIS } = require('../../constants/addresses.js');
-
-const contracts = {};
+const { Contract: AlchemyContract } = require('alchemy-sdk');
+const { C } = require('../../constants/runtime-constants');
 
 class Contracts {
-  static async getContractAsync(address, blockNumber, provider) {
-    const network = (await provider.detectNetwork()).name;
-    const key = JSON.stringify({ address, blockNumber, network });
-    if (!contracts[key]) {
-      contracts[key] = this.makeContract(address, ABIS[address], provider);
-    }
-    return contracts[key];
+  static _contracts = {};
+
+  static get(address, c = C()) {
+    return Contracts._getDefaultContract(address, c);
+  }
+
+  static getBeanstalk(c = C()) {
+    return Contracts.get(c.BEANSTALK, c);
   }
 
   static makeContract(address, abi, provider) {
-    return new Contract(address, abi, provider);
+    return new AlchemyContract(address, abi, provider);
+  }
+
+  static _getDefaultContract(address, c = C()) {
+    const network = c.CHAIN;
+    const key = JSON.stringify({ address, network });
+    if (!Contracts._contracts[key]) {
+      const abi = c.ABIS[address];
+      if (!abi) {
+        throw new Error(`There is no default ABI for contract ${address}.`);
+      }
+      Contracts._contracts[key] = this.makeContract(address, abi, c.RPC);
+    }
+    return Contracts._contracts[key];
   }
 }
 

@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const { getTickers, getTrades } = require('../service/coingecko-service');
 const RestParsingUtil = require('../utils/rest-parsing');
+const InputError = require('../error/input-error');
 
 const router = new Router({
   prefix: '/basin'
@@ -23,9 +24,7 @@ router.get('/tickers', async (ctx) => {
 router.get('/historical_trades', async (ctx) => {
   const options = RestParsingUtil.parseQuery(ctx.query);
   if (!options.ticker_id) {
-    ctx.body = { error: 'Required parameter not provided' };
-    ctx.status = 400;
-    return;
+    throw new InputError('Required parameter not provided');
   }
 
   // Defaults for optional variables
