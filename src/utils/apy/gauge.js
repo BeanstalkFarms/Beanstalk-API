@@ -70,7 +70,7 @@ class GaugeApyUtil {
     options
   ) {
     // In practice this probably doesnt need to get updated as seasons pass in the simulation
-    let PRECISION = C().DECIMALS;
+    let PRECISION = C(season).DECIMALS;
 
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;

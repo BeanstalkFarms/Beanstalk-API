@@ -3,13 +3,13 @@
 const EnvUtil = require('../../utils/env');
 const SubgraphClients = require('../../datasources/subgraph-client');
 
-const bip45Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP45.json');
+const bip49Abi = require('../../datasources/abi/beanstalk/Beanstalk-BIP49.json');
 const erc20Abi = require('../../datasources/abi/ERC20.json');
 const wellAbi = require('../../datasources/abi/basin/Well.json');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
 const contracts = {
-  BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, bip45Abi],
+  BEANSTALK: ['0xC1E088fC1323b20BCBee9bd1B9fC9546db5624C5', null, bip49Abi],
   BEAN: ['0xBEA0000029AD1c77D3d5D23Ba2D8893dB9d1Efab', 6, erc20Abi],
   UNRIPE_BEAN: ['0x1BEA0050E63e05FBb5D8BA2f10cf5800B6224449', 6, erc20Abi],
   UNRIPE_LP: ['0x1BEA3CcD22F4EBd3d37d731BA31Eeca95713716D', 6, erc20Abi],
@@ -39,7 +39,7 @@ const DECIMALS = {
 
 const MILESTONE = {
   startSeason: 1,
-  endSeason: 30000, // TODO: set this to the pause season +1 (the first season to occur on L2)
+  endSeason: 25130, // The first season to occur on L2
   siloV3Block: 17671557,
   isGaugeEnabled: ({ season, block }) => (season ? season >= 21798 : block >= 19927634)
 };

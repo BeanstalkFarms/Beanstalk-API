@@ -3,7 +3,7 @@ const BeanstalkSubgraphRepository = require('../../repository/subgraph/beanstalk
 const CommonSubgraphRepository = require('../../repository/subgraph/common-subgraph');
 const { sendWebhookMessage } = require('../../utils/discord');
 
-const DEFAULT_WAIT = 5 * 60 * 1000;
+const DEFAULT_WAIT = 5.5 * 60 * 1000;
 const INTERVAL = 5000;
 
 class OnSunriseUtil {

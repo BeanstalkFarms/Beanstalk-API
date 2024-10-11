@@ -12,13 +12,13 @@ const mapping = [
   {
     chain: 'eth',
     start: 20334284,
-    end: 'latest', // TODO: pause block on L1
+    end: 20921738, // Reseed pause block on L1
     address: '0xb24a70b71e4cca41eb114c2f61346982aa774180',
     abi: require('../../abi/UsdOracle2.json')
   },
   {
     chain: 'arb',
-    start: 202981420, // TODO: unpause block on L2
+    start: 262211593, // Reseed unpause block on L2
     end: 'latest',
     address: '0xD1A0060ba708BC4BCD3DA6C37EFa8deDF015FB70',
     abi: require('../../abi/beanstalk/Beanstalk-BIP50.json')

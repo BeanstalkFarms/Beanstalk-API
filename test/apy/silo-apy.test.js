@@ -306,8 +306,8 @@ describe('SiloApyService Orchestration', () => {
   it('gauge should supply appropriate parameters', async () => {
     const seasonBlockResponse = require('../mock-responses/subgraph/silo-apy/gaugeApyInputs_1.json');
     jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(seasonBlockResponse);
-    const preGaugeApyInputsResponse = require('../mock-responses/subgraph/silo-apy/gaugeApyInputs_2.json');
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(preGaugeApyInputsResponse);
+    const gaugeApyInputsResponse = require('../mock-responses/subgraph/silo-apy/gaugeApyInputs_2.json');
+    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(gaugeApyInputsResponse);
 
     const spy = jest.spyOn(GaugeApyUtil, 'calcApy');
     spy.mockReturnValueOnce({

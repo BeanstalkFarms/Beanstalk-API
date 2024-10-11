@@ -1,4 +1,5 @@
 const { C } = require('../../constants/runtime-constants');
+const AlchemyUtil = require('../../datasources/alchemy');
 const Contracts = require('../../datasources/contracts/contracts');
 const { BigInt_abs } = require('../bigint');
 
@@ -17,8 +18,8 @@ class WellFnUtil {
   }
 
   // Calculates the token volume resulting from a liquidity add operation.
-  static async calcLiquidityVolume(well, prevReserves, newReserves) {
-    const wellFn = Contracts.get(well.wellFunction.id);
+  static async calcLiquidityVolume(well, prevReserves, newReserves, c = C()) {
+    const wellFn = Contracts.get(well.wellFunction.id, c);
     const data = well.wellFunction.data;
 
     const initialLp = await wellFn.calcLpTokenSupply(prevReserves, data);
@@ -27,13 +28,20 @@ class WellFnUtil {
 
     // Determines how much of the liquidity operation was double sided.
     // Can then calculate how much was single sided.
-    const doubleSided = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, data)).map(
-      (bn) => {
-        return deltaLp > 0n ? BigInt(bn) : -BigInt(bn);
-      }
-    );
-    const deltaReserves = [newReserves[0] - prevReserves[0], newReserves[1] - prevReserves[1]];
-    return [doubleSided[0] - deltaReserves[0], doubleSided[1] - deltaReserves[1]];
+    const deltaReserves = [newReserves[0] - prevReserves[0], newReserves[1] - prevReserves[1]].map(BigInt_abs);
+    if (deltaLp > 0n) {
+      // Add liquidity
+      const doubleSided = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), newReserves, newLp, data)).map(
+        BigInt
+      );
+      return [doubleSided[0] - deltaReserves[0], doubleSided[1] - deltaReserves[1]];
+    } else {
+      // Remove liquidity
+      const doubleSided = (await wellFn.calcLPTokenUnderlying(BigInt_abs(deltaLp), prevReserves, initialLp, data)).map(
+        BigInt
+      );
+      return [deltaReserves[0] - doubleSided[0], deltaReserves[1] - doubleSided[1]];
+    }
   }
 
   /**
@@ -53,3 +61,35 @@ class WellFnUtil {
 }
 
 module.exports = WellFnUtil;
+
+if (require.main === module) {
+  (async () => {
+    await AlchemyUtil.ready('eth');
+
+    const result = await WellFnUtil.calcLiquidityVolume(
+      {
+        wellFunction: {
+          id: C('eth').CP2,
+          data: '0x'
+        }
+      },
+      [3000n * BigInt(10 ** 6), 10n * BigInt(10 ** 18)],
+      [1500n * BigInt(10 ** 6), 9n * BigInt(10 ** 18)],
+      C('eth')
+    );
+    console.log(result);
+
+    const result1 = await WellFnUtil.calcLiquidityVolume(
+      {
+        wellFunction: {
+          id: C('eth').CP2,
+          data: '0x'
+        }
+      },
+      [1500n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+      [3000n * BigInt(10 ** 6), 1n * BigInt(10 ** 18)],
+      C('eth')
+    );
+    console.log(result1);
+  })();
+}
