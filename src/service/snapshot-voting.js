@@ -17,7 +17,7 @@ class SnapshotVotingService {
     );
     let arbDelegations = [];
     if (C().CHAIN === 'arb') {
-      arbDelegations = SnapshotSubgraphRepository.getDelegations('arb', blockNumber);
+      arbDelegations = await SnapshotSubgraphRepository.getDelegations('arb', blockNumber);
     }
     const allDelegations = [...ethDelegations, ...arbDelegations];
 
@@ -46,7 +46,7 @@ class SnapshotVotingService {
       );
       results.push({
         address,
-        score: Number(votingPower / BigInt(10 ** (C().DECIMALS.stalk - 2)) / 100),
+        score: Number(votingPower / BigInt(10 ** (C().DECIMALS.stalk - 2))) / 100,
         stalkholders
       });
     }
