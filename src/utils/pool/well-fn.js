@@ -52,7 +52,7 @@ class WellFnUtil {
    * @param {*} decimals - decimal precision of tokens in this well
    */
   static _transformRate(rate, wellFnAddr, j, decimals) {
-    if (wellFnAddr === C().CP2) {
+    if (wellFnAddr === C().CP2 || wellFnAddr === C().CP2_121) {
       const decimalsToRemove = 18 - decimals[j];
       return rate / BigInt(10 ** decimalsToRemove);
     }
