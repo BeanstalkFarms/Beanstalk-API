@@ -26,7 +26,9 @@ const contracts = {
   USDC: ['0xaf88d065e77c8cC2239327C5EDb3A432268e5831', 18, erc20Abi],
   USDT: ['0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', 18, erc20Abi],
   CP2: ['0xbA1500c28C8965521f47F17Fc21A7829D6E1343e', null, wellFunctionAbi],
-  STABLE2: ['0xba150052e11591D0648b17A0E608511874921CBC', null, wellFunctionAbi]
+  CP2_121: ['0xba15000450bf6d48ec50bd6327a9403e401b72b4', null, wellFunctionAbi],
+  STABLE2: ['0xba150052e11591D0648b17A0E608511874921CBC', null, wellFunctionAbi],
+  STABLE2_121: ['0xba150052e11591D0648b17A0E608511874921CBC', null, wellFunctionAbi]
 };
 
 // Extract values from the above contracts
