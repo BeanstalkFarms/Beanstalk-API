@@ -34,7 +34,7 @@ describe('Pool Math', () => {
         data: '0x'
       }
     };
-    jest.spyOn(Contracts, 'get').mockReturnValue({
+    jest.spyOn(Contracts, 'getWellFunction').mockReturnValue({
       calcReserveAtRatioSwap: jest
         .fn()
         .mockResolvedValueOnce(2194835811232559843749n)

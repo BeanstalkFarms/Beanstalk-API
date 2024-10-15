@@ -14,8 +14,8 @@ class WellDto {
     rollingDailyBiTradeVolumeReserves
     wellFunction {
       id
-      data
     }
+    wellFunctionData
   `;
 
   constructor(subgraphWell) {
@@ -28,7 +28,10 @@ class WellDto {
       subgraphWell.rollingDailyBiTradeVolumeReserves.map(BigInt),
       this.tokenDecimals()
     );
-    this.wellFunction = subgraphWell.wellFunction;
+    this.wellFunction = {
+      id: subgraphWell.wellFunction.id,
+      data: subgraphWell.wellFunctionData
+    };
   }
 
   tokenDecimals() {
