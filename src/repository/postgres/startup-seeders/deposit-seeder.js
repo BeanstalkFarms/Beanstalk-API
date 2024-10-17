@@ -4,7 +4,6 @@ const SiloService = require('../../../service/silo-service');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const DepositRepository = require('../queries/deposit-repository');
-const TokenRepository = require('../queries/token-repository');
 
 // Seeds the deposits table with initial info
 class DepositSeeder {
@@ -20,41 +19,40 @@ class DepositSeeder {
 
     // Initial deposits list comes directly from subgraph
     const allDeposits = await BeanstalkSubgraphRepository.getAllDeposits(seedBlock);
-    console.log('num deposits', allDeposits.length);
+    const accounts = this.getDepositsByAccount(allDeposits);
 
-    // Organize by account/token so its clear which mow stems are needed.
-    const accounts = {};
-    for (const deposit of allDeposits) {
-      deposit.chain = C().CHAIN;
-      accounts[deposit.account] ||= {};
-      accounts[deposit.account][deposit.token] ||= [];
-      accounts[deposit.account][deposit.token].push(deposit);
-    }
+    const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
+    console.log(tokenInfos);
 
-    const tokenSettings = await SiloService.getWhitelistedTokenSettings({ block: seedBlock, chain: C().CHAIN });
-    console.log(tokenSettings);
-
+    // Get mow stems for each account/token pair, and update the deposit
     for (const account in accounts) {
       for (const token in accounts[account]) {
+        const tokenInfo = tokenInfos[token];
         const lastStem = await beanstalk.getLastMowedStem(account, token, { blockTag: seedBlock });
-        console.log(account, token, lastStem);
-        // currentStalk
-        // baseStalk
-        // grownStalk
-        // mowStem
-        // mowableStalk
-        // currentSeeds
+        for (const deposit of accounts[account][token]) {
+          deposit.mowStem = lastStem;
+          // Set inherent deposit info
+          deposit.setStalkAndSeeds(tokenInfo);
+          // Updates lambda stats according to current token bdv
+          // deposit.updateLambdaStats(tokenInfo);
+        }
+        console.log(accounts[account][token]);
       }
     }
-
-    // Bdv on lambda etc should go through some lambda specific logic external to this seeder
-    // bdvOnLambda
-    // stalkOnLambda
-    // seedsOnLambda
 
     // save
 
     // save meta with block number used
+  }
+
+  static getDepositsByAccount(allDeposits) {
+    const accounts = {};
+    for (const deposit of allDeposits) {
+      accounts[deposit.account] ||= {};
+      accounts[deposit.account][deposit.token] ||= [];
+      accounts[deposit.account][deposit.token].push(deposit);
+    }
+    return accounts;
   }
 }
 

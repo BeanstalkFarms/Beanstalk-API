@@ -11,6 +11,17 @@ class DepositRepository {
     });
     return count;
   }
+
+  // Inserts the given deposit rows
+  static async addDeposits(deposits, options) {
+    options = { ...DEFAULT_OPTIONS, ...options };
+    const newDeposits = await sequelize.models.Deposit.bulkCreate(deposits, {
+      validate: true,
+      returning: true,
+      transaction: options.transaction
+    });
+    return newDeposits;
+  }
 }
 
 module.exports = DepositRepository;

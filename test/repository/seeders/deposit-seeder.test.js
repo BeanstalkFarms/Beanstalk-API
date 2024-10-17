@@ -18,7 +18,7 @@ describe('Deposit Seeder', () => {
     const depositsResponse = require('../../mock-responses/subgraph/silo-service/allDeposits.json');
     jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(depositsResponse);
 
-    jest.spyOn(SiloService, 'getWhitelistedTokenSettings').mockResolvedValue({
+    jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue({
       [C().BEAN]: {
         valuesTbd: 5n
       }

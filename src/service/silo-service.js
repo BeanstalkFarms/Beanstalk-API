@@ -110,13 +110,29 @@ class SiloService {
     return retval;
   }
 
-  static async getWhitelistedTokenSettings({ block, chain }) {
+  // Combines results from tokenSettings + stemTipForToken
+  static async getWhitelistedTokenInfo({ block, chain }) {
     const beanstalk = Contracts.getBeanstalk();
     const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain } });
-    const tokenSettings = await Promise.all(
-      tokenModels.map((t) => beanstalk.tokenSettings(t.address, { blockTag: block }))
+    const addresses = tokenModels.map((t) => t.address);
+
+    const results = await Promise.all(
+      addresses.map(async (t) => {
+        const [tokenSetting, stemTip, bdv] = await Promise.all([
+          beanstalk.tokenSettings(t, { blockTag: block }),
+          beanstalk.stemTipForToken(t, { blockTag: block })
+        ]);
+        return { tokenSetting, stemTip, bdv };
+      })
     );
-    return tokenSettings;
+
+    return addresses.reduce((acc, next, idx) => {
+      acc[next] = {
+        ...results[idx].tokenSetting,
+        stemTip: results[idx].stemTip
+      };
+      return acc;
+    }, {});
   }
 
   // Updates all whitelisted tokens in the database

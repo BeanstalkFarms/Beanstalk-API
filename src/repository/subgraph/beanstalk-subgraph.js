@@ -234,7 +234,7 @@ class BeanstalkSubgraphRepository {
         }
       `,
       `block: {number: ${blockNumber}}`,
-      'depositedBDV_gt: 10000000000', // temp for faster testing
+      'depositedBDV_gt: 10000000000', // temp for faster testing (TODO: remove this!)
       {
         field: 'createdBlock',
         lastValue: 0,

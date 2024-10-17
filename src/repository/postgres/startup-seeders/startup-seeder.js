@@ -1,3 +1,4 @@
+const Log = require('../../../utils/logging');
 const DepositSeeder = require('./deposit-seeder');
 
 const SEEDERS = [DepositSeeder];
@@ -7,9 +8,11 @@ let progress = 0;
 class StartupSeeder {
   static async seedDatabase() {
     for (let i = 0; i < SEEDERS.length; ++i) {
+      Log.info(`Running seeder [${progress}]...`);
       await SEEDERS[i].run();
       ++progress;
     }
+    Log.info(`Completed all seeders`);
   }
 
   static isSeeded(seeder) {
