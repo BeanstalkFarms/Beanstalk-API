@@ -1,6 +1,7 @@
 const { Contract: AlchemyContract } = require('alchemy-sdk');
 const { C } = require('../../constants/runtime-constants');
 const BigIntContract = require('./bigint-contract');
+const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
 class Contracts {
   static _contracts = {};
@@ -11,6 +12,10 @@ class Contracts {
 
   static getBeanstalk(c = C()) {
     return Contracts.get(c.BEANSTALK, c);
+  }
+
+  static getWellFunction(address, c = C()) {
+    return Contracts.makeContract(address, wellFunctionAbi, c.RPC);
   }
 
   static makeContract(address, abi, provider) {
