@@ -3,6 +3,7 @@ const Contracts = require('../datasources/contracts/contracts');
 const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
+const ArraysUtil = require('../utils/arrays');
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const PromiseUtil = require('../utils/promise');
@@ -133,6 +134,23 @@ class SiloService {
       };
       return acc;
     }, {});
+  }
+
+  static async batchBdvs(calldata, block, batchSize = 500) {
+    const beanstalk = Contracts.getBeanstalk();
+    const tokenBatches = ArraysUtil.toChunks(calldata.tokens);
+    const amountBatches = ArraysUtil.toChunks(calldata.amounts);
+
+    const results = [];
+    for (let i = 0; i < tokenBatches.length; i++) {
+      const batchTokens = tokenBatches[i];
+      const batchAmounts = amountBatches[i];
+
+      // Call the bdvs function
+      const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
+      results.push(...bdvsResult);
+    }
+    return results;
   }
 
   // Updates all whitelisted tokens in the database

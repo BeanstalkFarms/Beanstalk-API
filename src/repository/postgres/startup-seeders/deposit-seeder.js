@@ -1,6 +1,7 @@
 const { C } = require('../../../constants/runtime-constants');
 const Contracts = require('../../../datasources/contracts/contracts');
 const SiloService = require('../../../service/silo-service');
+const Concurrent = require('../../../utils/concurrent');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const DepositRepository = require('../queries/deposit-repository');
@@ -27,18 +28,36 @@ class DepositSeeder {
     // Get mow stems for each account/token pair, and update the deposit
     for (const account in accounts) {
       for (const token in accounts[account]) {
-        const tokenInfo = tokenInfos[token];
-        const lastStem = await beanstalk.getLastMowedStem(account, token, { blockTag: seedBlock });
-        for (const deposit of accounts[account][token]) {
-          deposit.mowStem = lastStem;
-          // Set inherent deposit info
-          deposit.setStalkAndSeeds(tokenInfo);
-          // Updates lambda stats according to current token bdv
-          // deposit.updateLambdaStats(tokenInfo);
-        }
-        console.log(accounts[account][token]);
+        await Concurrent.run('deposit-seeder', async () => {
+          const tokenInfo = tokenInfos[token];
+          const lastStem = await beanstalk.getLastMowedStem(account, token, { blockTag: seedBlock });
+          for (const deposit of accounts[account][token]) {
+            deposit.mowStem = lastStem;
+            // Set inherent deposit info
+            deposit.setStalkAndSeeds(tokenInfo);
+            // Updates lambda stats according to current token bdv
+            // deposit.updateLambdaStats(tokenInfo);
+          }
+          // console.log(accounts[account][token]);
+        });
       }
     }
+    await Concurrent.allResolved('deposit-seeder');
+    console.log('done');
+
+    ////
+    // Prepare bdvs function call
+    const bdvsCalldata = {
+      tokens: [],
+      amounts: []
+    };
+    for (const deposit of allDeposits) {
+      bdvsCalldata.tokens.push(deposit.token);
+      bdvsCalldata.amounts.push(deposit.depositedAmount);
+    }
+    const depositLambdaBdvs = await SiloService.batchBdvs(bdvsCalldata, seedBlock);
+    console.log(depositLambdaBdvs);
+    ////
 
     // save
 
