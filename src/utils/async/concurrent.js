@@ -4,6 +4,8 @@ const MAX_RUNNING = 50;
 
 // Allows high levels of concurrency by continually running up to a maximum number of requests,
 // as opposed to waiting for the existing batch to complete before continuing.
+// Usage: likely in a loop: await Concurrent.run('uniqueId', async () => {});
+// When all have been started, need to await the completion with: await Concurrent.allResolved('uniqueId');
 class Concurrent {
   static running = {};
   static queue = {};

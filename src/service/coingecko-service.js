@@ -1,7 +1,7 @@
 const BlockUtil = require('../utils/block');
 const { createNumberSpread } = require('../utils/number');
 const BasinSubgraphRepository = require('../repository/subgraph/basin-subgraph');
-const PromiseUtil = require('../utils/promise');
+const PromiseUtil = require('../utils/async/promise');
 const LiquidityUtil = require('../utils/pool/liquidity');
 const NumberUtil = require('../utils/number');
 const { C } = require('../constants/runtime-constants');

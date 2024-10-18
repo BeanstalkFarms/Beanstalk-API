@@ -1,7 +1,7 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
 const SnapshotSubgraphRepository = require('../repository/subgraph/snapshot-subgraph');
-const PromiseUtil = require('../utils/promise');
+const PromiseUtil = require('../utils/async/promise');
 
 class SnapshotVotingService {
   // Returns a list of voting powers by requested address

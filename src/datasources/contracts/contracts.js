@@ -1,6 +1,6 @@
 const { Contract: AlchemyContract } = require('alchemy-sdk');
 const { C } = require('../../constants/runtime-constants');
-const BigIntContract = require('./bigint-contract');
+const SuperContract = require('./super-contract');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
 class Contracts {
@@ -20,7 +20,7 @@ class Contracts {
 
   static makeContract(address, abi, provider) {
     const underlyingContract = new AlchemyContract(address, abi, provider);
-    return new BigIntContract(underlyingContract);
+    return new SuperContract(underlyingContract);
   }
 
   static _getDefaultContract(address, c = C()) {

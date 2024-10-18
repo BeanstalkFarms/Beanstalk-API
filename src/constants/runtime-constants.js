@@ -1,5 +1,5 @@
 const AlchemyUtil = require('../datasources/alchemy');
-const AsyncContext = require('../utils/context');
+const AsyncContext = require('../utils/async/context');
 const EnvUtil = require('../utils/env');
 const BeanstalkEth = require('./raw/beanstalk-eth');
 const BeanstalkArb = require('./raw/beanstalk-arb');

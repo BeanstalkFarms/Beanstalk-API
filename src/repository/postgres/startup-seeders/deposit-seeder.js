@@ -1,7 +1,7 @@
 const { C } = require('../../../constants/runtime-constants');
 const Contracts = require('../../../datasources/contracts/contracts');
 const SiloService = require('../../../service/silo-service');
-const Concurrent = require('../../../utils/concurrent');
+const Concurrent = require('../../../utils/async/concurrent');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const { sequelize } = require('../models');
@@ -31,7 +31,7 @@ class DepositSeeder {
     // Get mow stems for each account/token pair, and update the deposit
     for (const account in accounts) {
       for (const token in accounts[account]) {
-        await Concurrent.run('deposit-seeder', async () => {
+        await Concurrent.run('DepositSeeder', async () => {
           const tokenInfo = tokenInfos[token];
           const lastStem = await beanstalk.getLastMowedStem(account, token, { blockTag: seedBlock });
           for (const deposit of accounts[account][token]) {
@@ -42,7 +42,7 @@ class DepositSeeder {
         });
       }
     }
-    await Concurrent.allResolved('deposit-seeder');
+    await Concurrent.allResolved('DepositSeeder');
 
     // Get current bdvs for all deposits
     const bdvsCalldata = {
@@ -60,13 +60,20 @@ class DepositSeeder {
       allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
     }
 
+    console.log(
+      'total stalk',
+      allDeposits.reduce((a, next) => {
+        return a + next.currentStalk;
+      }, 0n)
+    );
+
     const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain: C().CHAIN } });
     const models = allDeposits.map((d) => DepositModelAssembler.toModel(d, tokenModels));
     await sequelize.transaction(async (transaction) => {
       return await DepositRepository.addDeposits(models, { transaction });
     });
 
-    // save meta with block number used
+    // TODO: save meta with block number used
   }
 
   static getDepositsByAccount(allDeposits) {

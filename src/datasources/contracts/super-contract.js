@@ -1,8 +1,10 @@
-const { BigNumber } = require('alchemy-sdk');
 const { allToBigInt } = require('../../utils/number');
+const retryable = require('../../utils/async/retryable');
 
-// Proxy wrapper to transform all BigNumber -> BigInt
-class BigIntContract {
+// Proxy wrapper to:
+// (1) built in retry support for failed requests
+// (2) transform all BigNumber -> BigInt
+class SuperContract {
   constructor(contract) {
     const proxyHandler = {
       get: (target, property, receiver) => {
@@ -11,8 +13,8 @@ class BigIntContract {
         }
 
         return async (...args) => {
-          const rawResult = await contract[property](...args);
-          return BigIntContract._transformAll(rawResult);
+          const rawResult = await retryable(() => contract[property](...args));
+          return SuperContract._transformAll(rawResult);
         };
       }
     };
@@ -44,4 +46,4 @@ class BigIntContract {
   }
 }
 
-module.exports = BigIntContract;
+module.exports = SuperContract;

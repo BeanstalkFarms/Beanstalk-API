@@ -5,8 +5,9 @@ const TokenRepository = require('../repository/postgres/queries/token-repository
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const ArraysUtil = require('../utils/arrays');
 const BlockUtil = require('../utils/block');
+const Concurrent = require('../utils/async/concurrent');
 const { createNumberSpread } = require('../utils/number');
-const PromiseUtil = require('../utils/promise');
+const PromiseUtil = require('../utils/async/promise');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
@@ -136,7 +137,7 @@ class SiloService {
     }, {});
   }
 
-  static async batchBdvs(calldata, block, batchSize = 500) {
+  static async batchBdvs(calldata, block, batchSize = 100) {
     const beanstalk = Contracts.getBeanstalk();
     const tokenBatches = ArraysUtil.toChunks(calldata.tokens, batchSize);
     const amountBatches = ArraysUtil.toChunks(calldata.amounts, batchSize);
@@ -147,9 +148,12 @@ class SiloService {
       const batchAmounts = amountBatches[i];
 
       // Call the bdvs function
-      const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
-      results.push(...bdvsResult);
+      await Concurrent.run('batchBdvs', async () => {
+        const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
+        results.push(...bdvsResult);
+      });
     }
+    await Concurrent.allResolved('batchBdvs');
     return results;
   }
 
