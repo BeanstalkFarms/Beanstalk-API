@@ -1,4 +1,3 @@
-const { C } = require('../../../src/constants/runtime-constants');
 const AlchemyUtil = require('../../../src/datasources/alchemy');
 const Contracts = require('../../../src/datasources/contracts/contracts');
 const DepositRepository = require('../../../src/repository/postgres/queries/deposit-repository');
@@ -22,8 +21,8 @@ describe('Deposit Seeder', () => {
     const depositsResponse = require('../../mock-responses/subgraph/silo-service/allDeposits.json');
     jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(depositsResponse);
 
-    const whitelistInfoResponse = require('../../mock-responses/service/whitelistedTokenInfo.json');
-    jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue(allToBigInt(whitelistInfoResponse));
+    const whitelistInfoResponse = allToBigInt(require('../../mock-responses/service/whitelistedTokenInfo.json'));
+    jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue(whitelistInfoResponse);
 
     const mockBeanstalk = {
       getLastMowedStem: jest.fn().mockImplementation((token) => {
