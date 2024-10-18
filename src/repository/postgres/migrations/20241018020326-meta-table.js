@@ -1,10 +1,12 @@
 'use strict';
 
+const { timestamps } = require('../util/sequelize-util');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      'app-meta',
+      'ApiMeta',
       {
         id: {
           type: Sequelize.INTEGER,
@@ -16,8 +18,9 @@ module.exports = {
           allowNull: false
         },
         lastDepositUpdate: {
-          type: DataTypes.INTEGER
-        }
+          type: Sequelize.INTEGER
+        },
+        ...timestamps(Sequelize)
       },
       {
         uniqueKeys: {
@@ -30,6 +33,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('app-meta');
+    await queryInterface.dropTable('ApiMeta');
   }
 };

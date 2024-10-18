@@ -12,6 +12,7 @@ class DepositDto {
     depositedBDV
   `;
 
+  id;
   chain = C().CHAIN;
   account;
   token;
@@ -36,6 +37,7 @@ class DepositDto {
       this.depositedAmount = BigInt(d.depositedAmount);
       this.depositedBdv = BigInt(d.depositedBDV);
     } else if (type === 'db') {
+      this.id = d.id;
       this.account = d.account;
       this.token = d.Token.address;
       this.stem = d.stem;

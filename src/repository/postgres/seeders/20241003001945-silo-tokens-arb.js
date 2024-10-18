@@ -3,7 +3,7 @@
 const db = require('../models');
 const { C } = require('../../../constants/runtime-constants');
 const AlchemyUtil = require('../../../datasources/alchemy');
-const PromiseUtil = require('../../../utils/promise');
+const PromiseUtil = require('../../../utils/async/promise');
 const Contracts = require('../../../datasources/contracts/contracts');
 const EnvUtil = require('../../../utils/env');
 

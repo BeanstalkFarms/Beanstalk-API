@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     {
-      tableName: 'api-meta',
+      tableName: 'ApiMeta',
       indexes: [
         {
           unique: true,

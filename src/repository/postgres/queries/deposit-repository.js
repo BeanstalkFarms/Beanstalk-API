@@ -13,10 +13,10 @@ class DepositRepository {
     return count;
   }
 
-  // Inserts the given deposit rows
-  static async addDeposits(deposits, options) {
+  // Inserts/Updates the given deposit rows
+  static async upsertDeposits(deposits, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
-    await sequelize.models.Deposit.bulkCreate(deposits, {
+    await sequelize.models.Deposit.upsert(deposits, {
       validate: true,
       transaction: options.transaction
     });

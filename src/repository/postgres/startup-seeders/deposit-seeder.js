@@ -1,14 +1,11 @@
 const { C } = require('../../../constants/runtime-constants');
 const Contracts = require('../../../datasources/contracts/contracts');
+const DepositService = require('../../../service/deposit-service');
 const SiloService = require('../../../service/silo-service');
 const Concurrent = require('../../../utils/async/concurrent');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
-const { sequelize } = require('../models');
-const DepositModelAssembler = require('../models/assemblers/deposit-assembler');
 const DepositRepository = require('../queries/deposit-repository');
-const MetaRepository = require('../queries/meta-repository');
-const TokenRepository = require('../queries/token-repository');
 
 // Seeds the deposits table with initial info
 class DepositSeeder {
@@ -61,25 +58,7 @@ class DepositSeeder {
       allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
     }
 
-    console.log(
-      'total stalk',
-      allDeposits.reduce((a, next) => {
-        return a + next.currentStalk;
-      }, 0n)
-    );
-
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain: C().CHAIN } });
-    const models = allDeposits.map((d) => DepositModelAssembler.toModel(d, tokenModels));
-    await sequelize.transaction(async (transaction) => {
-      await DepositRepository.addDeposits(models, { transaction });
-      await MetaRepository.update(
-        C().CHAIN,
-        {
-          lastDepositUpdate: seedBlock
-        },
-        { transaction }
-      );
-    });
+    await DepositService.updateDeposits(allDeposits);
   }
 
   static getDepositsByAccount(allDeposits) {
