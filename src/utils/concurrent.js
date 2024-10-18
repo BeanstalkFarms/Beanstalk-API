@@ -1,0 +1,79 @@
+const MAX_RUNNING = 50;
+
+// Improvement could be wrapping the id inside of an async context
+
+// Allows high levels of concurrency by continually running up to a maximum number of requests,
+// as opposed to waiting for the existing batch to complete before continuing.
+class Concurrent {
+  static running = {};
+  static queue = {};
+  static runCount = {};
+  static errors = {};
+
+  static run(id, asyncCallback) {
+    this.running[id] ||= 0;
+    this.queue[id] ||= [];
+    this.runCount[id] ||= 0;
+    this.errors[id] ||= [];
+
+    return new Promise(async (resolve) => {
+      if (this.running[id] >= MAX_RUNNING) {
+        let queueResolve;
+        const queueable = new Promise((res) => {
+          queueResolve = res;
+        });
+        this.queue[id].push(queueResolve);
+        await queueable;
+      }
+
+      asyncCallback()
+        .then((r) => {
+          --this.running[id];
+          this._pop(id);
+        })
+        .catch((e) => {
+          --this.running[id];
+          this.errors[id].push(e);
+          this._pop(id);
+        });
+      ++this.running[id];
+
+      resolve();
+    });
+  }
+
+  static allResolved(id) {
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (this.running[id] === 0 && this.queue[id].length === 0) {
+          clearInterval(interval);
+          if (this.errors[id].length === 0) {
+            resolve();
+          } else {
+            reject(`Failed with errors: ${this.errors[id]}`);
+          }
+          this.errors[id].length = 0;
+        }
+      }, 50);
+    });
+  }
+
+  static allSettled(id) {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (this.running[id] === 0 && this.queue[id].length === 0) {
+          clearInterval(interval);
+          resolve();
+          this.errors[id].length = 0;
+        }
+      }, 50);
+    });
+  }
+
+  static _pop(id) {
+    if (this.queue[id].length > 0) {
+      this.queue[id].shift()();
+    }
+  }
+}
+module.exports = Concurrent;

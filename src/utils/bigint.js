@@ -29,11 +29,17 @@ function BigInt_applyPercent(bi, percent) {
   return (bi * numerator) / denominator;
 }
 
+// Should wrap potentially falsy values in this
+function isNil(value) {
+  return value === undefined || value === null;
+}
+
 module.exports = {
   formatBigintHex,
   formatBigintDecimal,
   BigInt_abs,
   BigInt_sum,
   BigInt_max,
-  BigInt_applyPercent
+  BigInt_applyPercent,
+  isNil
 };

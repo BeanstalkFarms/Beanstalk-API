@@ -20,10 +20,10 @@ class DepositSeeder {
 
     // Initial deposits list comes directly from subgraph
     const allDeposits = await BeanstalkSubgraphRepository.getAllDeposits(seedBlock);
-    const accounts = this.getDepositsByAccount(allDeposits);
+    Log.info(`Seeding with ${allDeposits.length} deposits as of block ${seedBlock}`);
 
+    const accounts = this.getDepositsByAccount(allDeposits);
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
-    console.log(tokenInfos);
 
     // Get mow stems for each account/token pair, and update the deposit
     for (const account in accounts) {
@@ -35,18 +35,13 @@ class DepositSeeder {
             deposit.mowStem = lastStem;
             // Set inherent deposit info
             deposit.setStalkAndSeeds(tokenInfo);
-            // Updates lambda stats according to current token bdv
-            // deposit.updateLambdaStats(tokenInfo);
           }
-          // console.log(accounts[account][token]);
         });
       }
     }
     await Concurrent.allResolved('deposit-seeder');
-    console.log('done');
 
-    ////
-    // Prepare bdvs function call
+    // Get current bdvs for all deposits
     const bdvsCalldata = {
       tokens: [],
       amounts: []
@@ -56,8 +51,11 @@ class DepositSeeder {
       bdvsCalldata.amounts.push(deposit.depositedAmount);
     }
     const depositLambdaBdvs = await SiloService.batchBdvs(bdvsCalldata, seedBlock);
-    console.log(depositLambdaBdvs);
-    ////
+
+    // Updates lambda stats
+    for (let i = 0; i < allDeposits.length; ++i) {
+      allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
+    }
 
     // save
 

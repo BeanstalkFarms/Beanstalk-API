@@ -1,4 +1,5 @@
 const { C } = require('../../../constants/runtime-constants');
+const { isNil } = require('../../../utils/bigint');
 
 class DepositDto {
   static subgraphFields = `
@@ -49,7 +50,7 @@ class DepositDto {
   }
 
   setStalkAndSeeds(tokenInfo) {
-    if (!this.depositedBdv || !this.stem || !this.mowStem || !tokenInfo) {
+    if (isNil(this.depositedBdv) || isNil(this.stem) || isNil(this.mowStem) || !tokenInfo) {
       throw new Error('DepositDto missing required fields for setStalkAndSeeds');
     }
     this.baseStalk = this.depositedBdv * tokenInfo.stalkIssuedPerBdv;
@@ -62,7 +63,7 @@ class DepositDto {
   // bdvOnLambda should be provided by calling bdvs function on this.depositedAmount.
   // It is done external to this method so it can be batched with other deposit's requests.
   updateLambdaStats(bdvOnLambda, tokenInfo) {
-    if (!bdvOnLambda || !tokenInfo) {
+    if (isNil(bdvOnLambda) || !tokenInfo) {
       throw new Error('DepositDto missing required fields for updateLambdaStats');
     }
     this.bdvOnLambda = bdvOnLambda;

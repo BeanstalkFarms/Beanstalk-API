@@ -138,8 +138,8 @@ class SiloService {
 
   static async batchBdvs(calldata, block, batchSize = 500) {
     const beanstalk = Contracts.getBeanstalk();
-    const tokenBatches = ArraysUtil.toChunks(calldata.tokens);
-    const amountBatches = ArraysUtil.toChunks(calldata.amounts);
+    const tokenBatches = ArraysUtil.toChunks(calldata.tokens, batchSize);
+    const amountBatches = ArraysUtil.toChunks(calldata.amounts, batchSize);
 
     const results = [];
     for (let i = 0; i < tokenBatches.length; i++) {
