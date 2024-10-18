@@ -3,9 +3,9 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { C } = require('../../constants/runtime-constants');
-const { ApyInitType } = require('../../repository/postgres/models/types/types');
-const { fromBigInt } = require('../number');
+const { C } = require('../../../constants/runtime-constants');
+const { ApyInitType } = require('../../../repository/postgres/models/types/types');
+const { fromBigInt } = require('../../../utils/number');
 
 class PreGaugeApyUtil {
   /**

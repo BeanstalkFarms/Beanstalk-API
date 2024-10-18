@@ -1,6 +1,6 @@
-const SuperContract = require('../../src/datasources/contracts/bigint-contract');
+const SuperContract = require('../../src/datasources/contracts/super-contract');
 
-describe('UpgradeableContract', () => {
+describe('SuperContract', () => {
   test('converts singleton values', () => {
     expect(SuperContract._transformAll('50')).toEqual(50n);
     expect(SuperContract._transformAll(5)).toEqual(5n);

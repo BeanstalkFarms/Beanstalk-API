@@ -6,8 +6,8 @@
 
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 
-const PreGaugeApyUtil = require('../utils/apy/pre-gauge');
-const GaugeApyUtil = require('../utils/apy/gauge');
+const PreGaugeApyUtil = require('./utils/apy/pre-gauge');
+const GaugeApyUtil = require('./utils/apy/gauge');
 const InputError = require('../error/input-error');
 const YieldRepository = require('../repository/postgres/queries/yield-repository');
 const { ApyInitType } = require('../repository/postgres/models/types/types');

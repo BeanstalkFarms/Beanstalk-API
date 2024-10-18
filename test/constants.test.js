@@ -1,6 +1,6 @@
 const { C, RuntimeConstants } = require('../src/constants/runtime-constants');
 const AlchemyUtil = require('../src/datasources/alchemy');
-const AsyncContext = require('../src/utils/context');
+const AsyncContext = require('../src/utils/async/context');
 const EnvUtil = require('../src/utils/env');
 
 describe('Chain constants', () => {

@@ -3,12 +3,11 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { C } = require('../../constants/runtime-constants');
-const { ApyInitType } = require('../../repository/postgres/models/types/types');
-const { fromBigInt } = require('../number');
-const NumberUtil = require('../number');
+const { C } = require('../../../constants/runtime-constants');
+const { ApyInitType } = require('../../../repository/postgres/models/types/types');
+const { fromBigInt, sum } = require('../../../utils/number');
+
 const GPFunction = require('./gp-functions/gp-function');
-const LegacyDefaultGaugePointFunction = require('./gp-functions/legacy');
 
 class GaugeApyUtil {
   /**
@@ -98,7 +97,7 @@ class GaugeApyUtil {
 
     // Current percentages allocations of each LP
     const currentPercentLpBdv = [];
-    const sumLpBdv = NumberUtil.sum(gaugeLpDepositedBdvCopy);
+    const sumLpBdv = sum(gaugeLpDepositedBdvCopy);
     for (let i = 0; i < gaugeLpDepositedBdvCopy.length; ++i) {
       currentPercentLpBdv.push((gaugeLpDepositedBdvCopy[i] / sumLpBdv) * 100);
     }
@@ -110,7 +109,7 @@ class GaugeApyUtil {
       fromBigInt(siloDepositedBeanBdv, PRECISION.bdv, PRECISION.bdv / 3) -
       GaugeApyUtil.#sumGerminatingBdv(germinatingBeanBdv, PRECISION.bdv);
     let totalStalk = fromBigInt(siloStalk, PRECISION.stalk, 0);
-    let gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
+    let gaugeBdv = beanBdv + sum(gaugeLpDepositedBdvCopy);
     let nonGaugeDepositedBdv_ =
       fromBigInt(nonGaugeDepositedBdv, PRECISION.bdv, PRECISION.bdv / 3) -
       GaugeApyUtil.#sumGerminatingBdv(nonGaugeGerminatingBdv, PRECISION.bdv);
@@ -160,7 +159,7 @@ class GaugeApyUtil {
         for (let j = 0; j < gaugeLpDepositedBdvCopy.length; ++j) {
           gaugeLpDepositedBdvCopy[j] += fromBigInt(gaugeLpGerminatingBdv[j][index], PRECISION.bdv, PRECISION.bdv / 3);
         }
-        gaugeBdv = beanBdv + NumberUtil.sum(gaugeLpDepositedBdvCopy);
+        gaugeBdv = beanBdv + sum(gaugeLpDepositedBdvCopy);
         nonGaugeDepositedBdv_ += fromBigInt(nonGaugeGerminatingBdv[index], PRECISION.bdv, PRECISION.bdv / 3);
         totalBdv = gaugeBdv + nonGaugeDepositedBdv_;
       }
@@ -180,7 +179,7 @@ class GaugeApyUtil {
       }
 
       const beanGpPerBdv = largestLpGpPerBdv * rScaled;
-      const gpTotal = NumberUtil.sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
+      const gpTotal = sum(gaugeLpPointsCopy) + beanGpPerBdv * beanBdv;
       const avgGsPerBdv = totalStalk / totalBdv - 1;
       const gs = (avgGsPerBdv / catchUpRate) * gaugeBdv;
       const beanSeedsGs = (gs / gpTotal) * beanGpPerBdv;

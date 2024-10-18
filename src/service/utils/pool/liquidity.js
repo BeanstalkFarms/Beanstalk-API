@@ -1,7 +1,7 @@
-const Contracts = require('../../datasources/contracts/contracts');
-const PriceService = require('../../service/price-service');
-const NumberUtil = require('../number');
-const { BigInt_applyPercent } = require('../bigint');
+const Contracts = require('../../../datasources/contracts/contracts');
+const PriceService = require('../../price-service');
+const NumberUtil = require('../../../utils/number');
+const { BigInt_applyPercent } = require('../../../utils/bigint');
 
 class LiquidityUtil {
   // Calculates the current usd liquidity for a pool having these tokens and reserves

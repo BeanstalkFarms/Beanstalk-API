@@ -1,7 +1,7 @@
-const { C } = require('../../constants/runtime-constants');
-const AlchemyUtil = require('../../datasources/alchemy');
-const Contracts = require('../../datasources/contracts/contracts');
-const { BigInt_abs } = require('../bigint');
+const { C } = require('../../../constants/runtime-constants');
+const AlchemyUtil = require('../../../datasources/alchemy');
+const Contracts = require('../../../datasources/contracts/contracts');
+const { BigInt_abs } = require('../../../utils/bigint');
 
 // This functionality may or may not be helpful within this API project - it is used in subgraphs.
 // However it was first developed here as a means of understanding the inputs/outputs.

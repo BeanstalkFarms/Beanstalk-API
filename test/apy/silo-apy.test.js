@@ -3,8 +3,8 @@ const {
   DECIMALS
 } = require('../../src/constants/raw/beanstalk-eth');
 const SiloApyService = require('../../src/service/silo-apy');
-const GaugeApyUtil = require('../../src/utils/apy/gauge');
-const PreGaugeApyUtil = require('../../src/utils/apy/pre-gauge');
+const GaugeApyUtil = require('../../src/service/utils/apy/gauge');
+const PreGaugeApyUtil = require('../../src/service/utils/apy/pre-gauge');
 const { toBigInt } = require('../../src/utils/number');
 const { mockBeanstalkSG } = require('../util/mock-sg');
 

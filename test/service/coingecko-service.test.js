@@ -13,7 +13,7 @@ const {
 } = require('../../src/constants/raw/beanstalk-eth');
 const SubgraphQueryUtil = require('../../src/utils/subgraph-query');
 const { mockBasinSG } = require('../util/mock-sg');
-const LiquidityUtil = require('../../src/utils/pool/liquidity');
+const LiquidityUtil = require('../../src/service/utils/pool/liquidity');
 const CoingeckoService = require('../../src/service/coingecko-service');
 
 const testTimestamp = 1715020584;

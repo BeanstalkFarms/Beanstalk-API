@@ -1,10 +1,9 @@
-const { C } = require('../src/constants/runtime-constants');
 const Contracts = require('../src/datasources/contracts/contracts');
 const WellDto = require('../src/repository/subgraph/dto/WellDto');
 const PriceService = require('../src/service/price-service');
-const ConstantProductWellUtil = require('../src/utils/pool/constant-product');
-const LiquidityUtil = require('../src/utils/pool/liquidity');
-const WellFnUtil = require('../src/utils/pool/well-fn');
+const ConstantProductWellUtil = require('../src/service/utils/pool/constant-product');
+const LiquidityUtil = require('../src/service/utils/pool/liquidity');
+const WellFnUtil = require('../src/service/utils/pool/well-fn');
 
 describe('Pool Math', () => {
   test('Pool Liquidity USD', async () => {

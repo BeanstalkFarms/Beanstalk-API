@@ -15,7 +15,7 @@ describe('DTO Objects', () => {
     expect(deposit.account).toEqual('0x0000002e4f99cb1e699042699b91623b1334d2f7');
     expect(deposit.token).toEqual('0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab');
     expect(deposit.stem).toEqual(-12474000000n);
-    expect(deposit.amount).toEqual(167759n);
-    expect(deposit.bdv).toEqual(76747732n);
+    expect(deposit.depositedAmount).toEqual(167759n);
+    expect(deposit.depositedBdv).toEqual(76747732n);
   });
 });
