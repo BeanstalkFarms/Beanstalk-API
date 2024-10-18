@@ -4,7 +4,7 @@ const timeoutPromise = (timeLimitMs, resolveTrigger) =>
     resolveTrigger.timer = timeout;
   });
 // Must provide a function such that a fresh thenable can be created upon invocation
-function retryable(asyncFunction, timeLimitMs = 10000, retryCount = 2) {
+function retryable(asyncFunction, timeLimitMs = 15000, retryCount = 2) {
   if (retryCount < 0) {
     return Promise.reject(new Error('Exceeded retry count'));
   }

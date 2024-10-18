@@ -6,7 +6,7 @@ class MetaRepository {
   static async get(chain, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
 
-    const meta = await sequelize.models.Meta.findAll({
+    const meta = await sequelize.models.Meta.findOne({
       where: {
         chain
       },

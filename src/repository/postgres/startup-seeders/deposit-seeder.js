@@ -58,7 +58,7 @@ class DepositSeeder {
       allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
     }
 
-    await DepositService.updateDeposits(allDeposits);
+    await DepositService.updateDeposits(allDeposits, seedBlock);
   }
 
   static getDepositsByAccount(allDeposits) {
