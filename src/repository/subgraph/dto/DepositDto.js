@@ -16,6 +16,7 @@ class DepositDto {
   account;
   token;
   stem;
+  mowStem;
   depositedAmount;
   depositedBdv;
   baseStalk;
@@ -27,15 +28,28 @@ class DepositDto {
   stalkOnLambda;
   seedsOnLambda;
 
-  constructor(type, subgraphDeposit) {
+  constructor(type, d) {
     if (type === 'sg') {
-      this.account = subgraphDeposit.farmer.id;
-      this.token = subgraphDeposit.token;
-      this.stem = BigInt(subgraphDeposit.stemV31);
-      this.depositedAmount = BigInt(subgraphDeposit.depositedAmount);
-      this.depositedBdv = BigInt(subgraphDeposit.depositedBDV);
+      this.account = d.farmer.id;
+      this.token = d.token;
+      this.stem = BigInt(d.stemV31);
+      this.depositedAmount = BigInt(d.depositedAmount);
+      this.depositedBdv = BigInt(d.depositedBDV);
     } else if (type === 'db') {
-      // TODO
+      this.account = d.account;
+      this.token = d.Token.address;
+      this.stem = d.stem;
+      this.mowStem = d.mowStem;
+      this.depositedAmount = d.depositedAmount;
+      this.depositedBdv = d.depositedBdv;
+      this.baseStalk = d.baseStalk;
+      this.grownStalk = d.grownStalk;
+      this.mowableStalk = d.mowableStalk;
+      this.currentStalk = d.currentStalk;
+      this.currentSeeds = d.currentSeeds;
+      this.bdvOnLambda = d.bdvOnLambda;
+      this.stalkOnLambda = d.stalkOnLambda;
+      this.seedsOnLambda = d.seedsOnLambda;
     } else {
       throw new Error(`Invalid constructor type '${type}'.`);
     }
@@ -54,8 +68,8 @@ class DepositDto {
       throw new Error('DepositDto missing required fields for setStalkAndSeeds');
     }
     this.baseStalk = this.depositedBdv * tokenInfo.stalkIssuedPerBdv;
-    this.grownStalk = this.depositedBdv * ((this.mowStem - this.stem) * BigInt(10 ** 6));
-    this.mowableStalk = this.depositedBdv * ((tokenInfo.stemTip - this.mowStem) * BigInt(10 ** 6));
+    this.grownStalk = this.depositedBdv * (this.mowStem - this.stem);
+    this.mowableStalk = this.depositedBdv * (tokenInfo.stemTip - this.mowStem);
     this.currentStalk = this.baseStalk + this.grownStalk;
     this.currentSeeds = this.depositedBdv * tokenInfo.stalkEarnedPerSeason;
   }
@@ -71,7 +85,7 @@ class DepositDto {
 
     // Includes the effect of a mow
     const baseStalkOnLambda = this.bdvOnLambda * tokenInfo.stalkIssuedPerBdv;
-    const grownStalkOnLambda = this.bdvOnLambda * ((tokenInfo.stemTip - this.stem) * BigInt(10 ** 6));
+    const grownStalkOnLambda = this.bdvOnLambda * (tokenInfo.stemTip - this.stem);
     this.stalkOnLambda = baseStalkOnLambda + grownStalkOnLambda;
   }
 }

@@ -4,7 +4,10 @@ const SiloService = require('../../../service/silo-service');
 const Concurrent = require('../../../utils/concurrent');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
+const { sequelize } = require('../models');
+const DepositModelAssembler = require('../models/assemblers/deposit-assembler');
 const DepositRepository = require('../queries/deposit-repository');
+const TokenRepository = require('../queries/token-repository');
 
 // Seeds the deposits table with initial info
 class DepositSeeder {
@@ -57,7 +60,11 @@ class DepositSeeder {
       allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
     }
 
-    // save
+    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain: C().CHAIN } });
+    const models = allDeposits.map((d) => DepositModelAssembler.toModel(d, tokenModels));
+    await sequelize.transaction(async (transaction) => {
+      return await DepositRepository.addDeposits(models, { transaction });
+    });
 
     // save meta with block number used
   }

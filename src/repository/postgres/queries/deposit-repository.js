@@ -1,4 +1,5 @@
 const { sequelize, Sequelize } = require('../models');
+const DepositModelAssembler = require('../models/assemblers/deposit-assembler');
 
 const DEFAULT_OPTIONS = {};
 
@@ -15,12 +16,10 @@ class DepositRepository {
   // Inserts the given deposit rows
   static async addDeposits(deposits, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
-    const newDeposits = await sequelize.models.Deposit.bulkCreate(deposits, {
+    await sequelize.models.Deposit.bulkCreate(deposits, {
       validate: true,
-      returning: true,
       transaction: options.transaction
     });
-    return newDeposits;
   }
 }
 
