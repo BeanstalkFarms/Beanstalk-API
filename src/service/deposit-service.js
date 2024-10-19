@@ -7,7 +7,7 @@ const AsyncContext = require('../utils/async/context');
 
 class DepositService {
   static async updateDeposits(depositDtos, fromBlock) {
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain: C().CHAIN } });
+    const tokenModels = await TokenRepository.findWhitelistedTokens(C().CHAIN);
     const models = depositDtos.map((d) => DepositModelAssembler.toModel(d, tokenModels));
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositRepository.upsertDeposits(models);

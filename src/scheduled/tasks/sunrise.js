@@ -41,7 +41,7 @@ class SunriseTask {
 
     // Save new yields
     await AsyncContext.sequelizeTransaction(async () => {
-      return await YieldRepository.addYields(yieldRows, { transaction });
+      return await YieldRepository.addYields(yieldRows);
     });
   }
 }

@@ -51,8 +51,7 @@ class YieldRepository {
   }
 
   // Inserts the given yield entries
-  static async addYields(yields, options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
+  static async addYields(yields) {
     const newYields = await sequelize.models.Yield.bulkCreate(yields, {
       validate: true,
       returning: true,

@@ -3,11 +3,10 @@ const { sequelize, Sequelize } = require('../models');
 
 class TokenRepository {
   // Returns all whitelisted tokens
-  static async findWhitelistedTokens(options) {
+  static async findWhitelistedTokens(chain) {
     const optionalWhere = {};
-    // TODO
-    if (options.where.chain) {
-      optionalWhere.chain = options.where.chain;
+    if (chain) {
+      optionalWhere.chain = chain;
     }
 
     const rows = await sequelize.models.Token.findAll({

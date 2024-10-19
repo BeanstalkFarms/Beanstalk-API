@@ -115,7 +115,7 @@ class SiloService {
   // Combines results from tokenSettings + stemTipForToken
   static async getWhitelistedTokenInfo({ block, chain }) {
     const beanstalk = Contracts.getBeanstalk();
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain } });
+    const tokenModels = await TokenRepository.findWhitelistedTokens(chain);
     const addresses = tokenModels.map((t) => t.address);
 
     const results = await Promise.all(
@@ -161,7 +161,7 @@ class SiloService {
   static async updateWhitelistedTokenInfo() {
     const chain = C().CHAIN;
     const beanstalk = Contracts.getBeanstalk();
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain } });
+    const tokenModels = await TokenRepository.findWhitelistedTokens(chain);
 
     const updatedTokens = [];
     await AsyncContext.sequelizeTransaction(async () => {
