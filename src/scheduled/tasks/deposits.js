@@ -1,7 +1,12 @@
 class DepositsTask {
-  // Updates the
   static async updateDeposits() {
-    //
+    // Determine range of blocks to update on
+    const currentBlock = (await C().RPC.getBlock()).number;
+
+    // Buffer to avoid issues with a chain reorg.
+    // This could be reduced further but is sufficient for now.
+    const updateBlock = currentBlock - 10; // TODO: function to determine how many blocks per second
+    // meta block + 1
   }
 
   // Updates the list of deposits in the database, adding/removing entries as needed
