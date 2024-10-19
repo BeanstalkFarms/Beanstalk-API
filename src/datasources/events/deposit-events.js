@@ -1,28 +1,11 @@
-const { C } = require('../../constants/runtime-constants');
 const AlchemyUtil = require('../alchemy');
-const Contracts = require('../contracts/contracts');
+const FilterLogs = require('./filter-logs');
 
-////
-const iBeanstalk = Contracts.getBeanstalk().interface;
-
-const EVENT_NAMES = ['AddDeposit', 'RemoveDeposit', 'RemoveDeposits'];
-const TOPICS = EVENT_NAMES.map((n) => iBeanstalk.getEventTopic(n));
-////
-console.log(TOPICS);
+const DEPOSIT_EVENTS = ['AddDeposit', 'RemoveDeposit', 'RemoveDeposits'];
 
 class DepositEvents {
   static async getAllSiloDepositEvents(fromBlock, toBlock = 'latest') {
-    //
-    const filter = {
-      address: C().BEANSTALK,
-      topics: [TOPICS],
-      fromBlock,
-      toBlock
-    };
-
-    const logs = await C().RPC.getLogs(filter);
-    const events = logs.map((log) => iBeanstalk.parseLog(log));
-    return events;
+    return await FilterLogs.getBeanstalkEvents(DEPOSIT_EVENTS, fromBlock, toBlock);
   }
 
   // Collapses RemoveDeposits out of its array form
@@ -64,6 +47,6 @@ if (require.main === module) {
     // console.log(logs.filter((l) => l.name === 'AddDeposit')[0]);
     // console.log(logs.filter((l) => l.name === 'RemoveDeposit')[0]);
     // console.log(logs.filter((l) => l.name === 'RemoveDeposits')[0].args.stems);
-    // console.log(await DepositEvents.getAllDepositEventsCollapsed(264547404));
+    console.log(await DepositEvents.getAllDepositEventsCollapsed(264547404));
   })();
 }
