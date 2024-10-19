@@ -8,6 +8,10 @@ class SuperContract {
   constructor(contract) {
     const proxyHandler = {
       get: (target, property, receiver) => {
+        if (['interface', 'provider', 'filters', 'address'].includes(property)) {
+          return contract[property];
+        }
+
         if (property === 'then') {
           return undefined;
         }
