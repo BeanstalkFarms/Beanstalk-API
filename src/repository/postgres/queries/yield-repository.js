@@ -1,3 +1,4 @@
+const AsyncContext = require('../../../utils/async/context');
 const { sequelize, Sequelize } = require('../models');
 const { ApyInitType } = require('../models/types/types');
 
@@ -38,7 +39,7 @@ class YieldRepository {
         season,
         ...optionalWhere
       },
-      transaction: options.transaction
+      transaction: AsyncContext.getOrUndef('transaction')
     });
     return rows;
   }
@@ -55,7 +56,7 @@ class YieldRepository {
     const newYields = await sequelize.models.Yield.bulkCreate(yields, {
       validate: true,
       returning: true,
-      transaction: options.transaction
+      transaction: AsyncContext.getOrUndef('transaction')
     });
     return newYields;
   }

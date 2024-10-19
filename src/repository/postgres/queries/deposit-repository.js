@@ -1,24 +1,20 @@
+const AsyncContext = require('../../../utils/async/context');
 const { sequelize, Sequelize } = require('../models');
 
-const DEFAULT_OPTIONS = {};
-
 class DepositRepository {
-  static async numRows(options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
-
+  static async numRows() {
     const count = await sequelize.models.Deposit.count({
-      transaction: options.transaction
+      transaction: AsyncContext.getOrUndef('transaction')
     });
     return count;
   }
 
   // Inserts/Updates the given deposit rows
-  static async upsertDeposits(deposits, options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
+  static async upsertDeposits(deposits) {
     for (const row of deposits) {
       await sequelize.models.Deposit.upsert(row, {
         validate: true,
-        transaction: options.transaction
+        transaction: AsyncContext.getOrUndef('transaction')
       });
     }
   }

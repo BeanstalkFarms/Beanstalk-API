@@ -3,6 +3,8 @@ class DepositsTask {
     // Determine range of blocks to update on
     const currentBlock = (await C().RPC.getBlock()).number;
 
+    // const prevUpdateBlock =
+
     // Buffer to avoid issues with a chain reorg.
     // This could be reduced further but is sufficient for now.
     const updateBlock = currentBlock - 10; // TODO: function to determine how many blocks per second

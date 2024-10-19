@@ -1,13 +1,11 @@
+const AsyncContext = require('../../../utils/async/context');
 const { sequelize, Sequelize } = require('../models');
-
-const DEFAULT_OPTIONS = {};
 
 class TokenRepository {
   // Returns all whitelisted tokens
   static async findWhitelistedTokens(options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
-
     const optionalWhere = {};
+    // TODO
     if (options.where.chain) {
       optionalWhere.chain = options.where.chain;
     }
@@ -17,20 +15,19 @@ class TokenRepository {
         isWhitelisted: true,
         ...optionalWhere
       },
-      transaction: options.transaction
+      transaction: AsyncContext.getOrUndef('transaction')
     });
     return rows;
   }
 
   // Updates the given token with new column values
-  static async updateToken(address, chain, fieldsToUpdate, options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
+  static async updateToken(address, chain, fieldsToUpdate) {
     const [_, updatedTokens] = await sequelize.models.Token.update(fieldsToUpdate, {
       where: {
         address,
         chain
       },
-      transaction: options.transaction,
+      transaction: AsyncContext.getOrUndef('transaction'),
       returning: true
     });
     return updatedTokens;

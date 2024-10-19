@@ -3,6 +3,7 @@ const AsyncContext = require('../utils/async/context');
 const EnvUtil = require('../utils/env');
 const BeanstalkEth = require('./raw/beanstalk-eth');
 const BeanstalkArb = require('./raw/beanstalk-arb');
+const { isNil } = require('../utils/bigint');
 
 const C_MAPPING = {
   eth: BeanstalkEth,
@@ -13,6 +14,9 @@ const C_MAPPING = {
 // i.e. jest.spyOn(RuntimeConstants, 'proxyUnderlying').mockReturnValue(4);
 class RuntimeConstants {
   static proxyUnderlying({ chain, season }) {
+    if (isNil(chain)) {
+      throw new Error('Invalid chain provided');
+    }
     return new Proxy({}, RuntimeConstants._makeProxyHandler(chain, season));
   }
 
@@ -60,10 +64,8 @@ class RuntimeConstants {
 // C(chain).DECIMALS[token]
 const C = (opt) => {
   if (!opt) {
-    let defaultChain;
-    try {
-      defaultChain = AsyncContext.get('chain');
-    } catch (e) {
+    let defaultChain = AsyncContext.getOrUndef('chain');
+    if (!defaultChain) {
       // If there is no async context, this is from a system process/non rest. Use default configured chain
       defaultChain = EnvUtil.defaultChain();
     }

@@ -1,9 +1,9 @@
-const { sequelize } = require('../../repository/postgres/models');
 const YieldModelAssembler = require('../../repository/postgres/models/assemblers/yield-assembler');
 const { ApyInitType } = require('../../repository/postgres/models/types/types');
 const YieldRepository = require('../../repository/postgres/queries/yield-repository');
 const SiloApyService = require('../../service/silo-apy');
 const SiloService = require('../../service/silo-service');
+const AsyncContext = require('../../utils/async/context');
 const Log = require('../../utils/logging');
 const OnSunriseUtil = require('../util/on-sunrise');
 
@@ -40,7 +40,7 @@ class SunriseTask {
     ];
 
     // Save new yields
-    await sequelize.transaction(async (transaction) => {
+    await AsyncContext.sequelizeTransaction(async () => {
       return await YieldRepository.addYields(yieldRows, { transaction });
     });
   }

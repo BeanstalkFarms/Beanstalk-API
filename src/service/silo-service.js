@@ -1,6 +1,5 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
-const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const ArraysUtil = require('../utils/arrays');
@@ -8,6 +7,7 @@ const BlockUtil = require('../utils/block');
 const Concurrent = require('../utils/async/concurrent');
 const { createNumberSpread } = require('../utils/number');
 const PromiseUtil = require('../utils/async/promise');
+const AsyncContext = require('../utils/async/context');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
@@ -164,7 +164,7 @@ class SiloService {
     const tokenModels = await TokenRepository.findWhitelistedTokens({ where: { chain } });
 
     const updatedTokens = [];
-    await sequelize.transaction(async (transaction) => {
+    await AsyncContext.sequelizeTransaction(async () => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
         const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
@@ -182,21 +182,14 @@ class SiloService {
         );
 
         updatedTokens.push(
-          ...(await TokenRepository.updateToken(
-            token,
-            chain,
-            {
-              supply,
-              bdv,
-              stalkEarnedPerSeason,
-              stemTip,
-              totalDeposited,
-              totalDepositedBdv
-            },
-            {
-              transaction
-            }
-          ))
+          ...(await TokenRepository.updateToken(token, chain, {
+            supply,
+            bdv,
+            stalkEarnedPerSeason,
+            stemTip,
+            totalDeposited,
+            totalDepositedBdv
+          }))
         );
       }
     });
