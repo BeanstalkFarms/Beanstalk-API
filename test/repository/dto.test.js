@@ -1,5 +1,5 @@
-const DepositDto = require('../../src/repository/subgraph/dto/DepositDto');
-const WellDto = require('../../src/repository/subgraph/dto/WellDto');
+const DepositDto = require('../../src/repository/dto/DepositDto');
+const WellDto = require('../../src/repository/dto/WellDto');
 const { allToBigInt } = require('../../src/utils/number');
 
 const sampleWell = require('../mock-responses/subgraph/entities/well.json');

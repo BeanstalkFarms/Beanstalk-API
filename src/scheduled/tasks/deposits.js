@@ -1,6 +1,7 @@
 const { C } = require('../../constants/runtime-constants');
 const DepositEvents = require('../../datasources/events/deposit-events');
 const MetaRepository = require('../../repository/postgres/queries/meta-repository');
+const DepositDto = require('../../repository/dto/DepositDto');
 const DepositService = require('../../service/deposit-service');
 const AsyncContext = require('../../utils/async/context');
 
@@ -17,8 +18,11 @@ class DepositsTask {
     // Buffer to avoid issues with a chain reorg
     const updateBlock = currentBlock - 10; // TODO: function to determine how many blocks per second
 
+    const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
+
     await AsyncContext.sequelizeTransaction(async () => {
-      await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock);
+      await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock, tokenInfos);
+      // TODO: need to identify when someone has mown
       // TODO: if isHourly, need to update the seed count associated with every deposit
       await MetaRepository.update(C().CHAIN, {
         lastDepositUpdate: updateBlock
@@ -32,7 +36,7 @@ class DepositsTask {
   }
 
   // Updates the list of deposits in the database, adding/removing entries as needed
-  static async updateDepositsList(fromBlock, toBlock) {
+  static async updateDepositsList(fromBlock, toBlock, tokenInfos) {
     const netActivity = await DepositsTask.getNetChange(fromBlock, toBlock);
 
     // Pull corresponding db entries
@@ -48,8 +52,7 @@ class DepositsTask {
     }
     const deposits = await DepositService.getMatchingDeposits(depositsToRetrieve);
 
-    const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
-    const { toUpsert, toDelete } = DepositsTask.updateCurrentDepositValues(deposits, netActivity, tokenInfos);
+    const { toUpsert, toDelete } = await DepositsTask.updateDtoList(deposits, netActivity, tokenInfos, toBlock);
 
     if (toDelete.length > 0) {
       await DepositService.removeDeposits(toDelete);
@@ -92,7 +95,7 @@ class DepositsTask {
   }
 
   // Increase/decrease deposited amounts. Identifies which deposits should be deleted or upserted
-  static updateCurrentDepositValues(deposits, netActivity, tokenInfos) {
+  static async updateDtoList(deposits, netActivity, tokenInfos, blockNumber) {
     const toUpsert = [];
     const toDelete = [];
     for (const deposit of deposits) {
@@ -102,10 +105,42 @@ class DepositsTask {
         toDelete.push(deposit);
       } else {
         deposit.depositedBdv += netActivity[key].bdv;
-        deposit.setStalkAndSeeds(tokenInfos[deposit.token]);
         toUpsert.push(deposit);
       }
     }
+
+    // Find new deposits which arent in the db yet
+    const depositKeys = new Set(deposits.map((d) => `${d.account}|${d.token}|${d.stem}`));
+    const newDeposits = [];
+    const accountTokenPairs = [];
+    for (const key in netActivity) {
+      if (!depositKeys.has(key)) {
+        const newDeposit = new DepositDto();
+        newDeposits.push(newDeposit);
+
+        const [account, token, stem] = key.split('|');
+        newDeposit.account = account;
+        newDeposit.token = token;
+        newDeposit.stem = BigInt(stem);
+        newDeposit.depositedAmount = netActivity[key].amount;
+        newDeposit.depositedBdv = netActivity[key].bdv;
+
+        accountTokenPairs.push({ account, token });
+      }
+    }
+
+    // Assign mow stems to new deposits
+    const mowStems = await DepositService.getMowStems(accountTokenPairs, blockNumber);
+    for (const deposit of newDeposits) {
+      deposit.mowStem = mowStems[`${deposit.account}|${deposit.token}`];
+      toUpsert.push(deposit);
+    }
+
+    // Update current values
+    for (const deposit of toUpsert) {
+      deposit.setStalkAndSeeds(tokenInfos[deposit.token]);
+    }
+
     return { toUpsert, toDelete };
   }
 }

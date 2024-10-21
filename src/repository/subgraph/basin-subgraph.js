@@ -1,7 +1,7 @@
 const { gql } = require('graphql-request');
 const { C } = require('../../constants/runtime-constants');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
-const WellDto = require('./dto/WellDto');
+const WellDto = require('../dto/WellDto');
 
 class BasinSubgraphRepository {
   static async getAllWells(blockNumber, c = C()) {

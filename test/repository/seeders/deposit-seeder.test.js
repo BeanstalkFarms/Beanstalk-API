@@ -25,12 +25,12 @@ describe('Deposit Seeder', () => {
     const whitelistInfoResponse = allToBigInt(require('../../mock-responses/service/whitelistedTokenInfo.json'));
     jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue(whitelistInfoResponse);
 
-    const mockBeanstalk = {
-      getLastMowedStem: jest.fn().mockImplementation((token) => {
-        return 0n;
-      })
-    };
-    jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
+    jest.spyOn(DepositService, 'getMowStems').mockResolvedValue(
+      depositsResponse.siloDeposits.reduce((acc, next) => {
+        acc[`${next.farmer.id}|${next.token}`] = 50n;
+        return acc;
+      }, {})
+    );
     jest.spyOn(DepositService, 'batchUpdateLambdaBdvs').mockImplementation(() => {});
     jest.spyOn(AsyncContext, 'sequelizeTransaction').mockImplementation(() => {});
 

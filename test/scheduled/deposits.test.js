@@ -1,5 +1,6 @@
 const DepositEvents = require('../../src/datasources/events/deposit-events');
 const DepositsTask = require('../../src/scheduled/tasks/deposits');
+const DepositService = require('../../src/service/deposit-service');
 const { allToBigInt } = require('../../src/utils/number');
 
 describe('Deposits Task', () => {
@@ -47,9 +48,16 @@ describe('Deposits Task', () => {
         bdv: 250n
       }
     };
-    const tokenInfos = { bean: 'undefined' };
+    const tokenInfos = {
+      bean: { stalkIssuedPerBdv: 10000000000n, stalkEarnedPerSeason: 5000000n, stemTip: 40000000000n }
+    };
 
-    const { toDelete, toUpsert } = DepositsTask.updateCurrentDepositValues(deposits, activity, tokenInfos);
+    jest.spyOn(DepositService, 'getMowStems').mockResolvedValue({
+      'abc|bean': 0n,
+      'def|bean': 50n
+    });
+
+    const { toDelete, toUpsert } = await DepositsTask.updateDtoList(deposits, activity, tokenInfos);
 
     expect(toDelete.length).toBe(1);
     expect(toDelete[0].account).toBe('def');

@@ -1,5 +1,5 @@
 const Contracts = require('../src/datasources/contracts/contracts');
-const WellDto = require('../src/repository/subgraph/dto/WellDto');
+const WellDto = require('../src/repository/dto/WellDto');
 const PriceService = require('../src/service/price-service');
 const ConstantProductWellUtil = require('../src/service/utils/pool/constant-product');
 const LiquidityUtil = require('../src/service/utils/pool/liquidity');

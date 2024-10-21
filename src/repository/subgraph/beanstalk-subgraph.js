@@ -2,7 +2,7 @@ const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
 const { C } = require('../../constants/runtime-constants');
 const { gql } = require('graphql-request');
-const DepositDto = require('./dto/DepositDto');
+const DepositDto = require('../dto/DepositDto');
 
 class BeanstalkSubgraphRepository {
   static async getDepositedBdvs(accounts, blockNumber, c = C()) {

@@ -1,7 +1,9 @@
 const { C } = require('../constants/runtime-constants');
+const Contracts = require('../datasources/contracts/contracts');
 const DepositModelAssembler = require('../repository/postgres/models/assemblers/deposit-assembler');
 const DepositRepository = require('../repository/postgres/queries/deposit-repository');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
+const Concurrent = require('../utils/async/concurrent');
 const SiloService = require('./silo-service');
 
 class DepositService {
@@ -20,6 +22,21 @@ class DepositService {
   static async removeDeposits(depositDtos) {
     const depositIds = depositDtos.map((d) => d.id);
     await DepositRepository.destroyByIds(depositIds);
+  }
+
+  // Retrieves all mow stems for the requested account/token pairs
+  static async getMowStems(accountTokenPairs, blockNumber) {
+    const results = {};
+    const beanstalk = Contracts.getBeanstalk();
+    for (let i = 0; i < accountTokenPairs.length; ++i) {
+      const { account, token } = accountTokenPairs[i];
+      await Concurrent.run('getMowStems', async () => {
+        results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
+      });
+    }
+    await Concurrent.allResolved('DepositSeeder');
+
+    return results;
   }
 
   // Updates bdv/lambda stats on all of the given deposits

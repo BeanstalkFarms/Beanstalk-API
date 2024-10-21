@@ -1,4 +1,4 @@
-const DepositDto = require('../../../subgraph/dto/DepositDto');
+const DepositDto = require('../../../dto/DepositDto');
 
 class DepositModelAssembler {
   static toModel(depositDto, tokenModels) {

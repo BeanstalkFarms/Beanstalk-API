@@ -1,8 +1,6 @@
 const { C } = require('../../../constants/runtime-constants');
-const Contracts = require('../../../datasources/contracts/contracts');
 const DepositService = require('../../../service/deposit-service');
 const SiloService = require('../../../service/silo-service');
-const Concurrent = require('../../../utils/async/concurrent');
 const AsyncContext = require('../../../utils/async/context');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
@@ -19,7 +17,6 @@ class DepositSeeder {
     }
 
     const seedBlock = (await C().RPC.getBlock()).number;
-    const beanstalk = Contracts.getBeanstalk();
 
     // Initial deposits list comes directly from subgraph
     const allDeposits = await BeanstalkSubgraphRepository.getAllDeposits(seedBlock);
@@ -28,21 +25,24 @@ class DepositSeeder {
     const accounts = this.getDepositsByAccount(allDeposits);
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
 
-    // Get mow stems for each account/token pair, and update the deposit
+    // Get mow stems for each account/token pair
+    const accountTokenPairs = [];
     for (const account in accounts) {
       for (const token in accounts[account]) {
-        await Concurrent.run('DepositSeeder', async () => {
-          const tokenInfo = tokenInfos[token];
-          const lastStem = await beanstalk.getLastMowedStem(account, token, { blockTag: seedBlock });
-          for (const deposit of accounts[account][token]) {
-            deposit.mowStem = lastStem;
-            // Set inherent deposit info
-            deposit.setStalkAndSeeds(tokenInfo);
-          }
-        });
+        accountTokenPairs.push({ account, token });
       }
     }
-    await Concurrent.allResolved('DepositSeeder');
+    const mowStems = await DepositService.getMowStems(accountTokenPairs);
+
+    // Update each deposit with its current info
+    for (const account in accounts) {
+      for (const token in accounts[account]) {
+        for (const deposit of accounts[account][token]) {
+          deposit.mowStem = mowStems[`${account}|${token}`];
+          deposit.setStalkAndSeeds(tokenInfos[token]);
+        }
+      }
+    }
 
     await DepositService.batchUpdateLambdaBdvs(allDeposits, tokenInfos, seedBlock);
 

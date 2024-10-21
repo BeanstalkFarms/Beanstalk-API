@@ -1,5 +1,5 @@
-const { C } = require('../../../constants/runtime-constants');
-const { isNil } = require('../../../utils/bigint');
+const { C } = require('../../constants/runtime-constants');
+const { isNil } = require('../../utils/bigint');
 
 class DepositDto {
   static subgraphFields = `
@@ -52,8 +52,6 @@ class DepositDto {
       this.bdvOnLambda = d.bdvOnLambda;
       this.stalkOnLambda = d.stalkOnLambda;
       this.seedsOnLambda = d.seedsOnLambda;
-    } else {
-      throw new Error(`Invalid constructor type '${type}'.`);
     }
   }
 
