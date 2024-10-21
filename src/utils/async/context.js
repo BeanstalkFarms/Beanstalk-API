@@ -8,8 +8,8 @@ class AsyncContext {
     return new Promise((resolve, reject) => {
       asyncLocalStorage.run(contextValues, async () => {
         try {
-          await callback();
-          resolve();
+          const result = await callback();
+          resolve(result);
         } catch (e) {
           reject(e);
         }
@@ -19,14 +19,18 @@ class AsyncContext {
 
   // Create a context including the db transaction
   static sequelizeTransaction(callback) {
+    if (AsyncContext.getOrUndef('transaction')) {
+      // No need to open another transaction if one is already open
+      return callback();
+    }
     return new Promise(async (resolve, reject) => {
       const transaction = await sequelize.transaction();
       // Maintains current context variables if one exists
       const currentStore = asyncLocalStorage.getStore() ?? {};
       try {
-        await AsyncContext.run({ transaction, ...currentStore }, callback);
+        const result = await AsyncContext.run({ transaction, ...currentStore }, callback);
         await transaction.commit();
-        resolve();
+        resolve(result);
       } catch (e) {
         await transaction.rollback();
         reject(e);

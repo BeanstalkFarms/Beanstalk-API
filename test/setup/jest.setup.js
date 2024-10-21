@@ -23,6 +23,13 @@ jest.mock('../../src/datasources/alchemy', () => {
   };
 });
 // Disables all database interactions
-jest.mock('../../src/repository/postgres/models/index', () => ({}));
+jest.mock('../../src/repository/postgres/models/index', () => {
+  return {
+    sequelize: {
+      transaction: jest.fn()
+    },
+    Sequelize: {}
+  };
+});
 // Disables any discord messaging
 jest.mock('../../src/utils/discord', () => ({}));
