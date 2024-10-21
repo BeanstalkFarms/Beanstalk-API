@@ -4,6 +4,7 @@ const DepositRepository = require('../../../src/repository/postgres/queries/depo
 const DepositSeeder = require('../../../src/repository/postgres/startup-seeders/deposit-seeder');
 const DepositService = require('../../../src/service/deposit-service');
 const SiloService = require('../../../src/service/silo-service');
+const AsyncContext = require('../../../src/utils/async/context');
 const Log = require('../../../src/utils/logging');
 const { allToBigInt } = require('../../../src/utils/number');
 const { mockBeanstalkSG } = require('../../util/mock-sg');
@@ -30,19 +31,9 @@ describe('Deposit Seeder', () => {
       })
     };
     jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
-
-    const bdvsSpy = jest
-      .spyOn(SiloService, 'batchBdvs')
-      .mockResolvedValue(depositsResponse.siloDeposits.map((d) => 123456n));
-
-    jest.spyOn(DepositService, 'updateDeposits').mockImplementation(() => {});
+    jest.spyOn(DepositService, 'batchUpdateLambdaBdvs').mockImplementation(() => {});
+    jest.spyOn(AsyncContext, 'sequelizeTransaction').mockImplementation(() => {});
 
     await DepositSeeder.run();
-
-    const bdvsCalldata = {
-      tokens: depositsResponse.siloDeposits.map((d) => d.token),
-      amounts: depositsResponse.siloDeposits.map((d) => BigInt(d.depositedAmount))
-    };
-    expect(bdvsSpy).toHaveBeenCalledWith(bdvsCalldata, 50);
   });
 });

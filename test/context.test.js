@@ -46,12 +46,6 @@ describe('AsyncContext', () => {
     });
 
     test('Preserves existing context values', async () => {
-      const mockTxn = {
-        commit: jest.fn(),
-        rollback: jest.fn()
-      };
-      jest.spyOn(sequelize, 'transaction').mockResolvedValue(mockTxn);
-
       await AsyncContext.run({ outer: 'abc' }, async () => {
         expect(AsyncContext.getOrUndef('outer')).toBeDefined();
         expect(AsyncContext.getOrUndef('transaction')).not.toBeDefined();

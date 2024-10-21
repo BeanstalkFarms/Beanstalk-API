@@ -3,9 +3,11 @@ const Contracts = require('../../../datasources/contracts/contracts');
 const DepositService = require('../../../service/deposit-service');
 const SiloService = require('../../../service/silo-service');
 const Concurrent = require('../../../utils/async/concurrent');
+const AsyncContext = require('../../../utils/async/context');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const DepositRepository = require('../queries/deposit-repository');
+const MetaRepository = require('../queries/meta-repository');
 
 // Seeds the deposits table with initial info
 class DepositSeeder {
@@ -42,25 +44,15 @@ class DepositSeeder {
     }
     await Concurrent.allResolved('DepositSeeder');
 
-    //// TODO: this part should be accessible elsewhere to also use during regular updates
-    // Get current bdvs for all deposits
-    const bdvsCalldata = {
-      tokens: [],
-      amounts: []
-    };
-    for (const deposit of allDeposits) {
-      bdvsCalldata.tokens.push(deposit.token);
-      bdvsCalldata.amounts.push(deposit.depositedAmount);
-    }
-    const depositLambdaBdvs = await SiloService.batchBdvs(bdvsCalldata, seedBlock);
+    await DepositService.batchUpdateLambdaBdvs(allDeposits, tokenInfos, seedBlock);
 
-    // Updates lambda stats
-    for (let i = 0; i < allDeposits.length; ++i) {
-      allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
-    }
-    ////
-
-    await DepositService.updateDeposits(allDeposits, seedBlock);
+    // Write initial deposits to db
+    await AsyncContext.sequelizeTransaction(async () => {
+      await DepositService.updateDeposits(allDeposits);
+      await MetaRepository.update(C().CHAIN, {
+        lastDepositUpdate: seedBlock
+      });
+    });
   }
 
   static getDepositsByAccount(allDeposits) {

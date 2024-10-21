@@ -26,7 +26,10 @@ jest.mock('../../src/datasources/alchemy', () => {
 jest.mock('../../src/repository/postgres/models/index', () => {
   return {
     sequelize: {
-      transaction: jest.fn()
+      transaction: jest.fn().mockResolvedValue({
+        commit: jest.fn(),
+        rollback: jest.fn()
+      })
     },
     Sequelize: {}
   };

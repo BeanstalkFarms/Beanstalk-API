@@ -20,10 +20,15 @@ class DepositsTask {
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock);
       // TODO: if isHourly, need to update the seed count associated with every deposit
+      await MetaRepository.update(C().CHAIN, {
+        lastDepositUpdate: updateBlock
+      });
     });
 
-    // Uses a looser update threshold once per hour
-    await DepositsTask.updateLambdaStats(isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD);
+    await AsyncContext.sequelizeTransaction(async () => {
+      // Uses a looser update threshold once per hour
+      await DepositsTask.updateLambdaStats(isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD);
+    });
   }
 
   // Updates the list of deposits in the database, adding/removing entries as needed
@@ -44,28 +49,17 @@ class DepositsTask {
     const deposits = await DepositService.getMatchingDeposits(depositsToRetrieve);
 
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
-    // Increase/decrease deposited amounts, delete entry if needed
-    const toUpdate = [];
-    const toDelete = [];
-    for (const deposit of deposits) {
-      const key = `${deposit.account}|${deposit.token}|${deposit.stem}`;
-      deposit.depositedAmount += netActivity[key].amount;
-      if (deposit.depositedAmount === 0n) {
-        toDelete.push(deposit);
-      } else {
-        deposit.setStalkAndSeeds(tokenInfos[deposit.token]);
-        deposit.depositedBdv += netActivity[key].bdv;
-        toUpdate.push(deposit);
-      }
-    }
+    const { toUpsert, toDelete } = DepositsTask.updateCurrentDepositValues(deposits, netActivity, tokenInfos);
 
     if (toDelete.length > 0) {
       await DepositService.removeDeposits(toDelete);
     }
 
     // Update lambda stats on the updateable deposits
-
-    // Update meta block
+    if (toUpsert.length > 0) {
+      await DepositService.batchUpdateLambdaBdvs(toUpsert, tokenInfos, updateBlock);
+      await DepositService.updateDeposits(toUpsert);
+    }
   }
 
   // Updates lambda bdv stats if the bdv of an asset has changed by more than `updateThreshold` since the last update.
@@ -95,6 +89,24 @@ class DepositsTask {
       }
     }
     return netActivity;
+  }
+
+  // Increase/decrease deposited amounts. Identifies which deposits should be deleted or upserted
+  static updateCurrentDepositValues(deposits, netActivity, tokenInfos) {
+    const toUpsert = [];
+    const toDelete = [];
+    for (const deposit of deposits) {
+      const key = `${deposit.account}|${deposit.token}|${deposit.stem}`;
+      deposit.depositedAmount += netActivity[key].amount;
+      if (deposit.depositedAmount === 0n) {
+        toDelete.push(deposit);
+      } else {
+        deposit.depositedBdv += netActivity[key].bdv;
+        deposit.setStalkAndSeeds(tokenInfos[deposit.token]);
+        toUpsert.push(deposit);
+      }
+    }
+    return { toUpsert, toDelete };
   }
 }
 module.exports = DepositsTask;
