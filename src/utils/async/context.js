@@ -17,10 +17,11 @@ class AsyncContext {
     });
   }
 
+  // Create a context including the db transaction
   static sequelizeTransaction(callback) {
     return new Promise(async (resolve, reject) => {
-      // Create a context including the db transaction
       const transaction = await sequelize.transaction();
+      // Maintains current context variables if one exists
       const currentStore = asyncLocalStorage.getStore() ?? {};
       try {
         await AsyncContext.run({ transaction, ...currentStore }, callback);

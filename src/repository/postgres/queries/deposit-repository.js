@@ -9,6 +9,17 @@ class DepositRepository {
     return count;
   }
 
+  // Retrieves a list of deposits matching a set of criteria
+  static async findByCriteria(criteriaList) {
+    const deposits = await sequelize.models.Deposit.findAll({
+      where: {
+        [Sequelize.Op.or]: criteriaList
+      },
+      transaction: AsyncContext.getOrUndef('transaction')
+    });
+    return deposits;
+  }
+
   // Inserts/Updates the given deposit rows
   static async upsertDeposits(deposits) {
     for (const row of deposits) {
