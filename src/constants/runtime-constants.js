@@ -14,8 +14,8 @@ const C_MAPPING = {
 // i.e. jest.spyOn(RuntimeConstants, 'proxyUnderlying').mockReturnValue(4);
 class RuntimeConstants {
   static proxyUnderlying({ chain, season }) {
-    if (isNil(chain)) {
-      throw new Error('Invalid chain provided');
+    if (isNil(chain) && isNil(season)) {
+      throw new Error(`One of chain/season must be provided.`);
     }
     return new Proxy({}, RuntimeConstants._makeProxyHandler(chain, season));
   }

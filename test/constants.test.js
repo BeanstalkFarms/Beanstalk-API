@@ -24,9 +24,9 @@ describe('Chain constants', () => {
   test('Uses default/contextual chain for C object', () => {
     jest.spyOn(EnvUtil, 'defaultChain').mockReturnValue('eth');
     expect(C().DECIMALS.stalk).toEqual(10);
-    jest.spyOn(AsyncContext, 'get').mockReturnValue('arb');
+    jest.spyOn(AsyncContext, 'getOrUndef').mockReturnValue('arb');
     expect(C().DECIMALS.stalk).toEqual(16);
-    jest.spyOn(AsyncContext, 'get').mockReturnValue('invalid chain');
+    jest.spyOn(AsyncContext, 'getOrUndef').mockReturnValue('invalid chain');
     expect(() => C().DECIMALS.stalk).toThrow();
   });
 
