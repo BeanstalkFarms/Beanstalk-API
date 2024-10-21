@@ -23,38 +23,48 @@ class DepositsTask {
 
   // Updates the list of deposits in the database, adding/removing entries as needed
   static async updateDepositsList(fromBlock, toBlock) {
-    // Gets the set of net deposit activity over this range in token amounts
-    const newEvents = await DepositEvents.getSiloDepositEventsCollapsed(fromBlock, toBlock);
-    const netActivity = {};
-    for (const event of newEvents) {
-      const key = `${event.account}-${event.token}-${event.stem}`;
-      netActivity[key] = (netActivity[key] ?? 0n) + BigInt(event.type) * event.amount;
-    }
-
-    // Filter 0 entries (no net activity)
-    const depositsToRetrieve = [];
-    for (const key in netActivity) {
-      if (netActivity[key] !== 0n) {
-        const elem = key.split('-');
-        depositsToRetrieve.push({
-          chain: C().CHAIN,
-          account: elem[0],
-          token: elem[1],
-          stem: BigInt(elem[2])
-        });
-      }
-    }
+    const netActivity = await DepositsTask.getNetChange(fromBlock, toBlock);
 
     // Pull corresponding db entries
+    const depositsToRetrieve = [];
+    for (const key in netActivity) {
+      const elem = key.split('|');
+      depositsToRetrieve.push({
+        chain: C().CHAIN,
+        account: elem[0],
+        token: elem[1],
+        stem: BigInt(elem[2])
+      });
+    }
     const deposits = await DepositService.getMatchingDeposits(depositsToRetrieve);
 
     // Increase/decrease deposited amounts, delete entry if needed
+
+    // Update meta block
   }
 
   // Updates lambda bdv stats if the bdv of an asset has changed by more than `updateThreshold` since the last update.
   static async updateLambdaStats(updateThreshold) {
     // Check whether bdv of a token has meaningfully updated since the last update
     // If so, pull all corresponding deposits from db and update their lambda stats
+  }
+
+  // Gets the set of net deposit activity over this range in token amounts
+  static async getNetChange(fromBlock, toBlock) {
+    const newEvents = await DepositEvents.getSiloDepositEventsCollapsed(fromBlock, toBlock);
+    const netActivity = {};
+    for (const event of newEvents) {
+      const key = `${event.account}|${event.token}|${event.stem}`;
+      netActivity[key] = (netActivity[key] ?? 0n) + BigInt(event.type) * event.amount;
+    }
+
+    // Filter 0 entries (no net activity)
+    for (const key in netActivity) {
+      if (netActivity[key] === 0n) {
+        delete netActivity[key];
+      }
+    }
+    return netActivity;
   }
 }
 module.exports = DepositsTask;
