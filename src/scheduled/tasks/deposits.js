@@ -2,23 +2,28 @@ const { C } = require('../../constants/runtime-constants');
 const DepositEvents = require('../../datasources/events/deposit-events');
 const MetaRepository = require('../../repository/postgres/queries/meta-repository');
 const DepositService = require('../../service/deposit-service');
+const AsyncContext = require('../../utils/async/context');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
 
 class DepositsTask {
   static async updateDeposits() {
+    const isHourly = new Date().getMinutes() === 0;
+
     // Determine range of blocks to update on
     const prevUpdateBlock = (await MetaRepository.get(C().CHAIN)).lastDepositUpdate;
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
     const updateBlock = currentBlock - 10; // TODO: function to determine how many blocks per second
 
-    await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock);
+    await AsyncContext.sequelizeTransaction(async () => {
+      await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock);
+      // TODO: if isHourly, need to update the seed count associated with every deposit
+    });
 
     // Uses a looser update threshold once per hour
-    const hourly = new Date().getMinutes() === 0;
-    await DepositsTask.updateLambdaStats(hourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD);
+    await DepositsTask.updateLambdaStats(isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD);
   }
 
   // Updates the list of deposits in the database, adding/removing entries as needed
@@ -38,7 +43,27 @@ class DepositsTask {
     }
     const deposits = await DepositService.getMatchingDeposits(depositsToRetrieve);
 
+    const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: seedBlock, chain: C().CHAIN });
     // Increase/decrease deposited amounts, delete entry if needed
+    const toUpdate = [];
+    const toDelete = [];
+    for (const deposit of deposits) {
+      const key = `${deposit.account}|${deposit.token}|${deposit.stem}`;
+      deposit.depositedAmount += netActivity[key].amount;
+      if (deposit.depositedAmount === 0n) {
+        toDelete.push(deposit);
+      } else {
+        deposit.setStalkAndSeeds(tokenInfos[deposit.token]);
+        deposit.depositedBdv += netActivity[key].bdv;
+        toUpdate.push(deposit);
+      }
+    }
+
+    if (toDelete.length > 0) {
+      await DepositService.removeDeposits(toDelete);
+    }
+
+    // Update lambda stats on the updateable deposits
 
     // Update meta block
   }
@@ -55,12 +80,17 @@ class DepositsTask {
     const netActivity = {};
     for (const event of newEvents) {
       const key = `${event.account}|${event.token}|${event.stem}`;
-      netActivity[key] = (netActivity[key] ?? 0n) + BigInt(event.type) * event.amount;
+      netActivity[key] ||= {
+        amount: 0n,
+        bdv: 0n
+      };
+      netActivity[key].amount += BigInt(event.type) * event.amount;
+      netActivity[key].bdv += BigInt(event.type) * event.bdv;
     }
 
     // Filter 0 entries (no net activity)
     for (const key in netActivity) {
-      if (netActivity[key] === 0n) {
+      if (netActivity[key].amount === 0n) {
         delete netActivity[key];
       }
     }

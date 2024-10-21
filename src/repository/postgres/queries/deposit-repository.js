@@ -29,6 +29,17 @@ class DepositRepository {
       });
     }
   }
+
+  static async destroyByIds(depositIds) {
+    await sequelize.models.Deposit.detroy({
+      where: {
+        id: {
+          [Sequelize.Op.in]: depositIds
+        }
+      },
+      transaction: AsyncContext.getOrUndef('transaction')
+    });
+  }
 }
 
 module.exports = DepositRepository;

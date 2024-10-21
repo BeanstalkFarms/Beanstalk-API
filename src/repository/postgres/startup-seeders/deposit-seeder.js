@@ -42,6 +42,7 @@ class DepositSeeder {
     }
     await Concurrent.allResolved('DepositSeeder');
 
+    //// TODO: this part should be accessible elsewhere to also use during regular updates
     // Get current bdvs for all deposits
     const bdvsCalldata = {
       tokens: [],
@@ -57,6 +58,7 @@ class DepositSeeder {
     for (let i = 0; i < allDeposits.length; ++i) {
       allDeposits[i].updateLambdaStats(depositLambdaBdvs[i], tokenInfos[allDeposits[i].token]);
     }
+    ////
 
     await DepositService.updateDeposits(allDeposits, seedBlock);
   }

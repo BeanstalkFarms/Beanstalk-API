@@ -24,7 +24,7 @@ describe('AsyncContext', () => {
       const txnSpy = jest.spyOn(sequelize, 'transaction').mockResolvedValue(mockTxn);
 
       await expect(
-        AsyncContext.sequelizeTransaction(() => {
+        AsyncContext.sequelizeTransaction(async () => {
           expect(AsyncContext.getOrUndef('transaction')).toBeDefined();
         })
       ).resolves.toBeUndefined();
@@ -35,7 +35,7 @@ describe('AsyncContext', () => {
       jest.clearAllMocks();
 
       await expect(
-        AsyncContext.sequelizeTransaction(() => {
+        AsyncContext.sequelizeTransaction(async () => {
           throw new Error('Callback error');
         })
       ).rejects.toBeDefined();
@@ -55,7 +55,7 @@ describe('AsyncContext', () => {
       await AsyncContext.run({ outer: 'abc' }, async () => {
         expect(AsyncContext.getOrUndef('outer')).toBeDefined();
         expect(AsyncContext.getOrUndef('transaction')).not.toBeDefined();
-        await AsyncContext.sequelizeTransaction(() => {
+        await AsyncContext.sequelizeTransaction(async () => {
           expect(AsyncContext.getOrUndef('outer')).toBeDefined();
           expect(AsyncContext.getOrUndef('transaction')).toBeDefined();
         });
@@ -73,7 +73,7 @@ describe('AsyncContext', () => {
       };
       const txnSpy = jest.spyOn(sequelize, 'transaction').mockResolvedValue(mockTxn);
       await AsyncContext.sequelizeTransaction(async () => {
-        await AsyncContext.sequelizeTransaction(() => {});
+        await AsyncContext.sequelizeTransaction(async () => {});
       });
 
       expect(txnSpy).toHaveBeenCalledTimes(1);
