@@ -23,11 +23,14 @@ class DepositsTask {
 
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock, tokenInfos);
-      // TODO: need to identify when someone has mown
+      // TODO: need to identify when someone has mown, to update mow stems
       if (isHourly) {
-        // Need to update the seed count associated with every deposit
+        // Need to update the mowable stalk/seed count on every deposit
         const allDeposits = await DepositService.getAllDeposits();
-        allDeposits.map((d) => d.setStalkAndSeeds(tokenInfos[d.token]));
+        allDeposits.map((d) => {
+          d.setStalkAndSeeds(tokenInfos[d.token]);
+          d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
+        });
         await DepositService.updateDeposits(allDeposits);
       }
 
@@ -67,7 +70,7 @@ class DepositsTask {
 
     // Update lambda stats on the updateable deposits
     if (toUpsert.length > 0) {
-      await DepositService.batchUpdateLambdaBdvs(toUpsert, tokenInfos, updateBlock);
+      await DepositService.batchUpdateLambdaBdvs(toUpsert, tokenInfos, toBlock);
       await DepositService.updateDeposits(toUpsert);
     }
   }
