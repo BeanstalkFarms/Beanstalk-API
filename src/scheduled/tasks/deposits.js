@@ -4,6 +4,7 @@ const MetaRepository = require('../../repository/postgres/queries/meta-repositor
 const DepositDto = require('../../repository/dto/DepositDto');
 const DepositService = require('../../service/deposit-service');
 const AsyncContext = require('../../utils/async/context');
+const ChainUtil = require('../../utils/chain');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
@@ -16,7 +17,7 @@ class DepositsTask {
     const prevUpdateBlock = (await MetaRepository.get(C().CHAIN)).lastDepositUpdate;
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
-    const updateBlock = currentBlock - 10; // TODO: function to determine how many blocks per second
+    const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
 
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
 
