@@ -1,12 +1,12 @@
 const DepositEvents = require('../../src/datasources/events/deposit-events');
 const DepositsTask = require('../../src/scheduled/tasks/deposits');
-const DepositService = require('../../src/service/deposit-service');
+const SiloService = require('../../src/service/silo-service');
 const { allToBigInt } = require('../../src/utils/number');
 
 describe('Deposits Task', () => {
   test('Identifies net deposit activity over block range', async () => {
-    const events = require('../mock-responses/events/getSiloDepositEventsCollapsed.json');
-    jest.spyOn(DepositEvents, 'getSiloDepositEventsCollapsed').mockResolvedValue(allToBigInt(events, ['type']));
+    const events = require('../mock-responses/events/getSiloDepositEvents.json');
+    jest.spyOn(DepositEvents, 'getSiloDepositEvents').mockResolvedValue(allToBigInt(events, ['type']));
 
     const netActivity = await DepositsTask.getNetChange(100, 200);
 
@@ -52,7 +52,7 @@ describe('Deposits Task', () => {
       bean: { stalkIssuedPerBdv: 10000000000n, stalkEarnedPerSeason: 5000000n, stemTip: 40000000000n }
     };
 
-    jest.spyOn(DepositService, 'getMowStems').mockResolvedValue({
+    jest.spyOn(SiloService, 'getMowStems').mockResolvedValue({
       'abc|bean': 0n,
       'def|bean': 50n
     });

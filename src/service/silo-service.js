@@ -137,6 +137,21 @@ class SiloService {
     }, {});
   }
 
+  // Retrieves all mow stems for the requested account/token pairs
+  static async getMowStems(accountTokenPairs, blockNumber) {
+    const results = {};
+    const beanstalk = Contracts.getBeanstalk();
+    for (let i = 0; i < accountTokenPairs.length; ++i) {
+      const { account, token } = accountTokenPairs[i];
+      await Concurrent.run('getMowStems', async () => {
+        results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
+      });
+    }
+    await Concurrent.allResolved('DepositSeeder');
+
+    return results;
+  }
+
   static async batchBdvs(calldata, block, batchSize = 100) {
     const beanstalk = Contracts.getBeanstalk();
     const tokenBatches = ArraysUtil.toChunks(calldata.tokens, batchSize);

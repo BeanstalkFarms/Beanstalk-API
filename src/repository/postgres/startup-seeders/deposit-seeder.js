@@ -32,7 +32,7 @@ class DepositSeeder {
         accountTokenPairs.push({ account, token });
       }
     }
-    const mowStems = await DepositService.getMowStems(accountTokenPairs);
+    const mowStems = await SiloService.getMowStems(accountTokenPairs);
 
     // Update each deposit with its current info
     for (const account in accounts) {

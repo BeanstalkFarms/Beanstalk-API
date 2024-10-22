@@ -4,15 +4,11 @@ const FilterLogs = require('./filter-logs');
 const DEPOSIT_EVENTS = ['AddDeposit', 'RemoveDeposit', 'RemoveDeposits'];
 
 class DepositEvents {
+  // Returns a summary of add/remove deposit events. Collapses RemoveDeposits out of its array form
   static async getSiloDepositEvents(fromBlock, toBlock = 'latest') {
-    return await FilterLogs.getBeanstalkEvents(DEPOSIT_EVENTS, fromBlock, toBlock);
-  }
-
-  // Collapses RemoveDeposits out of its array form
-  static async getSiloDepositEventsCollapsed(fromBlock, toBlock = 'latest') {
-    const allEvents = await DepositEvents.getSiloDepositEvents(fromBlock, toBlock);
+    const rawEvents = await FilterLogs.getBeanstalkEvents(DEPOSIT_EVENTS, fromBlock, toBlock);
     const collapsed = [];
-    for (const event of allEvents) {
+    for (const event of rawEvents) {
       if (event.name === 'RemoveDeposits') {
         for (let i = 0; i < event.args.stems.length; ++i) {
           collapsed.push({
@@ -37,6 +33,20 @@ class DepositEvents {
     }
     return collapsed;
   }
+
+  // Returns condensed info from StalkBalanceChanged
+  static async getStalkBalanceChangedEvents(fromBlock, toBlock = 'latest') {
+    const rawEvents = await FilterLogs.getBeanstalkEvents(['StalkBalanceChanged'], fromBlock, toBlock);
+    const summary = [];
+    for (const event of rawEvents) {
+      summary.push({
+        account: event.args.account,
+        deltaStalk: BigInt(event.args.delta),
+        blockNumber: event.rawLog.blockNumber
+      });
+    }
+    return summary;
+  }
 }
 module.exports = DepositEvents;
 
@@ -47,6 +57,7 @@ if (require.main === module) {
     // console.log(logs.filter((l) => l.name === 'AddDeposit')[0]);
     // console.log(logs.filter((l) => l.name === 'RemoveDeposit')[0]);
     // console.log(logs.filter((l) => l.name === 'RemoveDeposits')[0].args.stems);
-    console.log(await DepositEvents.getSiloDepositEventsCollapsed(264547404));
+    // console.log(await DepositEvents.getSiloDepositEvents(264547404));
+    console.log(await DepositEvents.getStalkBalanceChangedEvents(264547404));
   })();
 }

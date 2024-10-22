@@ -25,7 +25,7 @@ describe('Deposit Seeder', () => {
     const whitelistInfoResponse = allToBigInt(require('../../mock-responses/service/whitelistedTokenInfo.json'));
     jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue(whitelistInfoResponse);
 
-    jest.spyOn(DepositService, 'getMowStems').mockResolvedValue(
+    jest.spyOn(SiloService, 'getMowStems').mockResolvedValue(
       depositsResponse.siloDeposits.reduce((acc, next) => {
         acc[`${next.farmer.id}|${next.token}`] = 50n;
         return acc;

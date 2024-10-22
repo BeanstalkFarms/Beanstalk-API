@@ -23,11 +23,11 @@ class DepositsTask {
 
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock, tokenInfos);
-      // TODO: need to identify when someone has mown, to update mow stems
+      await DepositsTask.updateMowStems(prevUpdateBlock + 1, updateBlock, tokenInfos);
       if (isHourly) {
         // Need to update the mowable stalk/seed count on every deposit
         const allDeposits = await DepositService.getAllDeposits();
-        allDeposits.map((d) => {
+        allDeposits.forEach((d) => {
           d.setStalkAndSeeds(tokenInfos[d.token]);
           d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
         });
@@ -75,6 +75,23 @@ class DepositsTask {
     }
   }
 
+  // Updates mow stems for all deposits associated with users who have potentially mown.
+  static async updateMowStems(fromBlock, toBlock, tokenInfos) {
+    const stalkChangeEvents = await DepositEvents.getStalkBalanceChangedEvents(fromBlock, toBlock);
+    // Determine what assets each account has deposited and has possibly just mown
+    const accountsCriteria = new Set(stalkChangeEvents.map((e) => e.account)).map((account) => ({ account }));
+    const mownDeposits = await DepositService.getMatchingDeposits(accountsCriteria);
+
+    // Update mow stem for each
+    await DepositService.assignMowStems(mownDeposits, blockNumber);
+    mownDeposits.forEach((d) => {
+      d.setStalkAndSeeds(tokenInfos[d.token]);
+      d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
+    });
+
+    await DepositService.updateDeposits(mownDeposits);
+  }
+
   // Updates lambda bdv stats if the bdv of an asset has changed by more than `updateThreshold` since the last update.
   static async updateLambdaStats(updateThreshold) {
     // Check whether bdv of a token has meaningfully updated since the last update
@@ -83,7 +100,7 @@ class DepositsTask {
 
   // Gets the set of net deposit activity over this range in token amounts
   static async getNetChange(fromBlock, toBlock) {
-    const newEvents = await DepositEvents.getSiloDepositEventsCollapsed(fromBlock, toBlock);
+    const newEvents = await DepositEvents.getSiloDepositEvents(fromBlock, toBlock);
     const netActivity = {};
     for (const event of newEvents) {
       const key = `${event.account}|${event.token}|${event.stem}`;
@@ -122,7 +139,6 @@ class DepositsTask {
     // Find new deposits which arent in the db yet
     const depositKeys = new Set(deposits.map((d) => `${d.account}|${d.token}|${d.stem}`));
     const newDeposits = [];
-    const accountTokenPairs = [];
     for (const key in netActivity) {
       if (!depositKeys.has(key)) {
         const newDeposit = new DepositDto();
@@ -134,17 +150,11 @@ class DepositsTask {
         newDeposit.stem = BigInt(stem);
         newDeposit.depositedAmount = netActivity[key].amount;
         newDeposit.depositedBdv = netActivity[key].bdv;
-
-        accountTokenPairs.push({ account, token });
       }
     }
 
-    // Assign mow stems to new deposits
-    const mowStems = await DepositService.getMowStems(accountTokenPairs, blockNumber);
-    for (const deposit of newDeposits) {
-      deposit.mowStem = mowStems[`${deposit.account}|${deposit.token}`];
-      toUpsert.push(deposit);
-    }
+    await DepositService.assignMowStems(newDeposits, blockNumber);
+    toUpsert.push(...newDeposits);
 
     // Update current values
     for (const deposit of toUpsert) {
