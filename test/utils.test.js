@@ -12,7 +12,6 @@ const { allToBigInt, fromBigInt } = require('../src/utils/number');
 const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
 const { BigInt_applyPercent } = require('../src/utils/bigint');
 const { C } = require('../src/constants/runtime-constants');
-const { mockBeanstalkSG } = require('./util/mock-sg');
 
 describe('Utils', () => {
   test('Formats query parameters', async () => {

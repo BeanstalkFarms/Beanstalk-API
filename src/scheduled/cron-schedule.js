@@ -2,12 +2,29 @@ const cron = require('node-cron');
 const { sendWebhookMessage } = require('../utils/discord');
 const SunriseTask = require('./tasks/sunrise');
 const Log = require('../utils/logging');
+const DepositsTask = require('./tasks/deposits');
 
 // All cron jobs which could be activated are configured here
 const ALL_JOBS = {
   sunrise: {
     cron: '0 * * * *',
     function: SunriseTask.handleSunrise
+  },
+  deposits: {
+    cron: '* * * * *',
+    function: async () => {
+      if (DepositsTask.__cronLock) {
+        Log.info('Deposits task is still running, skipping this minute...');
+        return;
+      }
+
+      try {
+        DepositsTask.__cronLock = true;
+        await DepositsTask.updateDeposits();
+      } finally {
+        DepositsTask.__cronLock = false;
+      }
+    }
   },
   alert: {
     cron: '*/10 * * * * *',
