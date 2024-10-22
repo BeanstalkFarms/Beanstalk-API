@@ -20,6 +20,9 @@ module.exports = {
         lastDepositUpdate: {
           type: Sequelize.INTEGER
         },
+        lastLambdaBdvs: {
+          type: Sequelize.STRING
+        },
         ...timestamps(Sequelize)
       },
       {

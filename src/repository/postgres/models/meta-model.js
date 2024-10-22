@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       lastDepositUpdate: {
         type: DataTypes.INTEGER
+      },
+      lastLambdaBdvs: {
+        type: DataTypes.STRING
       }
     },
     {

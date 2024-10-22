@@ -1,5 +1,6 @@
 const { C } = require('../../../constants/runtime-constants');
 const DepositService = require('../../../service/deposit-service');
+const AppMetaService = require('../../../service/meta-service');
 const SiloService = require('../../../service/silo-service');
 const AsyncContext = require('../../../utils/async/context');
 const Log = require('../../../utils/logging');
@@ -45,13 +46,16 @@ class DepositSeeder {
     }
 
     await DepositService.batchUpdateLambdaBdvs(allDeposits, tokenInfos, seedBlock);
+    const bdvsAtUpdate = Object.keys(tokenInfos).reduce((acc, next) => {
+      acc[next] = tokenInfos[next].bdv;
+      return acc;
+    }, {});
 
     // Write initial deposits to db
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositService.updateDeposits(allDeposits);
-      await MetaRepository.update(C().CHAIN, {
-        lastDepositUpdate: seedBlock
-      });
+      await AppMetaService.setLastDepositUpdate(seedBlock);
+      await AppMetaService.setLastLambdaBdvs(bdvsAtUpdate);
     });
   }
 

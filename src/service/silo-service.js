@@ -122,7 +122,8 @@ class SiloService {
       addresses.map(async (t) => {
         const [tokenSetting, stemTip, bdv] = await Promise.all([
           beanstalk.tokenSettings(t, { blockTag: block }),
-          beanstalk.stemTipForToken(t, { blockTag: block })
+          beanstalk.stemTipForToken(t, { blockTag: block }),
+          beanstalk.bdv(t, { blockTag: block })
         ]);
         return { tokenSetting, stemTip, bdv };
       })
@@ -131,7 +132,8 @@ class SiloService {
     return addresses.reduce((acc, next, idx) => {
       acc[next] = {
         ...results[idx].tokenSetting,
-        stemTip: results[idx].stemTip
+        stemTip: results[idx].stemTip,
+        bdv: results[idx].bdv
       };
       return acc;
     }, {});

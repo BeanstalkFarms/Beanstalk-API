@@ -5,6 +5,7 @@ const DepositDto = require('../../repository/dto/DepositDto');
 const DepositService = require('../../service/deposit-service');
 const AsyncContext = require('../../utils/async/context');
 const ChainUtil = require('../../utils/chain');
+const AppMetaService = require('../../service/meta-service');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
@@ -12,9 +13,9 @@ const HOURLY_UPDATE_THRESHOLD = 0.005;
 class DepositsTask {
   static async updateDeposits() {
     const isHourly = new Date().getMinutes() === 0;
+    const { lastUpdate, lastBdvs } = await AppMetaService.getLambdaMeta();
 
     // Determine range of blocks to update on
-    const prevUpdateBlock = (await MetaRepository.get(C().CHAIN)).lastDepositUpdate;
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
     const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
@@ -22,8 +23,8 @@ class DepositsTask {
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
 
     await AsyncContext.sequelizeTransaction(async () => {
-      await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock, tokenInfos);
-      await DepositsTask.updateMowStems(prevUpdateBlock + 1, updateBlock, tokenInfos);
+      await DepositsTask.updateDepositsList(lastUpdate + 1, updateBlock, tokenInfos);
+      await DepositsTask.updateMowStems(lastUpdate + 1, updateBlock, tokenInfos);
       if (isHourly) {
         // Need to update the mowable stalk/seed count on every deposit
         const allDeposits = await DepositService.getAllDeposits();
@@ -40,8 +41,12 @@ class DepositsTask {
     });
 
     await AsyncContext.sequelizeTransaction(async () => {
-      // Uses a looser update threshold once per hour
-      await DepositsTask.updateLambdaStats(isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD);
+      await DepositsTask.updateLambdaStats(
+        updateBlock,
+        tokenInfos,
+        // Uses a looser update threshold once per hour
+        isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD
+      );
     });
   }
 
@@ -93,7 +98,7 @@ class DepositsTask {
   }
 
   // Updates lambda bdv stats if the bdv of an asset has changed by more than `updateThreshold` since the last update.
-  static async updateLambdaStats(updateThreshold) {
+  static async updateLambdaStats(blockNumber, tokenInfos, updateThreshold) {
     // Check whether bdv of a token has meaningfully updated since the last update
     // If so, pull all corresponding deposits from db and update their lambda stats
   }
