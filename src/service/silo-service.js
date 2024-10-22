@@ -161,6 +161,8 @@ class SiloService {
     const amountBatches = ArraysUtil.toChunks(calldata.amounts, batchSize);
 
     const results = [];
+    results.length = calldata.tokens.length;
+
     const TAG = 'batchBdvs';
     for (let i = 0; i < tokenBatches.length; i++) {
       const batchTokens = tokenBatches[i];
@@ -169,7 +171,8 @@ class SiloService {
       // Call the bdvs function
       await Concurrent.run(TAG, async () => {
         const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
-        results.push(...bdvsResult);
+        // Preserve result order
+        results.splice(i * batchSize, batchSize, ...bdvsResult);
       });
     }
     await Concurrent.allResolved(TAG);
