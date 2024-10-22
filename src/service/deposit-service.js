@@ -7,8 +7,14 @@ const Concurrent = require('../utils/async/concurrent');
 const SiloService = require('./silo-service');
 
 class DepositService {
+  static async getAllDeposits() {
+    const deposits = await DepositRepository.findAllWithOptions({});
+    const depositDtos = deposits.map((d) => DepositModelAssembler.fromModel(d));
+    return depositDtos;
+  }
+
   static async getMatchingDeposits(criteriaList) {
-    const deposits = await DepositRepository.findByCriteria(criteriaList);
+    const deposits = await DepositRepository.findAllWithOptions(criteriaList);
     const depositDtos = deposits.map((d) => DepositModelAssembler.fromModel(d));
     return depositDtos;
   }

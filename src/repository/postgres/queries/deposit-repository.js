@@ -9,14 +9,29 @@ class DepositRepository {
     return count;
   }
 
-  // Retrieves a list of deposits matching a set of criteria
-  static async findByCriteria(criteriaList) {
-    const deposits = await sequelize.models.Deposit.findAll({
-      where: {
-        [Sequelize.Op.or]: criteriaList
-      },
+  // Retrieves a list of deposits following optional criteria
+  static async findAllWithOptions({ criteriaList = null, sort = null, limit = null, skip = null } = {}) {
+    const options = {
+      where: {},
       transaction: AsyncContext.getOrUndef('transaction')
-    });
+    };
+    // Apply optional values when provided
+    if (criteriaList && criteriaList.length > 0) {
+      options.where = {
+        [Sequelize.Op.or]: criteriaList
+      };
+    }
+    if (sort) {
+      options.order = sort;
+    }
+    if (limit) {
+      options.limit = limit;
+    }
+    if (skip) {
+      options.offset = skip;
+    }
+
+    const deposits = await sequelize.models.Deposit.findAll(options);
     return deposits;
   }
 

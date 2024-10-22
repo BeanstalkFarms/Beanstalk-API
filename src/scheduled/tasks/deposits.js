@@ -24,7 +24,13 @@ class DepositsTask {
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(prevUpdateBlock + 1, updateBlock, tokenInfos);
       // TODO: need to identify when someone has mown
-      // TODO: if isHourly, need to update the seed count associated with every deposit
+      if (isHourly) {
+        // Need to update the seed count associated with every deposit
+        const allDeposits = await DepositService.getAllDeposits();
+        allDeposits.map((d) => d.setStalkAndSeeds(tokenInfos[d.token]));
+        await DepositService.updateDeposits(allDeposits);
+      }
+
       await MetaRepository.update(C().CHAIN, {
         lastDepositUpdate: updateBlock
       });
