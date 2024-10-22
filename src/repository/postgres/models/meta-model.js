@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER
       },
       lastLambdaBdvs: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT
       }
     },
     {

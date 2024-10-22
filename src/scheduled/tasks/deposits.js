@@ -6,12 +6,19 @@ const DepositService = require('../../service/deposit-service');
 const AsyncContext = require('../../utils/async/context');
 const ChainUtil = require('../../utils/chain');
 const AppMetaService = require('../../service/meta-service');
+const DepositRepository = require('../../repository/postgres/queries/deposit-repository');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
 
 class DepositsTask {
   static async updateDeposits() {
+    const count = await DepositRepository.numRows();
+    if (count === 0) {
+      Log.info(`Skipping deposit task, deposits table was empty.`);
+      return;
+    }
+
     const isHourly = new Date().getMinutes() === 0;
     const { lastUpdate, lastBdvs } = await AppMetaService.getLambdaMeta();
 

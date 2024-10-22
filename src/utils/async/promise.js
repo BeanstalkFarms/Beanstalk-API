@@ -11,8 +11,10 @@ class PromiseUtil {
     return allResults;
   }
 
-  static nullOnReject(promise) {
-    return promise.catch(() => null);
+  static defaultOnReject(defaultValue) {
+    return (promise) => {
+      return promise.catch(() => defaultValue);
+    };
   }
 }
 

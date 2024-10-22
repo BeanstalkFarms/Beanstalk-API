@@ -21,7 +21,7 @@ module.exports = {
           type: Sequelize.INTEGER
         },
         lastLambdaBdvs: {
-          type: Sequelize.STRING
+          type: Sequelize.TEXT
         },
         ...timestamps(Sequelize)
       },

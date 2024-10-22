@@ -21,7 +21,10 @@ function retryable(asyncFunction, timeLimitMs = 15000, retryCount = 2) {
         clearTimeout(resolveTrigger.timer);
         retryable(asyncFunction, timeLimitMs, retryCount - 1)
           .then(resolve)
-          .catch(reject);
+          .catch((_) => {
+            // Reject with the original error
+            reject(e);
+          });
       });
   });
 }

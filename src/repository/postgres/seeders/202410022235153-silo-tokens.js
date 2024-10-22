@@ -54,7 +54,7 @@ module.exports = {
             beanstalk.getTotalDeposited(token),
             beanstalk.getTotalDepositedBdv(token)
             // If any revert, they return null instead
-          ].map(PromiseUtil.nullOnReject)
+          ].map(PromiseUtil.defaultOnReject(null))
         );
         rows.push({
           address: token,

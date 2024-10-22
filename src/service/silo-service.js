@@ -123,7 +123,7 @@ class SiloService {
         const [tokenSetting, stemTip, bdv] = await Promise.all([
           beanstalk.tokenSettings(t, { blockTag: block }),
           beanstalk.stemTipForToken(t, { blockTag: block }),
-          beanstalk.bdv(t, { blockTag: block })
+          PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(t, BigInt(10 ** C().DECIMALS[t]), { blockTag: block }))
         ]);
         return { tokenSetting, stemTip, bdv };
       })
@@ -143,13 +143,14 @@ class SiloService {
   static async getMowStems(accountTokenPairs, blockNumber) {
     const results = {};
     const beanstalk = Contracts.getBeanstalk();
+    const TAG = 'getMowStems';
     for (let i = 0; i < accountTokenPairs.length; ++i) {
       const { account, token } = accountTokenPairs[i];
-      await Concurrent.run('getMowStems', async () => {
+      await Concurrent.run(TAG, async () => {
         results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
       });
     }
-    await Concurrent.allResolved('DepositSeeder');
+    await Concurrent.allResolved(TAG);
 
     return results;
   }
@@ -160,17 +161,18 @@ class SiloService {
     const amountBatches = ArraysUtil.toChunks(calldata.amounts, batchSize);
 
     const results = [];
+    const TAG = 'batchBdvs';
     for (let i = 0; i < tokenBatches.length; i++) {
       const batchTokens = tokenBatches[i];
       const batchAmounts = amountBatches[i];
 
       // Call the bdvs function
-      await Concurrent.run('batchBdvs', async () => {
+      await Concurrent.run(TAG, async () => {
         const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
         results.push(...bdvsResult);
       });
     }
-    await Concurrent.allResolved('batchBdvs');
+    await Concurrent.allResolved(TAG);
     return results;
   }
 
@@ -195,7 +197,7 @@ class SiloService {
             beanstalk.stemTipForToken(token),
             beanstalk.getTotalDeposited(token),
             beanstalk.getTotalDepositedBdv(token)
-          ].map(PromiseUtil.nullOnReject)
+          ].map(PromiseUtil.defaultOnReject(null))
         );
 
         updatedTokens.push(
