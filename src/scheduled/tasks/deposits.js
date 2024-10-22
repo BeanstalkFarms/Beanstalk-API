@@ -27,8 +27,7 @@ class DepositsTask {
     // Determine range of blocks to update on
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
-    // const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
-    const updateBlock = lastUpdate + 3000; //REVERT
+    const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
 
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
 

@@ -15,7 +15,6 @@ const EnvUtil = require('./utils/env.js');
 const ChainUtil = require('./utils/chain.js');
 const AlchemyUtil = require('./datasources/alchemy.js');
 const StartupSeeder = require('./repository/postgres/startup-seeders/startup-seeder.js');
-const DepositsTask = require('./scheduled/tasks/deposits.js'); //REVERT
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -27,8 +26,6 @@ async function appStartup() {
   for (const chain of EnvUtil.getEnabledChains()) {
     await AlchemyUtil.ready(chain);
   }
-
-  DepositsTask.updateDeposits(); //REVERT
 
   // This can be useful for local development, though migrations should be used instead
   // sequelize.sync();
