@@ -1,12 +1,12 @@
 const { C } = require('../../constants/runtime-constants');
 const DepositEvents = require('../../datasources/events/deposit-events');
-const MetaRepository = require('../../repository/postgres/queries/meta-repository');
 const DepositDto = require('../../repository/dto/DepositDto');
 const DepositService = require('../../service/deposit-service');
 const AsyncContext = require('../../utils/async/context');
 const ChainUtil = require('../../utils/chain');
 const AppMetaService = require('../../service/meta-service');
 const DepositRepository = require('../../repository/postgres/queries/deposit-repository');
+const { percentDiff } = require('../../utils/number');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
@@ -41,19 +41,18 @@ class DepositsTask {
         });
         await DepositService.updateDeposits(allDeposits);
       }
-
-      await MetaRepository.update(C().CHAIN, {
-        lastDepositUpdate: updateBlock
-      });
+      await AppMetaService.setLastDepositUpdate(updateBlock);
     });
 
     await AsyncContext.sequelizeTransaction(async () => {
-      await DepositsTask.updateLambdaStats(
+      await DepositsTask.updateLambdaOnBdvChanged(
+        lastBdvs,
         updateBlock,
         tokenInfos,
         // Uses a looser update threshold once per hour
         isHourly ? HOURLY_UPDATE_THRESHOLD : DEFAULT_UPDATE_THRESHOLD
       );
+      await AppMetaService.setLastLambdaBdvs(lastBdvs);
     });
   }
 
@@ -105,9 +104,23 @@ class DepositsTask {
   }
 
   // Updates lambda bdv stats if the bdv of an asset has changed by more than `updateThreshold` since the last update.
-  static async updateLambdaStats(blockNumber, tokenInfos, updateThreshold) {
-    // Check whether bdv of a token has meaningfully updated since the last update
-    // If so, pull all corresponding deposits from db and update their lambda stats
+  static async updateLambdaOnBdvChanged(lastBdvs, blockNumber, tokenInfos, updateThreshold) {
+    // Check whether bdv of a token has meaningfully changed since the last update
+    const tokensToUpdate = [];
+    for (const token in tokenInfos) {
+      lastBdvs[token] ||= tokenInfos[token].bdv;
+      if (percentDiff(lastBdvs[token], tokenInfos[token].bdv) > updateThreshold) {
+        tokensToUpdate.push(token);
+        lastBdvs[token] = tokenInfos[token].bdv;
+      }
+    }
+
+    if (tokensToUpdate.length > 0) {
+      const tokensCriteria = tokensToUpdate.map((token) => ({ token }));
+      const depositsToUpdate = await DepositService.getMatchingDeposits(tokensCriteria);
+      await DepositService.batchUpdateLambdaBdvs(depositsToUpdate, tokenInfos, blockNumber);
+      await DepositService.updateDeposits(depositsToUpdate);
+    }
   }
 
   // Gets the set of net deposit activity over this range in token amounts

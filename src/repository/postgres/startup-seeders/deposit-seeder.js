@@ -6,7 +6,6 @@ const AsyncContext = require('../../../utils/async/context');
 const Log = require('../../../utils/logging');
 const BeanstalkSubgraphRepository = require('../../subgraph/beanstalk-subgraph');
 const DepositRepository = require('../queries/deposit-repository');
-const MetaRepository = require('../queries/meta-repository');
 
 // Seeds the deposits table with initial info
 class DepositSeeder {

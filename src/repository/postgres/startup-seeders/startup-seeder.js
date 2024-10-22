@@ -1,6 +1,5 @@
-const { C } = require('../../../constants/runtime-constants');
+const AppMetaService = require('../../../service/meta-service');
 const Log = require('../../../utils/logging');
-const MetaRepository = require('../queries/meta-repository');
 const DepositSeeder = require('./deposit-seeder');
 
 const SEEDERS = [DepositSeeder];
@@ -10,10 +9,7 @@ let progress = 0;
 class StartupSeeder {
   static async seedDatabase() {
     // Initialize db meta
-    const meta = await MetaRepository.get(C().CHAIN);
-    if (!meta) {
-      await MetaRepository.insert({ chain: C().CHAIN });
-    }
+    await AppMetaService.init();
 
     for (let i = 0; i < SEEDERS.length; ++i) {
       Log.info(`Running seeder [${progress}]...`);

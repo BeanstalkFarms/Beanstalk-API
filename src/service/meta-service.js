@@ -4,6 +4,13 @@ const { formatBigintHex } = require('../utils/bigint');
 const { allToBigInt } = require('../utils/number');
 
 class AppMetaService {
+  static async init() {
+    const meta = await MetaRepository.get(C().CHAIN);
+    if (!meta) {
+      await MetaRepository.insert({ chain: C().CHAIN });
+    }
+  }
+
   static async getLambdaMeta() {
     const meta = await MetaRepository.get(C().CHAIN);
     return {

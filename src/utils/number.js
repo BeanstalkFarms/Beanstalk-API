@@ -93,6 +93,14 @@ class NumberUtil {
   static sum(a) {
     return a.reduce((r, c) => r + c, 0);
   }
+
+  static percentDiff(base, current) {
+    if (base === current) {
+      return 0;
+    }
+    const diff = base > current ? base - current : current - base;
+    return Number(diff) / Number(base);
+  }
 }
 
 module.exports = NumberUtil;
