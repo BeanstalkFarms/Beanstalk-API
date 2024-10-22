@@ -13,8 +13,8 @@ class DepositEvents {
         for (let i = 0; i < event.args.stems.length; ++i) {
           collapsed.push({
             type: -1,
-            account: event.args.account,
-            token: event.args.token,
+            account: event.args.account.toLowerCase(),
+            token: event.args.token.toLowerCase(),
             stem: BigInt(event.args.stems[i]),
             amount: BigInt(event.args.amounts[i]),
             bdv: BigInt(event.args.bdvs[i])
@@ -23,8 +23,8 @@ class DepositEvents {
       } else {
         collapsed.push({
           type: event.name === 'AddDeposit' ? 1 : -1,
-          account: event.args.account,
-          token: event.args.token,
+          account: event.args.account.toLowerCase(),
+          token: event.args.token.toLowerCase(),
           stem: BigInt(event.args.stem),
           amount: BigInt(event.args.amount),
           bdv: BigInt(event.args.bdv)
@@ -40,7 +40,7 @@ class DepositEvents {
     const summary = [];
     for (const event of rawEvents) {
       summary.push({
-        account: event.args.account,
+        account: event.args.account.toLowerCase(),
         deltaStalk: BigInt(event.args.delta),
         blockNumber: event.rawLog.blockNumber
       });

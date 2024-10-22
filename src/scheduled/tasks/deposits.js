@@ -28,22 +28,22 @@ class DepositsTask {
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
     // const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
-    const updateBlock = lastUpdate + 240; //REVERT
+    const updateBlock = lastUpdate + 3000; //REVERT
 
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
 
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(lastUpdate + 1, updateBlock, tokenInfos);
       await DepositsTask.updateMowStems(lastUpdate + 1, updateBlock, tokenInfos);
-      // if (isHourly) { // REVERT
-      // Need to update the mowable stalk/seed count on every deposit
-      const allDeposits = await DepositService.getAllDeposits();
-      allDeposits.forEach((d) => {
-        d.setStalkAndSeeds(tokenInfos[d.token]);
-        d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
-      });
-      await DepositService.updateDeposits(allDeposits);
-      // } // REVERT
+      if (isHourly) {
+        // Need to update the mowable stalk/seed count on every deposit
+        const allDeposits = await DepositService.getAllDeposits();
+        allDeposits.forEach((d) => {
+          d.setStalkAndSeeds(tokenInfos[d.token]);
+          d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
+        });
+        await DepositService.updateDeposits(allDeposits);
+      }
       await AppMetaService.setLastDepositUpdate(updateBlock);
     });
 
