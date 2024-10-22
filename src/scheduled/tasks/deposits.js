@@ -7,6 +7,8 @@ const ChainUtil = require('../../utils/chain');
 const AppMetaService = require('../../service/meta-service');
 const DepositRepository = require('../../repository/postgres/queries/deposit-repository');
 const { percentDiff } = require('../../utils/number');
+const Log = require('../../utils/logging');
+const SiloService = require('../../service/silo-service');
 
 const DEFAULT_UPDATE_THRESHOLD = 0.01;
 const HOURLY_UPDATE_THRESHOLD = 0.005;
@@ -25,22 +27,23 @@ class DepositsTask {
     // Determine range of blocks to update on
     const currentBlock = (await C().RPC.getBlock()).number;
     // Buffer to avoid issues with a chain reorg
-    const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
+    // const updateBlock = currentBlock - ChainUtil.blocksPerInterval(C().CHAIN, 10000);
+    const updateBlock = lastUpdate + 240; //REVERT
 
     const tokenInfos = await SiloService.getWhitelistedTokenInfo({ block: updateBlock, chain: C().CHAIN });
 
     await AsyncContext.sequelizeTransaction(async () => {
       await DepositsTask.updateDepositsList(lastUpdate + 1, updateBlock, tokenInfos);
       await DepositsTask.updateMowStems(lastUpdate + 1, updateBlock, tokenInfos);
-      if (isHourly) {
-        // Need to update the mowable stalk/seed count on every deposit
-        const allDeposits = await DepositService.getAllDeposits();
-        allDeposits.forEach((d) => {
-          d.setStalkAndSeeds(tokenInfos[d.token]);
-          d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
-        });
-        await DepositService.updateDeposits(allDeposits);
-      }
+      // if (isHourly) { // REVERT
+      // Need to update the mowable stalk/seed count on every deposit
+      const allDeposits = await DepositService.getAllDeposits();
+      allDeposits.forEach((d) => {
+        d.setStalkAndSeeds(tokenInfos[d.token]);
+        d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);
+      });
+      await DepositService.updateDeposits(allDeposits);
+      // } // REVERT
       await AppMetaService.setLastDepositUpdate(updateBlock);
     });
 
@@ -90,11 +93,13 @@ class DepositsTask {
   static async updateMowStems(fromBlock, toBlock, tokenInfos) {
     const stalkChangeEvents = await DepositEvents.getStalkBalanceChangedEvents(fromBlock, toBlock);
     // Determine what assets each account has deposited and has possibly just mown
-    const accountsCriteria = new Set(stalkChangeEvents.map((e) => e.account)).map((account) => ({ account }));
+    const accountsCriteria = Array.from(new Set(stalkChangeEvents.map((e) => e.account))).map((account) => ({
+      account
+    }));
     const mownDeposits = await DepositService.getMatchingDeposits(accountsCriteria);
 
     // Update mow stem for each
-    await DepositService.assignMowStems(mownDeposits, blockNumber);
+    await DepositService.assignMowStems(mownDeposits, toBlock);
     mownDeposits.forEach((d) => {
       d.setStalkAndSeeds(tokenInfos[d.token]);
       d.updateLambdaStats(d.bdvOnLambda, tokenInfos[d.token]);

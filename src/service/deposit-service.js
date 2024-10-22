@@ -12,7 +12,10 @@ class DepositService {
   }
 
   static async getMatchingDeposits(criteriaList) {
-    const deposits = await DepositRepository.findAllWithOptions(criteriaList);
+    if (criteriaList.length === 0) {
+      return [];
+    }
+    const deposits = await DepositRepository.findAllWithOptions({ criteriaList });
     const depositDtos = deposits.map((d) => DepositModelAssembler.fromModel(d));
     return depositDtos;
   }

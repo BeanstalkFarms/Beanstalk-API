@@ -16,7 +16,8 @@ class DepositSeeder {
       return;
     }
 
-    const seedBlock = (await C().RPC.getBlock()).number;
+    // const seedBlock = (await C().RPC.getBlock()).number;
+    const seedBlock = 266437145; //REVERT
 
     // Initial deposits list comes directly from subgraph
     const allDeposits = await BeanstalkSubgraphRepository.getAllDeposits(seedBlock);

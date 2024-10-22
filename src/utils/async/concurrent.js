@@ -45,6 +45,10 @@ class Concurrent {
   }
 
   static allResolved(id) {
+    if (this.running[id] === undefined) {
+      // Nothing with this id ever got ran
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         if (this.running[id] === 0 && this.queue[id].length === 0) {

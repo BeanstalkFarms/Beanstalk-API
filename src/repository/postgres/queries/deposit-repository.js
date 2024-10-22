@@ -12,6 +12,12 @@ class DepositRepository {
   // Retrieves a list of deposits following optional criteria
   static async findAllWithOptions({ criteriaList = null, sort = null, limit = null, skip = null } = {}) {
     const options = {
+      include: [
+        {
+          model: sequelize.models.Token,
+          attributes: ['address']
+        }
+      ],
       where: {},
       transaction: AsyncContext.getOrUndef('transaction')
     };
