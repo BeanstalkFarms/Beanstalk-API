@@ -93,7 +93,7 @@ class DepositRepository {
 
     if (lambdaBdvChange) {
       const cmp = lambdaBdvChange === 'increase' ? '>' : '<';
-      conditions.push(Sequelize.literal(`bdvOnLambda - depositedBdv ${cmp} 0`));
+      conditions.push(Sequelize.literal(`"bdvOnLambda" - "depositedBdv" ${cmp} 0`));
     }
 
     return conditions.length > 0 ? { [Sequelize.Op.and]: conditions } : {};

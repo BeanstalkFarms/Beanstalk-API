@@ -45,6 +45,9 @@ router.post('/deposits', async (ctx) => {
   /** @type {GetDepositsRequest} */
   const body = ctx.request.body;
 
+  body.account = body.account?.toLowerCase();
+  body.token = body.token?.toLowerCase();
+
   if (
     body.sort &&
     (!['bdv', 'seeds', 'stalk'].includes(body.sort.field) || !['absolute', 'relative'].includes(body.sort.type))

@@ -9,7 +9,7 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
-const { formatBigintHex } = require('./utils/bigint.js');
+const { formatBigintDecimal } = require('./utils/bigint.js');
 const AsyncContext = require('./utils/async/context.js');
 const EnvUtil = require('./utils/env.js');
 const ChainUtil = require('./utils/chain.js');
@@ -64,7 +64,7 @@ async function appStartup() {
     }
     try {
       await next(); // pass control to the next function specified in .use()
-      ctx.body = JSON.stringify(ctx.body, formatBigintHex);
+      ctx.body = JSON.stringify(ctx.body, formatBigintDecimal);
       if (!ctx.originalUrl.includes('healthcheck')) {
         console.log(
           `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`

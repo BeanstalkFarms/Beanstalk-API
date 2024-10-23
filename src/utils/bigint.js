@@ -8,7 +8,7 @@ const formatBigintHex = (_, value) => {
 };
 
 const formatBigintDecimal = (_, value) => {
-  return typeof value === 'bigint' ? value.toString(10) + 'n' : value;
+  return typeof value === 'bigint' ? value.toString(10) : value;
 };
 
 function BigInt_abs(x) {
