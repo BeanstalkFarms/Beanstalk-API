@@ -1,17 +1,51 @@
+/**
+ * @typedef {import('../../types/types').GetDepositsRequest} GetDepositsRequest
+ * @typedef {import('../../types/types').GetDepositsResult} GetDepositsResult
+ */
+
 const { C } = require('../constants/runtime-constants');
 const DepositModelAssembler = require('../repository/postgres/models/assemblers/deposit-assembler');
 const DepositRepository = require('../repository/postgres/queries/deposit-repository');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
+const AsyncContext = require('../utils/async/context');
+const AppMetaService = require('./meta-service');
 const SiloService = require('./silo-service');
 
 class DepositService {
+  /**
+   * Gets the requested precomputed deposit db entries
+   * @param {GetDepositsRequest} request
+   * @returns {Promise<GetDepositsResult>}
+   */
+  static async getDepositsWithOptions(request) {
+    const { deposits, lastUpdated } = await AsyncContext.sequelizeTransaction(async () => {
+      const [deposits, lambdaMeta] = await Promise.all([
+        DepositRepository.findAllWithOptions(??),
+        AppMetaService.getLambdaMeta()
+      ]);
+      return { deposits, lastUpdated: lambdaMeta.lastUpdate };
+    });
+
+    const depositDtos = deposits.map((d) => {
+      const dto = DepositModelAssembler.fromModel(d);
+      delete dto.id;
+      return dto;
+    });
+
+    return {
+      lastUpdated,
+      deposits: depositDtos
+    };
+  }
+
   static async getAllDeposits() {
     const deposits = await DepositRepository.findAllWithOptions({});
     const depositDtos = deposits.map((d) => DepositModelAssembler.fromModel(d));
     return depositDtos;
   }
 
-  static async getMatchingDeposits(criteriaList) {
+  // Returns deposits where a subset of fields match with entries in the given list
+  static async getDepositsIn(criteriaList) {
     if (criteriaList.length === 0) {
       return [];
     }
@@ -19,6 +53,7 @@ class DepositService {
     const depositDtos = deposits.map((d) => DepositModelAssembler.fromModel(d));
     return depositDtos;
   }
+
   // Updates the given deposits via upsert
   static async updateDeposits(depositDtos) {
     const tokenModels = await TokenRepository.findWhitelistedTokens(C().CHAIN);

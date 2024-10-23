@@ -1,3 +1,5 @@
+import DepositDto from '../src/repository/dto/DepositDto';
+
 export type DepositYield = {
   // Percentage growth in deposit's bdv
   bean: number;
@@ -53,8 +55,31 @@ export type CalcApyOptions = {
 };
 
 export type GetApyRequest = {
-  season: number;
-  emaWindows: number[];
-  tokens: string[];
+  season?: number;
+  emaWindows?: number[];
+  tokens?: string[];
   options?: CalcApyOptions;
+};
+
+export type SortType = 'absolute' | 'relative';
+export type LambdaBdvType = 'increase' | 'decrease';
+
+export type DepositsSortOptions = {
+  type: SortType;
+  field: string;
+};
+
+export type GetDepositsRequest = {
+  account?: string;
+  token?: string;
+  lambdaBdvChange?: LambdaBdvType;
+  sort?: DepositsSortOptions;
+  limit?: number;
+  skip?: number;
+};
+
+export type GetDepositsResult = {
+  // Block number
+  lastUpdated: number;
+  deposits: DepositDto[];
 };

@@ -73,7 +73,7 @@ class DepositsTask {
         stem: BigInt(elem[2])
       });
     }
-    const deposits = await DepositService.getMatchingDeposits(depositsToRetrieve);
+    const deposits = await DepositService.getDepositsIn(depositsToRetrieve);
 
     const { toUpsert, toDelete } = await DepositsTask.updateDtoList(deposits, netActivity, tokenInfos, toBlock);
 
@@ -95,7 +95,7 @@ class DepositsTask {
     const accountsCriteria = Array.from(new Set(stalkChangeEvents.map((e) => e.account))).map((account) => ({
       account
     }));
-    const mownDeposits = await DepositService.getMatchingDeposits(accountsCriteria);
+    const mownDeposits = await DepositService.getDepositsIn(accountsCriteria);
 
     // Update mow stem for each
     await DepositService.assignMowStems(mownDeposits, toBlock);
@@ -121,7 +121,7 @@ class DepositsTask {
 
     if (tokensToUpdate.length > 0) {
       const tokensCriteria = tokensToUpdate.map((token) => ({ token }));
-      const depositsToUpdate = await DepositService.getMatchingDeposits(tokensCriteria);
+      const depositsToUpdate = await DepositService.getDepositsIn(tokensCriteria);
       await DepositService.batchUpdateLambdaBdvs(depositsToUpdate, tokenInfos, blockNumber);
       await DepositService.updateDeposits(depositsToUpdate);
     }
