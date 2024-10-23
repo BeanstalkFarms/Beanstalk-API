@@ -1,3 +1,4 @@
+const InputError = require('../../../error/input-error');
 const Concurrent = require('../../../utils/async/concurrent');
 const AsyncContext = require('../../../utils/async/context');
 const { sequelize, Sequelize } = require('../models');
@@ -11,7 +12,13 @@ class DepositRepository {
   }
 
   // Retrieves a list of deposits following optional criteria
-  static async findAllWithOptions({ criteriaList = null, sort = null, limit = null, skip = null } = {}) {
+  static async findAllWithOptions({
+    criteriaList = null,
+    lambdaBdvChange = null,
+    sort = null,
+    limit = null,
+    skip = null
+  } = {}) {
     const options = {
       include: [
         {
@@ -23,30 +30,11 @@ class DepositRepository {
       transaction: AsyncContext.getOrUndef('transaction')
     };
     // Apply optional values when provided
-    if (criteriaList && criteriaList.length > 0) {
-      // Transform the input to reference the address on associated Token entity, and bigint to string
-      const rowCriteria = criteriaList.map((c) =>
-        Object.keys(c).reduce((acc, next) => {
-          if (next === 'token') {
-            acc['$Token.address$'] = c[next];
-          } else if (typeof c[next] === 'bigint') {
-            acc[next] = c[next].toString();
-          } else {
-            acc[next] = c[next];
-          }
-          return acc;
-        }, {})
-      );
-      options.where = {
-        [Sequelize.Op.or]: rowCriteria
-      };
-    }
+    options.where = this._constructFindWhere(criteriaList, lambdaBdvChange);
     if (sort) {
-      options.order = sort;
+      options.order = this._constructFindSort(sort);
     }
-    if (limit) {
-      options.limit = limit;
-    }
+    options.limit = limit ?? 100;
     if (skip) {
       options.offset = skip;
     }
@@ -78,6 +66,54 @@ class DepositRepository {
       },
       transaction: AsyncContext.getOrUndef('transaction')
     });
+  }
+
+  static _constructFindWhere(criteriaList, lambdaBdvChange) {
+    const conditions = [];
+
+    if (criteriaList && criteriaList.length > 0) {
+      // Transform the input to reference the address on associated Token entity, and bigint to string
+      const rowCriteria = criteriaList.map((c) =>
+        Object.keys(c).reduce((acc, next) => {
+          if (next === 'token') {
+            acc['$Token.address$'] = c[next];
+          } else if (typeof c[next] === 'bigint') {
+            acc[next] = c[next].toString();
+          } else {
+            acc[next] = c[next];
+          }
+          return acc;
+        }, {})
+      );
+
+      conditions.push({
+        [Sequelize.Op.or]: rowCriteria
+      });
+    }
+
+    if (lambdaBdvChange) {
+      const cmp = lambdaBdvChange === 'increase' ? '>' : '<';
+      conditions.push(Sequelize.literal(`bdvOnLambda - depositedBdv ${cmp} 0`));
+    }
+
+    return conditions.length > 0 ? { [Sequelize.Op.and]: conditions } : {};
+  }
+
+  static _constructFindSort(sort) {
+    const SORT_OPTONS = {
+      'bdv|absolute': 'ABS("bdvOnLambda" - "depositedBdv")',
+      'bdv|relative': 'ABS("bdvOnLambda" - "depositedBdv") / "depositedBdv"',
+      'stalk|absolute': 'ABS("stalkOnLambda" - "currentStalk")',
+      'stalk|relative': 'ABS("stalkOnLambda" - "currentStalk") / "currentStalk"',
+      'seeds|absolute': 'ABS("seedsOnLambda" - "currentSeeds")',
+      'seeds|relative': 'ABS("seedsOnLambda" - "currentSeeds") / "currentSeeds"'
+    };
+    const sqlLiteral = SORT_OPTONS[`${sort.field}|${sort.type}`];
+    if (!sqlLiteral) {
+      throw new InputError('Invalid sort options provided');
+    }
+
+    return [[sequelize.literal(sqlLiteral), 'DESC']];
   }
 }
 

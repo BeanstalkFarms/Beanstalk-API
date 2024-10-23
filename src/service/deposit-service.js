@@ -19,8 +19,14 @@ class DepositService {
    */
   static async getDepositsWithOptions(request) {
     const { deposits, lastUpdated } = await AsyncContext.sequelizeTransaction(async () => {
+      const criteriaList = [];
+      request.account && criteriaList.push({ account: request.account });
+      request.token && criteriaList.push({ token: request.token });
       const [deposits, lambdaMeta] = await Promise.all([
-        DepositRepository.findAllWithOptions(??),
+        DepositRepository.findAllWithOptions({
+          criteriaList,
+          ...request
+        }),
         AppMetaService.getLambdaMeta()
       ]);
       return { deposits, lastUpdated: lambdaMeta.lastUpdate };
