@@ -1,7 +1,7 @@
 'use strict';
 
 const { ApyInitType } = require('../models/types/types');
-const { bigintStringColumn, timestamps } = require('../util/sequelize-util');
+const { timestamps } = require('../util/sequelize-util');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -31,7 +31,10 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false
         },
-        ...bigintStringColumn('emaBeans', Sequelize, { allowNull: false }),
+        emaBeans: {
+          type: Sequelize.NUMERIC(38, 0),
+          allowNull: false
+        },
         initType: {
           type: Sequelize.ENUM,
           values: Object.values(ApyInitType),

@@ -33,19 +33,19 @@ module.exports = {
         allowNull: false
       },
       bdv: {
-        type: Sequelize.STRING
+        type: Sequelize.NUMERIC(38, 0)
       },
       stalkEarnedPerSeason: {
-        type: Sequelize.STRING
+        type: Sequelize.NUMERIC(38, 0)
       },
       stemTip: {
-        type: Sequelize.STRING
+        type: Sequelize.NUMERIC(38, 0)
       },
       totalDeposited: {
-        type: Sequelize.STRING
+        type: Sequelize.NUMERIC(38, 0)
       },
       totalDepositedBdv: {
-        type: Sequelize.STRING
+        type: Sequelize.NUMERIC(38, 0)
       },
       ...timestamps(Sequelize)
     });
