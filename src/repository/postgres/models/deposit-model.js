@@ -1,3 +1,5 @@
+const { bigintNumericColumn } = require('../util/sequelize-util');
+
 module.exports = (sequelize, DataTypes) => {
   const Deposit = sequelize.define(
     'Deposit',
@@ -16,64 +18,28 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       /// Token added via association below ///
-      stem: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
-      depositedAmount: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('stem', DataTypes, { allowNull: false }),
+      ...bigintNumericColumn('depositedAmount', DataTypes, { allowNull: false }),
       // Current recorded deposited bdv
-      depositedBdv: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('depositedBdv', DataTypes, { allowNull: false }),
       // Current stalk credited to this deposit (base + grown)
-      currentStalk: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('currentStalk', DataTypes, { allowNull: false }),
       // Base stalk
-      baseStalk: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('baseStalk', DataTypes, { allowNull: false }),
       // Grown stalk that has been mown
-      grownStalk: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('grownStalk', DataTypes, { allowNull: false }),
       // Stem of the previous mow for this deposit
-      mowStem: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('mowStem', DataTypes, { allowNull: false }),
       // Unmown stalk
-      mowableStalk: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('mowableStalk', DataTypes, { allowNull: false }),
       // Current seeds
-      currentSeeds: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('currentSeeds', DataTypes, { allowNull: false }),
       // Recorded bdv upon a lambda convert
-      bdvOnLambda: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('bdvOnLambda', DataTypes, { allowNull: false }),
       // Total stalk upon lambda convert. Includes the resulting Mow
-      stalkOnLambda: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('stalkOnLambda', DataTypes, { allowNull: false }),
       // Seeds upon lambda convert
-      seedsOnLambda: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      }
+      ...bigintNumericColumn('seedsOnLambda', DataTypes, { allowNull: false })
     },
     {
       tableName: 'deposit',

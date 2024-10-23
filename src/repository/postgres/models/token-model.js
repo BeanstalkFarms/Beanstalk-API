@@ -1,3 +1,5 @@
+const { bigintNumericColumn } = require('../util/sequelize-util');
+
 module.exports = (sequelize, DataTypes) => {
   const Token = sequelize.define(
     'Token',
@@ -24,10 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false
       },
-      supply: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('supply', DataTypes, { allowNull: false }),
       decimals: {
         type: DataTypes.INTEGER,
         allowNull: false
@@ -36,26 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
-      bdv: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
-      stalkEarnedPerSeason: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
-      stemTip: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
-      totalDeposited: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
-      totalDepositedBdv: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      }
+      ...bigintNumericColumn('bdv', DataTypes, { allowNull: false }),
+      ...bigintNumericColumn('stalkEarnedPerSeason', DataTypes, { allowNull: false }),
+      ...bigintNumericColumn('stemTip', DataTypes, { allowNull: false }),
+      ...bigintNumericColumn('totalDeposited', DataTypes, { allowNull: false }),
+      ...bigintNumericColumn('totalDepositedBdv', DataTypes, { allowNull: false })
     },
     {
       tableName: 'token',

@@ -10,18 +10,15 @@ function bigintFrom(decOrHex) {
   return decOrHex !== null ? BigInt(decOrHex) : null;
 }
 
-// Includes Getters/Setters for transforming between BigInt/string in runtime models
-const bigintStringColumn = (column, Sequelize, attributes = {}) => {
+// Include getter for transforming to BigInt from NUMERIC in runtime models
+const bigintNumericColumn = (column, Sequelize, attributes = {}) => {
   return {
     [column]: {
-      type: Sequelize.STRING,
+      type: Sequelize.NUMERIC(38, 0),
       ...attributes,
       get() {
         const value = this.getDataValue(column);
         return value ? bigintFrom(value) : undefined;
-      },
-      set(bigintValue) {
-        this.setDataValue(column, bigintToDecStr(bigintValue));
       }
     }
   };
@@ -42,6 +39,6 @@ const timestamps = (Sequelize) => {
 };
 
 module.exports = {
-  bigintStringColumn,
+  bigintNumericColumn,
   timestamps
 };

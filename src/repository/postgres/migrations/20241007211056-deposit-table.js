@@ -1,6 +1,6 @@
 'use strict';
 
-const { timestamps } = require('../util/sequelize-util');
+const { timestamps, bigintNumericColumn } = require('../util/sequelize-util');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -21,10 +21,6 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false
         },
-        stem: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
         tokenId: {
           type: Sequelize.INTEGER,
           references: {
@@ -34,60 +30,28 @@ module.exports = {
           onDelete: 'RESTRICT',
           allowNull: false
         },
-        depositedAmount: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('stem', Sequelize, { allowNull: false }),
+        ...bigintNumericColumn('depositedAmount', Sequelize, { allowNull: false }),
         // Current recorded deposited bdv
-        depositedBdv: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('depositedBdv', Sequelize, { allowNull: false }),
         // Current stalk credited to this deposit (base + grown)
-        currentStalk: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('currentStalk', Sequelize, { allowNull: false }),
         // Base stalk
-        baseStalk: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('baseStalk', Sequelize, { allowNull: false }),
         // Grown stalk that has been mown
-        grownStalk: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('grownStalk', Sequelize, { allowNull: false }),
         // Stem of the previous mow for this deposit
-        mowStem: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('mowStem', Sequelize, { allowNull: false }),
         // Unmown stalk
-        mowableStalk: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('mowableStalk', Sequelize, { allowNull: false }),
         // Current seeds
-        currentSeeds: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('currentSeeds', Sequelize, { allowNull: false }),
         // Recorded bdv upon a lambda convert
-        bdvOnLambda: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('bdvOnLambda', Sequelize, { allowNull: false }),
         // Total stalk upon lambda convert. Includes the resulting Mow
-        stalkOnLambda: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('stalkOnLambda', Sequelize, { allowNull: false }),
         // Seeds upon lambda convert
-        seedsOnLambda: {
-          type: Sequelize.NUMERIC(38, 0),
-          allowNull: false
-        },
+        ...bigintNumericColumn('seedsOnLambda', Sequelize, { allowNull: false }),
         ...timestamps(Sequelize)
       },
       {

@@ -1,3 +1,4 @@
+const { bigintNumericColumn } = require('../util/sequelize-util');
 const { ApyInitType } = require('./types/types');
 
 module.exports = (sequelize, DataTypes) => {
@@ -17,10 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false
       },
-      emaBeans: {
-        type: DataTypes.NUMERIC(38, 0),
-        allowNull: false
-      },
+      ...bigintNumericColumn('emaBeans', DataTypes, { allowNull: false }),
       initType: {
         type: DataTypes.ENUM,
         values: Object.values(ApyInitType),
