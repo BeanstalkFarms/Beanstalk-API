@@ -18,10 +18,17 @@ class DepositService {
    * @returns {Promise<GetDepositsResult>}
    */
   static async getDepositsWithOptions(request) {
+    const criteriaList = [];
+    request.account && criteriaList.push({ account: request.account });
+    request.token && criteriaList.push({ token: request.token });
+
+    if (!request.sort) {
+      request.sort = {
+        type: 'absolute',
+        field: 'bdv'
+      };
+    }
     const { deposits, lastUpdated } = await AsyncContext.sequelizeTransaction(async () => {
-      const criteriaList = [];
-      request.account && criteriaList.push({ account: request.account });
-      request.token && criteriaList.push({ token: request.token });
       const [deposits, lambdaMeta] = await Promise.all([
         DepositRepository.findAllWithOptions({
           criteriaList,

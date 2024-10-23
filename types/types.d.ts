@@ -62,11 +62,12 @@ export type GetApyRequest = {
 };
 
 export type SortType = 'absolute' | 'relative';
+export type SortFields = 'bdv' | 'stalk' | 'seeds';
 export type LambdaBdvType = 'increase' | 'decrease';
 
 export type DepositsSortOptions = {
   type: SortType;
-  field: string;
+  field: SortFields;
 };
 
 export type GetDepositsRequest = {
