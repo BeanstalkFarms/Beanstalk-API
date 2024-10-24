@@ -14,6 +14,8 @@ const { ApyInitType } = require('../repository/postgres/models/types/types');
 const YieldModelAssembler = require('../repository/postgres/models/assemblers/yield-assembler');
 const RestParsingUtil = require('../utils/rest-parsing');
 const { C } = require('../constants/runtime-constants');
+const TokenRepository = require('../repository/postgres/queries/token-repository');
+const AsyncContext = require('../utils/async/context');
 
 class SiloApyService {
   static DEFAULT_WINDOWS = [24, 168, 720];
@@ -52,7 +54,7 @@ class SiloApyService {
 
   /**
    * Validates the get apy request. Validation can be skipped by specifying options.skipValidation.
-   * Skipping validation is more performant and is safe due to this involving readonly operations.
+   * Skipping validation is more performant and is safe when doing readonly operations.
    * @param {GetApyRequest}
    * @returns {GetApyRequest}
    */
@@ -263,6 +265,42 @@ class SiloApyService {
       });
     }
     return windowResults;
+  }
+
+  // Computes and saves the deafult seasonal apy entries.
+  // Defaults to the latest season if none is provided
+  static async saveSeasonalApys({ season, tokenModels } = {}) {
+    if (!season) {
+      season = (await BeanstalkSubgraphRepository.getLatestSeason()).season;
+    }
+
+    if (!tokenModels) {
+      // Determine list of tokens active at this point from subgraph
+      const availableTokens = await BeanstalkSubgraphRepository.getPreviouslyWhitelistedTokens({ season }, C(season));
+      tokenModels = await TokenRepository.findByAddresses(availableTokens.all);
+    }
+    const tokenAddrs = tokenModels.map((t) => t.address.toLowerCase());
+
+    // Compute with both init types. Skips `getApy` method - avoids db check and rest validations
+    const [latestAvgApy, latestNewApy] = await Promise.all([
+      SiloApyService.calcApy(season, SiloApyService.DEFAULT_WINDOWS, tokenAddrs, {
+        initType: ApyInitType.AVERAGE
+      }),
+      SiloApyService.calcApy(season, SiloApyService.DEFAULT_WINDOWS, tokenAddrs, {
+        initType: ApyInitType.NEW
+      })
+    ]);
+
+    // Prepare rows
+    const yieldRows = [
+      ...YieldModelAssembler.toModels(latestAvgApy, ApyInitType.AVERAGE, tokenModels),
+      ...YieldModelAssembler.toModels(latestNewApy, ApyInitType.NEW, tokenModels)
+    ];
+
+    // Save new yields
+    await AsyncContext.sequelizeTransaction(async () => {
+      return await YieldRepository.addYields(yieldRows);
+    });
   }
 }
 

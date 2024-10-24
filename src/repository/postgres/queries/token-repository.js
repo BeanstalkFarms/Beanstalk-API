@@ -9,14 +9,27 @@ class TokenRepository {
       optionalWhere.chain = chain;
     }
 
-    const rows = await sequelize.models.Token.findAll({
+    const models = await sequelize.models.Token.findAll({
       where: {
         isWhitelisted: true,
         ...optionalWhere
       },
       transaction: AsyncContext.getOrUndef('transaction')
     });
-    return rows;
+    return models;
+  }
+
+  // Returns all tokens matching the requested addresses
+  static async findByAddresses(addresses) {
+    const models = await sequelize.models.Token.findAll({
+      where: {
+        address: {
+          [Sequelize.Op.in]: addresses
+        }
+      },
+      transaction: AsyncContext.getOrUndef('transaction')
+    });
+    return models;
   }
 
   // Updates the given token with new column values
