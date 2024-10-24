@@ -225,10 +225,9 @@ class SiloApyService {
    */
   static async calcWindowEMA(season, windows) {
     const c = C(season);
-    // First sunrise after replant. The subgraph has no silo data prior to this.
-    const MIN_SEASON = 6075;
-    if (season < MIN_SEASON) {
-      throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${MIN_SEASON}.`);
+    // The beanstalk subgraph has no silo data prior to replant.
+    if (season < c.MIN_EMA_SEASON) {
+      throw new Error(`Invalid season requested for EMA. Minimum allowed season is ${c.MIN_EMA_SEASON}.`);
     }
 
     if (Math.min(...windows) <= 0) {
@@ -236,7 +235,7 @@ class SiloApyService {
     }
 
     // Determine effective windows based on how many datapoints are actually available
-    const minSeason = Math.max(MIN_SEASON, c.MILESTONE.startSeason) - 1;
+    const minSeason = Math.max(c.MIN_EMA_SEASON, c.MILESTONE.startSeason) - 1;
     const numDataPoints = [];
     for (const requestedWindow of windows) {
       numDataPoints.push(Math.min(season - minSeason, requestedWindow));

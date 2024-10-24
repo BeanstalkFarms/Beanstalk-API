@@ -34,8 +34,8 @@ class RuntimeConstants {
         }
         let value = constants[property];
         if (!value) {
-          // Secondarily search for the property among the addresses
-          value = constants.ADDRESSES[property];
+          // Secondarily search for the property among the addresses/misc
+          value = constants.ADDRESSES[property] ?? constants.MISC[property];
         }
         return value;
       }

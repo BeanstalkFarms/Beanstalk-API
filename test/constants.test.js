@@ -34,4 +34,9 @@ describe('Chain constants', () => {
     expect(C(2500).DECIMALS.stalk).toEqual(10);
     expect(C(35000).DECIMALS.stalk).toEqual(16);
   });
+
+  test('Fallback to addresses/misc', () => {
+    expect(C().BEANWETH).toBeDefined();
+    expect(C().MIN_EMA_SEASON).toBeDefined();
+  });
 });

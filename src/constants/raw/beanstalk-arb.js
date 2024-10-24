@@ -57,11 +57,16 @@ SG.BEANSTALK = SubgraphClients.named(SG.BEANSTALK);
 SG.BEAN = SubgraphClients.named(SG.BEAN);
 SG.BASIN = SubgraphClients.named(SG.BASIN);
 
+const MISC = {
+  MIN_EMA_SEASON: 6075
+};
+
 Object.freeze(ADDRESSES);
 Object.freeze(DECIMALS);
 Object.freeze(ABIS);
 Object.freeze(MILESTONE);
 Object.freeze(SG);
+Object.freeze(MISC);
 
 // ** DO NOT USE ANY OF THESE EXPORTS DIRECTLY. USE `C` IN runtime-constants.js ** //
 module.exports = {
@@ -70,5 +75,6 @@ module.exports = {
   DECIMALS,
   ABIS,
   MILESTONE,
-  SG
+  SG,
+  MISC
 };
