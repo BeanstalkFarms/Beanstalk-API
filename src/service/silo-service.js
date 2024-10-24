@@ -146,7 +146,7 @@ class SiloService {
     const TAG = 'getMowStems';
     for (let i = 0; i < accountTokenPairs.length; ++i) {
       const { account, token } = accountTokenPairs[i];
-      await Concurrent.run(TAG, async () => {
+      await Concurrent.run(TAG, 50, async () => {
         results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
       });
     }
@@ -169,7 +169,7 @@ class SiloService {
       const batchAmounts = amountBatches[i];
 
       // Call the bdvs function
-      await Concurrent.run(TAG, async () => {
+      await Concurrent.run(TAG, 50, async () => {
         const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
         // Preserve result order
         results.splice(i * batchSize, batchSize, ...bdvsResult);

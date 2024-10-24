@@ -1,10 +1,6 @@
-const MAX_RUNNING = 50;
-
-// Improvement could be wrapping the id inside of an async context
-
 // Allows high levels of concurrency by continually running up to a maximum number of requests,
 // as opposed to waiting for the existing batch to complete before continuing.
-// Usage: likely in a loop: await Concurrent.run('uniqueId', async () => {});
+// Usage: likely in a loop: await Concurrent.run('uniqueId', 50, async () => {});
 // When all have been started, need to await the completion with: await Concurrent.allResolved('uniqueId');
 class Concurrent {
   static running = {};
@@ -12,14 +8,14 @@ class Concurrent {
   static runCount = {};
   static errors = {};
 
-  static run(id, asyncCallback) {
+  static run(id, maxConcurrent, asyncCallback) {
     this.running[id] ||= 0;
     this.queue[id] ||= [];
     this.runCount[id] ||= 0;
     this.errors[id] ||= [];
 
     return new Promise(async (resolve) => {
-      if (this.running[id] >= MAX_RUNNING) {
+      if (this.running[id] >= maxConcurrent) {
         let queueResolve;
         const queueable = new Promise((res) => {
           queueResolve = res;

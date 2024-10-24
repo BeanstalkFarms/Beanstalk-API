@@ -47,7 +47,7 @@ class DepositRepository {
   static async upsertDeposits(deposits) {
     const TAG = 'upsertDeposits';
     for (const row of deposits) {
-      await Concurrent.run(TAG, async () => {
+      await Concurrent.run(TAG, 50, async () => {
         await sequelize.models.Deposit.upsert(row, {
           validate: true,
           transaction: AsyncContext.getOrUndef('transaction')
