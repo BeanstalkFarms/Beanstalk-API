@@ -1,7 +1,12 @@
 /**
  * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
+ * @typedef {import('../../types/types').CalcApysResult} CalcApysResult
+ *
  * @typedef {import('../../types/types').GetApyHistoryRequest} GetApyHistoryRequest
+ * @typedef {import('../../types/types').GetApyHistoryResult} GetApyHistoryResult
+ *
  * @typedef {import('../../types/types').GetDepositsRequest} GetDepositsRequest
+ * @typedef {import('../../types/types').GetDepositsResult} GetDepositsResult
  */
 
 const InputError = require('../error/input-error');
@@ -35,6 +40,7 @@ router.post('/yield', async (ctx) => {
     throw new InputError('Query parameter `chain` is not compatible with this request.');
   }
 
+  /** @type {CalcApysResult} */
   const results = await SiloApyService.getApy(body);
   ctx.body = results;
 });
@@ -51,6 +57,7 @@ router.post('/yield-history', async (ctx) => {
     throw new InputError('A required parameter was not provided.');
   }
 
+  /** @type {GetApyHistoryResult} */
   const results = await SiloApyService.getHistoricalApy(body);
   ctx.body = results;
 });
@@ -84,6 +91,7 @@ router.post('/deposits', async (ctx) => {
     throw new InputError('`skip` must be a number.');
   }
 
+  /** @type {GetDepositsResult} */
   const results = await DepositService.getDepositsWithOptions(body);
   ctx.body = results;
 });

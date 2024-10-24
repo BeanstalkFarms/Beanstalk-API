@@ -9,6 +9,11 @@ export type DepositYield = {
   ownership: number;
 };
 
+export type EmaInfo = {
+  effectiveWindow: number;
+  rewardBeans: string;
+};
+
 export type DepositYieldMap = {
   [asset: string]: DepositYield;
 };
@@ -20,6 +25,8 @@ export type WindowYieldMap = {
 export type CalcApysResult = {
   season: number;
   yields: WindowYieldMap;
+  initType: ApyInitType;
+  ema: { [requestedWindow: string]: EmaInfo };
 };
 
 export type WindowEMAResult = {
