@@ -2,6 +2,9 @@
  * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
  * @typedef {import('../../types/types').CalcApysResult} CalcApysResult
  * @typedef {import('../../types/types').WindowEMAResult} WindowEMAResult
+ *
+ * @typedef {import('../../types/types').GetApyHistoryRequest} GetApyHistoryRequest
+ * @typedef {import('../../types/types').GetApyHistoryResult} GetApyHistoryResult
  */
 
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
@@ -50,6 +53,23 @@ class SiloApyService {
     let { season, emaWindows, tokens, options } = request;
     tokens = tokens.map((t) => t.toLowerCase());
     return await this.calcApy(season, emaWindows, tokens, options);
+  }
+
+  /**
+   * Gets the requested historical vAPYs from the database, if they have been calculated already
+   * @param {GetApyHistoryRequest} request
+   * @returns {Promise<GetApyHistoryResult>}
+   */
+  static async getHistoricalApy(request) {
+    const yieldModels = await YieldRepository.findHistoricalYields(request);
+    return yieldModels.reduce((acc, next) => {
+      acc[next.season] = {
+        bean: next.beanYield,
+        stalk: next.stalkYield,
+        ownership: next.ownershipYield
+      };
+      return acc;
+    }, {});
   }
 
   /**

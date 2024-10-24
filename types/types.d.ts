@@ -61,6 +61,20 @@ export type GetApyRequest = {
   options?: CalcApyOptions;
 };
 
+export type GetApyHistoryRequest = {
+  token: string;
+  emaWindow: number;
+  initType: ApyInitType;
+  fromSeason: number;
+  toSeason: number;
+  // Identifies how many records to skip, i.e. pull one record for every 5 seasons
+  interval?: number;
+};
+
+export type GetApyHistoryResult = {
+  [season: number]: DepositYield;
+};
+
 export type SortType = 'absolute' | 'relative';
 export type SortFields = 'bdv' | 'stalk' | 'seeds';
 export type LambdaBdvType = 'increase' | 'decrease';

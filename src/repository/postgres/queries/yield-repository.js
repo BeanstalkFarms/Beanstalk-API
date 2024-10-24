@@ -22,7 +22,7 @@ class YieldRepository {
       optionalWhere.initType = options.where.initType;
     }
 
-    const rows = await sequelize.models.Yield.findAll({
+    const models = await sequelize.models.Yield.findAll({
       include: [
         {
           model: sequelize.models.Token,
@@ -35,13 +35,37 @@ class YieldRepository {
       },
       transaction: AsyncContext.getOrUndef('transaction')
     });
-    return rows;
+    return models;
   }
 
   // Returns yields within the requested season range
-  static async findHistoricalYields(fromSeason, toSeason, options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
-    throw new Error('Not Implemented');
+  static async findHistoricalYields({ token, emaWindow, initType, fromSeason, toSeason, interval }) {
+    interval ??= 1;
+    const models = await sequelize.models.Yield.findAll({
+      include: [
+        {
+          model: sequelize.models.Token,
+          attributes: ['address']
+        }
+      ],
+      where: {
+        '$Token.address$': token,
+        emaWindow,
+        initType,
+        [Sequelize.Op.and]: [
+          { season: { [Sequelize.Op.between]: [fromSeason, toSeason] } },
+          {
+            [Sequelize.Op.or]: [
+              Sequelize.literal(`"season" % ${interval} = 0`),
+              { season: fromSeason },
+              { season: toSeason }
+            ]
+          }
+        ]
+      },
+      transaction: AsyncContext.getOrUndef('transaction')
+    });
+    return models;
   }
 
   // Inserts the given yield entries

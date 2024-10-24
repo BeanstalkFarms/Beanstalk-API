@@ -1,5 +1,6 @@
 /**
  * @typedef {import('../../types/types').GetApyRequest} GetApyRequest
+ * @typedef {import('../../types/types').GetApyHistoryRequest} GetApyHistoryRequest
  * @typedef {import('../../types/types').GetDepositsRequest} GetDepositsRequest
  */
 
@@ -35,6 +36,22 @@ router.post('/yield', async (ctx) => {
   }
 
   const results = await SiloApyService.getApy(body);
+  ctx.body = results;
+});
+
+/**
+ * Returns historical entries, precomputed from the database.
+ * Can only return one token/window/init type per request.
+ */
+router.post('/yield-history', async (ctx) => {
+  /** @type {GetApyHistoryRequest} */
+  const body = ctx.request.body;
+
+  if (!body.token || !body.emaWindow || !body.initType || !body.fromSeason || !body.toSeason) {
+    throw new InputError('A required parameter was not provided.');
+  }
+
+  const results = await SiloApyService.getHistoricalApy(body);
   ctx.body = results;
 });
 
