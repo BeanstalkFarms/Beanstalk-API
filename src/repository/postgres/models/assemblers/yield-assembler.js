@@ -1,17 +1,13 @@
-const { C } = require('../../../../constants/runtime-constants');
-
 class YieldModelAssembler {
-  static toModels(yieldResults, requestedWindows, apyInitType, tokenModels) {
+  static toModels(yieldResults, apyInitType, tokenModels) {
     const yieldModels = [];
-    const availableWindows = Object.keys(yieldResults.yields).map((w) => parseInt(w));
-    const maxAvailable = Math.max(...availableWindows);
-    for (const window of requestedWindows) {
-      const effectiveWindow = window > maxAvailable ? maxAvailable : window;
+    for (const window in yieldResults.ema) {
+      const effectiveWindow = yieldResults.ema[window].effectiveWindow;
       for (const tokenAddr in yieldResults.yields[effectiveWindow]) {
         yieldModels.push({
           tokenId: tokenModels.find((t) => t.address.toLowerCase() === tokenAddr).id,
           season: yieldResults.season,
-          emaWindow: window,
+          emaWindow: parseInt(window),
           emaEffectiveWindow: effectiveWindow,
           emaBeans: BigInt(yieldResults.ema[window].rewardBeans),
           initType: apyInitType,

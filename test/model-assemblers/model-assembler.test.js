@@ -17,12 +17,7 @@ describe('Model Assemblers', () => {
         { id: 5, address: UNRIPE_BEAN },
         { id: 6, address: UNRIPE_LP }
       ];
-      const models = YieldModelAssembler.toModels(
-        yieldDto,
-        SiloApyService.DEFAULT_WINDOWS,
-        ApyInitType.AVERAGE,
-        tokenIdMapping
-      );
+      const models = YieldModelAssembler.toModels(yieldDto, ApyInitType.AVERAGE, tokenIdMapping);
 
       // Modify such that Token is present with the required info
       models.forEach((m) => {
@@ -47,12 +42,7 @@ describe('Model Assemblers', () => {
         { id: 5, address: UNRIPE_BEAN },
         { id: 6, address: UNRIPE_LP }
       ];
-      const models = YieldModelAssembler.toModels(
-        earlyYieldsDto,
-        SiloApyService.DEFAULT_WINDOWS,
-        ApyInitType.AVERAGE,
-        tokenIdMapping
-      );
+      const models = YieldModelAssembler.toModels(earlyYieldsDto, ApyInitType.AVERAGE, tokenIdMapping);
 
       expect(Object.keys(earlyYieldsDto.yields).length).toBe(2);
       expect(models.length).toBe(3 * 6);

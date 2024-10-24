@@ -35,8 +35,8 @@ class SunriseTask {
 
     // Prepare rows
     const yieldRows = [
-      ...YieldModelAssembler.toModels(latestAvgApy, SiloApyService.DEFAULT_WINDOWS, ApyInitType.AVERAGE, tokens),
-      ...YieldModelAssembler.toModels(latestNewApy, SiloApyService.DEFAULT_WINDOWS, ApyInitType.NEW, tokens)
+      ...YieldModelAssembler.toModels(latestAvgApy, ApyInitType.AVERAGE, tokens),
+      ...YieldModelAssembler.toModels(latestNewApy, ApyInitType.NEW, tokens)
     ];
 
     // Save new yields
