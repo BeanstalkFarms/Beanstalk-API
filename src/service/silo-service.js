@@ -192,7 +192,7 @@ class SiloService {
         const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
           [
             Contracts.get(token).totalSupply(),
-            beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals)),
+            PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))),
             (async () => {
               const tokenSettings = await beanstalk.tokenSettings(token);
               return tokenSettings.stalkEarnedPerSeason;

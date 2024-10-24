@@ -71,7 +71,7 @@ module.exports = {
         ]);
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
           [
-            beanstalk.bdv(token, BigInt(10 ** decimals)),
+            PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(token, BigInt(10 ** decimals))),
             (async () => {
               const tokenSettings = await beanstalk.tokenSettings(token);
               return tokenSettings.stalkEarnedPerSeason;

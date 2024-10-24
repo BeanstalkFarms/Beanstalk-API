@@ -28,6 +28,7 @@ class DepositService {
         field: 'bdv'
       };
     }
+
     const { deposits, lastUpdated } = await AsyncContext.sequelizeTransaction(async () => {
       const [deposits, lambdaMeta] = await Promise.all([
         DepositRepository.findAllWithOptions({

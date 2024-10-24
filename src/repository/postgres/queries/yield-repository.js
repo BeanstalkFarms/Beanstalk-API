@@ -8,12 +8,6 @@ const DEFAULT_OPTIONS = {
 };
 
 class YieldRepository {
-  // Returns the latest available yield entries
-  static async findLatestYields(options) {
-    options = { ...DEFAULT_OPTIONS, ...options };
-    throw new Error('Not Implemented');
-  }
-
   // Returns the yields for the requested season
   static async findSeasonYields(season, options) {
     options = { ...DEFAULT_OPTIONS, ...options };
