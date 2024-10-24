@@ -13,6 +13,7 @@ const InputError = require('../error/input-error');
 const DepositService = require('../service/deposit-service');
 const SiloApyService = require('../service/silo-apy');
 const { getMigratedGrownStalk, getUnmigratedGrownStalk } = require('../service/silo-service');
+const YieldService = require('../service/yield-service');
 const RestParsingUtil = require('../utils/rest-parsing');
 
 const Router = require('koa-router');
@@ -58,7 +59,7 @@ router.post('/yield-history', async (ctx) => {
   }
 
   /** @type {GetApyHistoryResult} */
-  const results = await SiloApyService.getHistoricalApy(body);
+  const results = await YieldService.getHistoricalApy(body);
   ctx.body = results;
 });
 

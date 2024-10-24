@@ -1,8 +1,5 @@
-const YieldModelAssembler = require('../../repository/postgres/models/assemblers/yield-assembler');
-const YieldRepository = require('../../repository/postgres/queries/yield-repository');
-const SiloApyService = require('../../service/silo-apy');
 const SiloService = require('../../service/silo-service');
-const AsyncContext = require('../../utils/async/context');
+const YieldService = require('../../service/yield-service');
 const Log = require('../../utils/logging');
 const OnSunriseUtil = require('../util/on-sunrise');
 
@@ -15,7 +12,7 @@ class SunriseTask {
     // Update whitelisted token info
     const tokenModels = await SiloService.updateWhitelistedTokenInfo();
 
-    SiloApyService.saveSeasonalApys({ tokenModels });
+    await YieldService.saveSeasonalApys({ tokenModels });
   }
 }
 
