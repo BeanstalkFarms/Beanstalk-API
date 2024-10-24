@@ -1,8 +1,9 @@
 const AppMetaService = require('../../../service/meta-service');
 const Log = require('../../../utils/logging');
+const ApySeeder = require('./apy-seeder');
 const DepositSeeder = require('./deposit-seeder');
 
-const SEEDERS = [DepositSeeder];
+const SEEDERS = [DepositSeeder, ApySeeder];
 let progress = 0;
 
 // For seeding the database during api uptime, ideal for longer running seeds.
