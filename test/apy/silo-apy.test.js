@@ -2,6 +2,7 @@ const {
   ADDRESSES: { BEAN, BEAN3CRV, BEANWETH, BEANWSTETH, UNRIPE_BEAN, UNRIPE_LP },
   DECIMALS
 } = require('../../src/constants/raw/beanstalk-eth');
+const { ApyInitType } = require('../../src/repository/postgres/models/types/types');
 const SiloApyService = require('../../src/service/silo-apy');
 const GaugeApyUtil = require('../../src/service/utils/apy/gauge');
 const PreGaugeApyUtil = require('../../src/service/utils/apy/pre-gauge');
@@ -58,7 +59,10 @@ describe('Pre-Gauge Silo APY', () => {
       3000000n,
       44103977396567n,
       1636664801904743831n,
-      24942000280720n
+      24942000280720n,
+      {
+        initType: ApyInitType.AVERAGE
+      }
     );
 
     expect(apy['BEAN'].bean).toBeCloseTo(0.318007383109455);
@@ -81,6 +85,7 @@ describe('Pre-Gauge Silo APY', () => {
       24942000280720n,
       // User starts with a deposit
       {
+        initType: ApyInitType.AVERAGE,
         initUserValues: [
           {
             stalkPerBdv: 2.5
@@ -109,7 +114,7 @@ describe('Pre-Gauge Silo APY', () => {
       1636664801904743831n,
       24942000280720n,
       {
-        initType: 'NEW',
+        initType: ApyInitType.NEW,
         duration: 720 // 1 month
       }
     );
@@ -137,7 +142,10 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [[0n, 0n]],
       [0n, 0n],
-      [null, null, 0n, toBigInt(4, DECIMALS.seeds)]
+      [null, null, 0n, toBigInt(4, DECIMALS.seeds)],
+      {
+        initType: ApyInitType.AVERAGE
+      }
     );
 
     expect(apy[BEAN].bean).toBeCloseTo(0.35084711071357977);
@@ -175,6 +183,7 @@ describe('Gauge Silo APY', () => {
       [toBigInt(1000000, DECIMALS.bdv), toBigInt(500000, DECIMALS.bdv)],
       [null, null],
       {
+        initType: ApyInitType.AVERAGE,
         // User starts with a specific deposit
         initUserValues: [
           {
@@ -216,7 +225,7 @@ describe('Gauge Silo APY', () => {
       [0n, 0n],
       [null, null],
       {
-        initType: 'NEW'
+        initType: ApyInitType.NEW
       }
     );
 
@@ -248,7 +257,8 @@ describe('Gauge Silo APY', () => {
         [5000n, 0n]
       ],
       [0n, 0n],
-      [null, null, null, 0n]
+      [null, null, null, 0n],
+      { initType: ApyInitType.AVERAGE }
     );
 
     expect(apy[BEANWETH].bean).toBeCloseTo(0.204566395461806);
@@ -285,7 +295,7 @@ describe('SiloApyService Orchestration', () => {
       }
     });
 
-    const result = await SiloApyService.calcApy(19000, [720], [BEAN, BEAN3CRV]);
+    const result = await SiloApyService.calcApy(19000, [720], [BEAN, BEAN3CRV], { initType: ApyInitType.AVERAGE });
 
     expect(spy).toHaveBeenCalledWith(
       322227371n,
@@ -295,7 +305,7 @@ describe('SiloApyService Orchestration', () => {
       44103977396567n,
       1448607918287565335n,
       29993650158762n,
-      undefined
+      { initType: ApyInitType.AVERAGE }
     );
 
     expect(result.season).toEqual(19000);
@@ -333,7 +343,9 @@ describe('SiloApyService Orchestration', () => {
       }
     });
 
-    const result = await SiloApyService.calcApy(22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN]);
+    const result = await SiloApyService.calcApy(22096, [720], [BEAN, BEAN3CRV, BEANWETH, UNRIPE_BEAN], {
+      initType: ApyInitType.AVERAGE
+    });
     // console.log('outer apy result', result);
 
     expect(spy).toHaveBeenCalledWith(
@@ -352,7 +364,7 @@ describe('SiloApyService Orchestration', () => {
       [[0n, 0n]],
       [0n, 0n],
       [null, 1n, null, 1n],
-      undefined
+      { initType: ApyInitType.AVERAGE }
     );
 
     expect(result.season).toEqual(22096);
