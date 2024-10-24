@@ -74,7 +74,7 @@ class GaugeApyUtil {
     const catchUpRate = options?.catchUpRate ?? 4320;
     const duration = options?.duration ?? 8760;
 
-    if (options?.initType && ![ApyInitType.NEW, ApyInitType.AVERAGE].includes(options.initType)) {
+    if (!options.initType && ![ApyInitType.NEW, ApyInitType.AVERAGE].includes(options.initType)) {
       throw new Error(`Unrecognized initType ${options.initType}`);
     }
 
@@ -126,17 +126,16 @@ class GaugeApyUtil {
       userLp.push(tokens[i] === -1 ? 0 : 1);
       userStalk.push(
         options?.initUserValues?.[i]?.stalkPerBdv ??
-          (!options?.initType || options?.initType === ApyInitType.AVERAGE
-            ? // AVERAGE is the default
-              totalStalk / totalBdv
+          (options.initType === ApyInitType.AVERAGE
+            ? totalStalk / totalBdv
             : // New deposit starts with 0 stalk (all germinating)
               0)
       );
       // These amounts will be added to user stalk as the germination period finishes
       userGerminating.push(
         options?.initUserValues?.[i]?.germinating ??
-          (!options?.initType || options?.initType === ApyInitType.AVERAGE
-            ? // AVERAGE will not have any germinating (default)
+          (options.initType === ApyInitType.AVERAGE
+            ? // AVERAGE will not have any germinating
               [0, 0]
             : // Set germination to finish after 2 seasons
               [season % 2 == 0 ? 1 : 0, season % 2 == 0 ? 0 : 1])

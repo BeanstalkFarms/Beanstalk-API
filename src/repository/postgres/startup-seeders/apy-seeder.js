@@ -19,7 +19,7 @@ class ApySeeder {
     for (const season of missingSeasons) {
       try {
         // TODO: This can be increased once the decentralized subgraphs are deployed + the rate limit is increased
-        await Concurrent.run(TAG, 2, async () => {
+        await Concurrent.run(TAG, 5, async () => {
           await SiloApyService.saveSeasonalApys({ season });
         });
         Log.info(`Saved apy for season ${season}`);

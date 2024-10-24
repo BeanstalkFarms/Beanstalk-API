@@ -34,6 +34,7 @@ class YieldModelAssembler {
           effectiveWindow: model.emaEffectiveWindow,
           rewardBeans: model.emaBeans
         };
+        yieldResult.initType = model.initType;
       }
       yieldResult.yields[model.emaWindow][model.Token.address] = {
         bean: model.beanYield,

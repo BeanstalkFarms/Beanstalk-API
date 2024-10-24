@@ -53,17 +53,20 @@ class SiloApyService {
   }
 
   /**
-   * Validates the get apy request. Validation can be skipped by specifying options.skipValidation.
+   * Validates the get apy request, and sets default values.
+   * Validation can be skipped by specifying options.skipValidation.
    * Skipping validation is more performant and is safe when doing readonly operations.
    * @param {GetApyRequest}
    * @returns {GetApyRequest}
    */
   static async validate({ season, emaWindows, tokens, options }) {
-    emaWindows = emaWindows ?? this.DEFAULT_WINDOWS;
+    emaWindows ??= this.DEFAULT_WINDOWS;
+    options ??= {};
+    options.initType ??= ApyInitType.AVERAGE;
 
     // Check whether season/tokens are valid
     const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason()).season;
-    season = season ?? latestSeason;
+    season ??= latestSeason;
     if (season > latestSeason) {
       throw new InputError(`Requested season ${season} exceeds the latest available season ${latestSeason}`);
     }
@@ -93,7 +96,8 @@ class SiloApyService {
     const c = C(season);
     const apyResults = {
       season,
-      yields: {}
+      yields: {},
+      initType: options.initType
     };
     const windowEMAs = await this.calcWindowEMA(season, windows);
     apyResults.ema = windowEMAs.reduce((acc, next, idx) => {
