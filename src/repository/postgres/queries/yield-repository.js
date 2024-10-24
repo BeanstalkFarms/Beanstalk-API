@@ -53,6 +53,23 @@ class YieldRepository {
     });
     return newYields;
   }
+
+  // Returns a list of all seasons that are missing yield entries
+  static async findMissingSeasons(maxSeason) {
+    const seasons = await sequelize.query(
+      `
+        SELECT s AS missingseason
+        FROM generate_series(1, :maxSeason) AS s
+        LEFT JOIN (SELECT DISTINCT season FROM yield) y ON s = y.season
+        WHERE y.season IS NULL;
+      `,
+      {
+        replacements: { maxSeason },
+        type: Sequelize.QueryTypes.SELECT
+      }
+    );
+    return seasons.map((s) => s.missingseason);
+  }
 }
 
 module.exports = YieldRepository;
