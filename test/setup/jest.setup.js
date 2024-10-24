@@ -31,7 +31,13 @@ jest.mock('../../src/repository/postgres/models/index', () => {
         rollback: jest.fn()
       })
     },
-    Sequelize: {}
+    Sequelize: {
+      Op: {
+        or: 'a',
+        and: 'b'
+      },
+      literal: jest.fn()
+    }
   };
 });
 // Disables any discord messaging

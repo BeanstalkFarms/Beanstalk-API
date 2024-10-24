@@ -113,7 +113,7 @@ class DepositRepository {
       throw new InputError('Invalid sort options provided');
     }
 
-    return [[sequelize.literal(sqlLiteral), 'DESC']];
+    return [[Sequelize.literal(sqlLiteral), 'DESC']];
   }
 }
 
