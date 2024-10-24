@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false
       },
+      // Actual number of datapoints (different from emaWindow if < emaWindow seasons were available)
+      emaEffectiveWindow: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       ...bigintNumericColumn('emaBeans', DataTypes, { allowNull: false }),
       initType: {
         type: DataTypes.ENUM,

@@ -15,9 +15,9 @@ const YieldModelAssembler = require('../repository/postgres/models/assemblers/yi
 const RestParsingUtil = require('../utils/rest-parsing');
 const { C } = require('../constants/runtime-constants');
 
-const DEFAULT_WINDOWS = [24, 168, 720];
-
 class SiloApyService {
+  static DEFAULT_WINDOWS = [24, 168, 720];
+
   /**
    * Gets the requested vAPY, calculating if needed
    * @param {GetApyRequest} request
@@ -27,12 +27,12 @@ class SiloApyService {
     // Check whether this request is suitable to be serviced from the database directly
     if (
       (!request.options || RestParsingUtil.onlyHasProperties(request.options, ['initType'])) &&
-      (!request.emaWindows || request.emaWindows.every((w) => DEFAULT_WINDOWS.includes(w)))
+      (!request.emaWindows || request.emaWindows.every((w) => this.DEFAULT_WINDOWS.includes(w)))
     ) {
       const season = request.season ?? (await BeanstalkSubgraphRepository.getLatestSeason()).season;
       const yields = await YieldRepository.findSeasonYields(season, {
         where: {
-          emaWindows: request.emaWindows ?? DEFAULT_WINDOWS,
+          emaWindows: request.emaWindows ?? this.DEFAULT_WINDOWS,
           initType: request.options?.initType ?? ApyInitType.AVERAGE
         }
       });
@@ -57,7 +57,7 @@ class SiloApyService {
    * @returns {GetApyRequest}
    */
   static async validate({ season, emaWindows, tokens, options }) {
-    emaWindows = emaWindows ?? DEFAULT_WINDOWS;
+    emaWindows = emaWindows ?? this.DEFAULT_WINDOWS;
 
     // Check whether season/tokens are valid
     const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason()).season;
@@ -94,9 +94,12 @@ class SiloApyService {
       yields: {}
     };
     const windowEMAs = await this.calcWindowEMA(season, windows);
-    apyResults.emaBeans = windowEMAs.reduce((a, c) => {
-      a[c.window] = c.beansPerSeason;
-      return a;
+    apyResults.ema = windowEMAs.reduce((acc, next, idx) => {
+      acc[windows[idx]] = {
+        effectiveWindow: next.window,
+        rewardBeans: next.beansPerSeason
+      };
+      return acc;
     }, {});
     if (!c.MILESTONE.isGaugeEnabled({ season })) {
       const sgResult = await BeanstalkSubgraphRepository.getPreGaugeApyInputs(season, c);

@@ -31,6 +31,10 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false
         },
+        emaEffectiveWindow: {
+          type: Sequelize.INTEGER,
+          allowNull: false
+        },
         ...bigintNumericColumn('emaBeans', Sequelize, { allowNull: false }),
         initType: {
           type: Sequelize.ENUM,
