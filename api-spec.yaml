@@ -278,7 +278,87 @@ paths:
                   - yields
                   - initType
                   - ema
-
+  /yield-history:
+    post:
+      tags:
+        - Silo
+      summary: Retrieves silo yields already stored in the database.
+      operationId: yieldHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  format: address
+                  description: The whitelisted token address.
+                  example: "0xabcd"
+                emaWindow:
+                  type: integer
+                  enum: [24, 168, 720]
+                  description: The EMA window size. Corresponds to a 24h, 7d, and 30d vAPY.
+                initType:
+                  type: string
+                  enum: [NEW, AVERAGE]
+                  description: Whether to retrieve yields calculated based on a new silo deposit or the average silo deposit.
+                fromSeason:
+                  type: integer
+                  description: The earliest season to appear in the result. Guaranteed to be included if a result for it exists (regardless of interval)
+                  example: 20000
+                toSeason:
+                  type: integer
+                  description: The latest season to appear in the result. Guaranteed to be included if a result for it exists (regardless of interval)
+                  example: 25000
+                interval:
+                  type: integer
+                  description: Specifies a skip interval between seasons in the result. i.e. interval of 10 will return an entry for every 10 seasons in the response.
+                  example: 0
+              required:
+                - token
+                - emaWindow
+                - initType
+                - fromSeason
+                - toSeason
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    bean:
+                      type: number
+                      format: float
+                      description: The annualized growth in bean count
+                    stalk:
+                      type: number
+                      format: float
+                      description: The annualized growth in stalk count
+                    ownership:
+                      type: number
+                      format: float
+                      description: The annualized growth in silo ownership percentage
+                  description: Yield breakdown for the season.
+                description: Mapping of season numbers to their yield data.
+              example:
+                "10000":
+                  bean: 0
+                  stalk: 0.8661584416280589
+                  ownership: 0.6056560518900254
+                "10001":
+                  bean: 0
+                  stalk: 0.8642958966146155
+                  ownership: 0.6044476224863509
+                "10002":
+                  bean: 0
+                  stalk: 0.8642958966146155
+                  ownership: 0.6044476224863509
   /price:
     get:
       tags:
