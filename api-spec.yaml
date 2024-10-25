@@ -278,7 +278,7 @@ paths:
                   - yields
                   - initType
                   - ema
-  /yield-history:
+  /silo/yield-history:
     post:
       tags:
         - Silo
@@ -359,6 +359,134 @@ paths:
                   bean: 0
                   stalk: 0.8642958966146155
                   ownership: 0.6044476224863509
+  /silo/deposits:
+    post:
+      tags:
+        - Silo
+      summary: Retrieves detailed information about Deposits in the silo.
+      operationId: siloDeposits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  format: address
+                  description: EVM address of a depositor. Default is all accounts
+                  example: "0xabcd"
+                token:
+                  type: string
+                  format: address
+                  description: EVM address of a whitelisted token. Default is all tokens
+                  example: "0xef01"
+                sort:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [absolute, relative]
+                      description: Absolute sorting will return the largest absolue differences, while relative will return largest relative differences. Absolute sorting will thus prefer larger farmers.
+                    field:
+                      type: string
+                      enum: [bdv, stalk, seeds]
+                      description: The field to sort by with the given strategy
+                  description: Sorts the result based on the difference in actual values vs the would-be values upon a lambda convert.
+                lambdaBdvChange:
+                  type: string
+                  enum: [increase, decrease]
+                  description: Specifies whether to filter for would-be increasing or decreasing bdv upon a lambda convert. Default is to return both.
+                limit:
+                  type: integer
+                  description: The maximum number of results to return.
+                  default: 100
+                skip:
+                  type: integer
+                  description: The number of results to skip (for pagination).
+                  default: 0
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lastUpdated:
+                    type: integer
+                    description: The last block number in which the list of deposits was updated and the lambda stats checked for large fluctuations.
+                  deposits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        chain:
+                          type: string
+                          description: The blockchain network (e.g., 'arb' for Arbitrum).
+                        account:
+                          type: string
+                          format: address
+                          description: The depositor's EVM address.
+                        token:
+                          type: string
+                          format: address
+                          description: The deposited token's EVM address.
+                        stem:
+                          type: string
+                          description: The stem associated with the deposit.
+                        mowStem:
+                          type: string
+                          description: The stem in which this deposit was last mown.
+                        depositedAmount:
+                          type: string
+                          description: The amount of tokens deposited.
+                        depositedBdv:
+                          type: string
+                          description: The current recorded bdv of the deposited amount.
+                        baseStalk:
+                          type: string
+                          description: The base stalk portion of the deposit's stalk.
+                        grownStalk:
+                          type: string
+                          description: The grown stalk portion of the deposit's stalk
+                        mowableStalk:
+                          type: string
+                          description: The amount of stalk that would be accrue to the deposit upon a mow.
+                        currentStalk:
+                          type: string
+                          description: The current recorded stalk for this deposit.
+                        currentSeeds:
+                          type: string
+                          description: The current recorded seeds for this deposit.
+                        bdvOnLambda:
+                          type: string
+                          description: The bdv of this deposit if a lambda convert were to occur now.
+                        stalkOnLambda:
+                          type: string
+                          description: The amount of stalk of this deposit if a lambda convert were to occur now. This includes the affect of a mow.
+                        seedsOnLambda:
+                          type: string
+                          description: The amount of seeds of this deposit if a lambda convert were to occur now.
+              example:
+                lastUpdated: 267360284
+                deposits:
+                  - chain: "arb"
+                    account: "0x3d138e67dfac9a7af69d2694470b0b6d37721b06"
+                    token: "0xbea0005b8599265d41256905a9b3073d397812e4"
+                    stem: "14945036521"
+                    mowStem: "39978964924"
+                    depositedAmount: "5489953983"
+                    depositedBdv: "19685712512"
+                    baseStalk: "196857125120000000000"
+                    grownStalk: "492810717587449278336"
+                    mowableStalk: "42783894565816732800"
+                    currentStalk: "689667842707449278336"
+                    currentSeeds: "123527216069999616"
+                    bdvOnLambda: "5489953983"
+                    stalkOnLambda: "204266232677503621224"
+                    seedsOnLambda: "34449285564797544"
   /price:
     get:
       tags:
@@ -402,7 +530,7 @@ paths:
                     type: integer
                     description: Beanstalk Protocol deltaB
                     example: -4331
-  /voting-power:
+  /snapshot/voting-power:
     get:
       tags:
         - Snapshot
