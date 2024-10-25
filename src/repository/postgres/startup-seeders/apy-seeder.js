@@ -8,7 +8,6 @@ class ApySeeder {
     let missingSeasons = await YieldService.findMissingSeasons();
 
     // Calculate and save all vapys for each season (this will take a long time)
-    // Currently Pre-exploit seasons are expected to fail
     const TAG = Concurrent.tag('apySeeder');
     for (const season of missingSeasons) {
       await Concurrent.run(TAG, 2, async () => {

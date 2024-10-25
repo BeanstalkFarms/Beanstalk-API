@@ -193,6 +193,59 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Trade'
+  /voting-power:
+    get:
+      tags:
+        - Snapshot
+      summary: Retrieve the current Bean price, liquidity, and deltaB
+      operationId: voting-power
+      parameters:
+        - name: addresses
+          in: query
+          required: true
+          description: Comma-separated EVM addresses
+          schema:
+            type: string
+            example: 0xabcd,0xef01
+        - name: snapshot
+          in: query
+          required: true
+          description: EVM block number used to compute voting power on the given addresses
+          schema:
+            type: integer
+            example: 267347585
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                          format: address
+                          description: EVM address of the voter
+                          example: "0xabcd"
+                        score:
+                          type: number
+                          format: float
+                          description: Voting power associated with this EVM address, including any delegated votes.
+                          example: 1500.60
+                        stalkholders:
+                          type: object
+                          additionalProperties:
+                            type: number
+                            format: float
+                            example: 500.20
+                          description: Mapping of EVM addresses and their voting power contributing to the primary address' vote.
+
+
 components:
   parameters:
     blockNumber:
