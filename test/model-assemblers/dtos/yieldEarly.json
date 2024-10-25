@@ -69,15 +69,15 @@
     "ema": {
         "24": {
             "effectiveWindow": 24,
-            "rewardBeans": "0x0"
+            "beansPerSeason": "0x0"
         },
         "168": {
             "effectiveWindow": 150,
-            "rewardBeans": "0x0"
+            "beansPerSeason": "0x0"
         },
         "720": {
             "effectiveWindow": 150,
-            "rewardBeans": "0x0"
+            "beansPerSeason": "0x0"
         }
     }
 }

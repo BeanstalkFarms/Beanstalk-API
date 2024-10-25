@@ -103,10 +103,7 @@ class SiloApyService {
     };
     const windowEMAs = options.ema ?? (await this.calcWindowEMA(season, windows));
     apyResults.ema = windowEMAs.reduce((acc, next, idx) => {
-      acc[windows[idx]] = {
-        effectiveWindow: next.window,
-        rewardBeans: next.beansPerSeason
-      };
+      acc[windows[idx]] = next;
       return acc;
     }, {});
     if (!c.MILESTONE.isGaugeEnabled({ season })) {
@@ -114,7 +111,7 @@ class SiloApyService {
 
       // Calculate the apy for each window, i.e. each avg bean reward per season
       for (const ema of windowEMAs) {
-        apyResults.yields[ema.window] = PreGaugeApyUtil.calcApy(
+        apyResults.yields[ema.effectiveWindow] = PreGaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokens,
           tokens.map((t) => sgResult.tokens[t].grownStalkPerSeason),
@@ -200,7 +197,7 @@ class SiloApyService {
       }
 
       for (const ema of windowEMAs) {
-        apyResults.yields[ema.window] = GaugeApyUtil.calcApy(
+        apyResults.yields[ema.effectiveWindow] = GaugeApyUtil.calcApy(
           ema.beansPerSeason,
           tokenLabels,
           tokensToCalc,
@@ -265,7 +262,7 @@ class SiloApyService {
       }
 
       windowResults.push({
-        window: effectiveWindow,
+        effectiveWindow,
         beansPerSeason: BigInt(Math.round(currentEMA))
       });
     }

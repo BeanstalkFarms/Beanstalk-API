@@ -21,15 +21,15 @@ describe('Window EMA', () => {
     const emaResult = await SiloApyService.calcWindowEMA(21816, [24, 168, 720]);
 
     expect(emaResult[0]).toEqual({
-      window: 24,
+      effectiveWindow: 24,
       beansPerSeason: 35095777357n
     });
     expect(emaResult[1]).toEqual({
-      window: 168,
+      effectiveWindow: 168,
       beansPerSeason: 11144518350n
     });
     expect(emaResult[2]).toEqual({
-      window: 720,
+      effectiveWindow: 720,
       beansPerSeason: 3250542305n
     });
   });
@@ -272,7 +272,9 @@ describe('Gauge Silo APY', () => {
 
 describe('SiloApyService Orchestration', () => {
   beforeEach(() => {
-    jest.spyOn(SiloApyService, 'calcWindowEMA').mockResolvedValue([{ window: 720, beansPerSeason: 322227371n }]);
+    jest
+      .spyOn(SiloApyService, 'calcWindowEMA')
+      .mockResolvedValue([{ effectiveWindow: 720, beansPerSeason: 322227371n }]);
   });
 
   it('pre-gauge should supply appropriate parameters', async () => {

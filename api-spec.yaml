@@ -188,18 +188,26 @@ paths:
                       description: Indicates whether to calculate from the basis of a new silo deposit, or the average silo deposit.
                       default: "AVERAGE"
                     initUserValues:
-                      type: object
-                      properties:
-                        stalkPerBdv:
-                          type: number
-                          description: "(user deposited stalk) / (user deposited bdv + user germinating bdv)"
-                        germinating:
-                          type: array
-                          items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          stalkPerBdv:
                             type: number
-                          description: "[Even, Odd] germinating stalk ratio of this deposit type. Each entry should be computed as: (user germinating stalk) / (user deposited bdv + user germinating bdv)"
-                          default: [0, 0]
+                            description: "(user deposited stalk) / (user deposited bdv + user germinating bdv)"
+                          germinating:
+                            type: array
+                            items:
+                              type: number
+                            description: "[Even, Odd] germinating stalk ratio of this deposit type. Each entry should be computed as: (user germinating stalk) / (user deposited bdv + user germinating bdv)"
+                            default: [0, 0]
+                        description: Each entry in the array corresponds to the requested token at the same index.
                       description: Initial values of a deposit starting state. Takes precedence over initType
+                    ema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/EmaInfo'
+                      description: Override values to use for the ema
                     catchUpRate:
                       type: number
                       description: Target number of hours for a deposit's grown stalk to catch up (for gauge only)
@@ -254,25 +262,17 @@ paths:
                           ownership: 1.415032727943025
                   initType:
                     type: string
-                    enum: [NEW, AVERAGE]
-                    description: The initType used in the calculation
+                    enum: [NEW, AVERAGE, CUSTOM]
+                    description: The initType used in the calculation. Custom if initUserValues was used instead.
                   ema:
                     type: object
                     additionalProperties:
-                      type: object
-                      properties:
-                        effectiveWindow:
-                          type: integer
-                          description: The effective window used for the EMA. This is relevant if fewer datapoints were available than requested.
-                        rewardBeans:
-                          type: string
-                          description: The number of seasonal reward beans as a BigInt string
-                          example: "213456789"
+                      $ref: '#/components/schemas/EmaInfo'
                     description: EMA calculation details for each requested window.
                     example:
                         "720":
                           effectiveWindow: 350
-                          rewardBeans: "213456789"
+                          beansPerSeason: "213456789"
                 required:
                   - season
                   - yields
@@ -632,3 +632,13 @@ components:
         type:
           type: string
           example: "buy | sell"
+    EmaInfo:
+      type: object
+      properties:
+        effectiveWindow:
+          type: integer
+          description: The effective window used for the EMA. This is relevant if fewer datapoints were available than requested.
+        beansPerSeason:
+          type: string
+          description: The number of seasonal reward beans as a BigInt string
+          example: "213456789"

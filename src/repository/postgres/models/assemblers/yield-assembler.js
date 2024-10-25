@@ -9,7 +9,7 @@ class YieldModelAssembler {
           season: yieldResults.season,
           emaWindow: parseInt(window),
           emaEffectiveWindow: effectiveWindow,
-          emaBeans: BigInt(yieldResults.ema[window].rewardBeans),
+          emaBeans: BigInt(yieldResults.ema[window].beansPerSeason),
           initType: apyInitType,
           beanYield: yieldResults.yields[effectiveWindow][tokenAddr].bean,
           stalkYield: yieldResults.yields[effectiveWindow][tokenAddr].stalk,
@@ -32,7 +32,7 @@ class YieldModelAssembler {
         yieldResult.yields[model.emaWindow] = {};
         yieldResult.ema[model.emaWindow] = {
           effectiveWindow: model.emaEffectiveWindow,
-          rewardBeans: model.emaBeans
+          beansPerSeason: model.emaBeans
         };
         yieldResult.initType = model.initType;
       }

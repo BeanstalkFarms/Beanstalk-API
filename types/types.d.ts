@@ -9,11 +9,6 @@ export type DepositYield = {
   ownership: number;
 };
 
-export type EmaInfo = {
-  effectiveWindow: number;
-  rewardBeans: string;
-};
-
 export type DepositYieldMap = {
   [asset: string]: DepositYield;
 };
@@ -26,12 +21,12 @@ export type CalcApysResult = {
   season: number;
   yields: WindowYieldMap;
   initType: ApyInitType;
-  ema: { [requestedWindow: string]: EmaInfo };
+  ema: { [requestedWindow: string]: WindowEMAResult };
 };
 
 export type WindowEMAResult = {
   // The effective window (may be less than what was requested)
-  window: number;
+  effectiveWindow: number;
   // EMA number of beans earned per season
   beansPerSeason: BigInt;
 };
