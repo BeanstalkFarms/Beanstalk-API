@@ -1,59 +1,17 @@
 openapi: 3.0.0
 info:
   title: Beanstalk API
-  version: 0.0.1
+  version: 1.0.0
   description: REST API for getting information as to the current and historical state of Beanstalk and related protocols.
 servers:
   - url: 'https://api.bean.money'
   
 tags:
-  - name: Price
   - name: Basin
+  - name: Snapshot
+  - name: Price
 
 paths:
-  /price:
-    get:
-      tags:
-        - Price
-      summary: Retrieve the current Bean price, liquidity, and deltaB
-      operationId: price
-      parameters:
-        - $ref: '#/components/parameters/blockNumber'
-        - $ref: '#/components/parameters/timestamp'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  block:
-                    type: integer
-                    description: On-chain Ethereum block number of the requested price data
-                    example: 19804698
-                  timestamp:
-                    type: integer
-                    description: Unix timestamp of the block, in seconds
-                    example: 1714921799
-                  token:
-                    type: string
-                    description: Ethereum address of the token
-                    example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"
-                  usdPrice:
-                    type: number
-                    format: double
-                    description: Current price of the token in USD
-                    example: 0.9994
-                  liquidityUSD:
-                    type: number
-                    format: double
-                    description: Total liquidity in USD
-                    example: 28235107.24
-                  deltaB:
-                    type: integer
-                    description: Beanstalk Protocol deltaB
-                    example: -4331
   /basin/tickers:
     get:
       tags: 
@@ -193,6 +151,49 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Trade'
+  /price:
+    get:
+      tags:
+        - Price
+      summary: Retrieve the current Bean price, liquidity, and deltaB
+      operationId: price
+      parameters:
+        - $ref: '#/components/parameters/blockNumber'
+        - $ref: '#/components/parameters/timestamp'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  block:
+                    type: integer
+                    description: On-chain Ethereum block number of the requested price data
+                    example: 19804698
+                  timestamp:
+                    type: integer
+                    description: Unix timestamp of the block, in seconds
+                    example: 1714921799
+                  token:
+                    type: string
+                    description: Ethereum address of the token
+                    example: "0xbea0000029ad1c77d3d5d23ba2d8893db9d1efab"
+                  usdPrice:
+                    type: number
+                    format: double
+                    description: Current price of the token in USD
+                    example: 0.9994
+                  liquidityUSD:
+                    type: number
+                    format: double
+                    description: Total liquidity in USD
+                    example: 28235107.24
+                  deltaB:
+                    type: integer
+                    description: Beanstalk Protocol deltaB
+                    example: -4331
   /voting-power:
     get:
       tags:
