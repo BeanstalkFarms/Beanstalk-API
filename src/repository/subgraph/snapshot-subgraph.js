@@ -17,6 +17,7 @@ class SnapshotSubgraphRepository {
       gql`
         {
           delegations {
+            id
             delegate
             delegator
             timestamp
@@ -25,9 +26,11 @@ class SnapshotSubgraphRepository {
       `,
       blockNumber ? `block: {number: ${blockNumber}}` : '',
       `space: "beanstalkdao.eth"`,
-      ['timestamp'],
-      [0],
-      'asc'
+      {
+        field: 'timestamp',
+        lastValue: 0,
+        direction: 'asc'
+      }
     );
     return delegations.map((d) => ({ delegate: d.delegate, delegator: d.delegator }));
   }

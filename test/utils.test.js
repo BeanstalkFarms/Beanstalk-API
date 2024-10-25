@@ -8,11 +8,10 @@ jest.mock('../src/datasources/alchemy', () => ({
 const alchemy = require('../src/datasources/alchemy');
 
 const { parseQuery } = require('../src/utils/rest-parsing');
-const { allToBigInt, fromBigInt } = require('../src/utils/number');
+const { allToBigInt, fromBigInt, percentDiff } = require('../src/utils/number');
 const CommonSubgraphRepository = require('../src/repository/subgraph/common-subgraph');
 const { BigInt_applyPercent } = require('../src/utils/bigint');
 const { C } = require('../src/constants/runtime-constants');
-const { mockBeanstalkSG } = require('./util/mock-sg');
 
 describe('Utils', () => {
   test('Formats query parameters', async () => {
@@ -72,6 +71,18 @@ describe('Utils', () => {
       expect(obj.p3.p8).toEqual(null);
     });
 
+    test('Works on mix of arrays and objects', () => {
+      const obj = allToBigInt({
+        p1: '123456',
+        p2: [10, '55', '0x10', 'string']
+      });
+      expect(obj.p1).toEqual(123456n);
+      expect(obj.p2[0]).toEqual(10n);
+      expect(obj.p2[1]).toEqual(55n);
+      expect(obj.p2[2]).toEqual(16n);
+      expect(obj.p2[3]).toEqual('string');
+    });
+
     test('Retain some precision on string conversion', () => {
       const n1 = fromBigInt(123456789n, 6, 2);
       expect(n1).toEqual(123.45);
@@ -82,6 +93,13 @@ describe('Utils', () => {
       expect(BigInt_applyPercent(100n, 102)).toEqual(102n);
       expect(BigInt_applyPercent(100n, 95)).toEqual(95n);
       expect(BigInt_applyPercent(10000n, 105.371)).toEqual(10537n);
+    });
+
+    test('Percent diff', () => {
+      expect(percentDiff(100n, 150n)).toEqual(0.5);
+      expect(percentDiff(100n, 50n)).toEqual(0.5);
+      expect(percentDiff(50n, 100n)).toEqual(1);
+      expect(percentDiff(250n, 300n)).toEqual(0.2);
     });
   });
 });

@@ -1,0 +1,114 @@
+{
+  "siloDeposits": [
+    {
+      "id": "0x0000002e4f99cb1e699042699b91623b1334d2f7-0xbea0005b8599265d41256905a9b3073d397812e4-season-7973",
+      "farmer": {
+        "id": "0x0000002e4f99cb1e699042699b91623b1334d2f7"
+      },
+      "token": "0xbea0005b8599265d41256905a9b3073d397812e4",
+      "stemV31": "-12474000000",
+      "depositedAmount": "167",
+      "depositedBDV": "167",
+      "createdBlock": "15819911"
+    },
+    {
+      "id": "0x001f43cd9e84d90e1ee9db192724cef073d3fb2e-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-5386",
+      "farmer": {
+        "id": "0x001f43cd9e84d90e1ee9db192724cef073d3fb2e"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-17648000000",
+      "depositedAmount": "427343",
+      "depositedBDV": "79299",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x001f43cd9e84d90e1ee9db192724cef073d3fb2e-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-6074",
+      "farmer": {
+        "id": "0x001f43cd9e84d90e1ee9db192724cef073d3fb2e"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-16272000000",
+      "depositedAmount": "98625",
+      "depositedBDV": "18301",
+      "createdBlock": "15278067"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-3169",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-22082000000",
+      "depositedAmount": "119624063",
+      "depositedBDV": "22198001",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-4470",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-19480000000",
+      "depositedAmount": "10372559",
+      "depositedBDV": "1924780",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-4994",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-18432000000",
+      "depositedAmount": "11381984",
+      "depositedBDV": "2112094",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-5399",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-17622000000",
+      "depositedAmount": "30340076",
+      "depositedBDV": "5630046",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-5901",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-16618000000",
+      "depositedAmount": "108609774",
+      "depositedBDV": "20154138",
+      "createdBlock": "15277992"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea054dddbca12889e07b3e076f511bf1d27543-season-6074",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea054dddbca12889e07b3e076f511bf1d27543",
+      "stemV31": "-16272000000",
+      "depositedAmount": "461713828",
+      "depositedBDV": "85677781",
+      "createdBlock": "15278041"
+    },
+    {
+      "id": "0x002505eefcbd852a148f03ca3451811032a72f96-0x1bea059c3ea15f6c10be1c53d70c75fd1266d788-season-2734",
+      "farmer": {
+        "id": "0x002505eefcbd852a148f03ca3451811032a72f96"
+      },
+      "token": "0x1bea059c3ea15f6c10be1c53d70c75fd1266d788",
+      "stemV31": "-45904000000",
+      "depositedAmount": "891022603",
+      "depositedBDV": "186605583",
+      "createdBlock": "15278009"
+    }
+  ]
+}

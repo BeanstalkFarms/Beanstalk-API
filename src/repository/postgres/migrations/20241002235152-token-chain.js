@@ -10,7 +10,7 @@ module.exports = {
     });
 
     await queryInterface.addColumn('token', 'supply', {
-      type: Sequelize.STRING, // bigintStringColumn
+      type: Sequelize.NUMERIC(38, 0),
       allowNull: false,
       defaultValue: '0'
     });
@@ -22,7 +22,7 @@ module.exports = {
     });
 
     await queryInterface.changeColumn('token', 'supply', {
-      type: Sequelize.STRING,
+      type: Sequelize.NUMERIC(38, 0),
       allowNull: false
     });
 

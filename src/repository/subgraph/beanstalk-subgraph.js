@@ -2,6 +2,7 @@ const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { allToBigInt } = require('../../utils/number');
 const { C } = require('../../constants/runtime-constants');
 const { gql } = require('graphql-request');
+const DepositDto = require('../dto/DepositDto');
 
 class BeanstalkSubgraphRepository {
   static async getDepositedBdvs(accounts, blockNumber, c = C()) {
@@ -21,9 +22,11 @@ class BeanstalkSubgraphRepository {
       `,
       `block: {number: ${blockNumber}}`,
       `id_in: [${accounts.map((a) => `"${a}"`).join(', ')}]`,
-      ['stalk'],
-      [0],
-      'asc'
+      {
+        field: 'stalk',
+        lastValue: 0,
+        direction: 'asc'
+      }
     );
     const retval = {};
     for (const silo of silos) {
@@ -36,13 +39,14 @@ class BeanstalkSubgraphRepository {
     return retval;
   }
 
-  // From exclusive, To inclusive.
+  // From/to inclusive
   static async getSiloHourlyRewardMints(fromSeason, toSeason, c = C()) {
     const siloHourlySnapshots = await SubgraphQueryUtil.allPaginatedSG(
       c.SG.BEANSTALK,
       gql`
         {
           siloHourlySnapshots {
+            id
             season
             deltaBeanMints
           }
@@ -50,10 +54,12 @@ class BeanstalkSubgraphRepository {
       `,
       '',
       `silo: "${c.BEANSTALK}", season_lte: ${toSeason}`,
-      // Lower bound season is applied here (gt)
-      ['season'],
-      [fromSeason],
-      'asc'
+      {
+        field: 'season',
+        // Lower bound season is applied here (gte)
+        lastValue: fromSeason,
+        direction: 'asc'
+      }
     );
     return allToBigInt(
       siloHourlySnapshots.reduce((result, next) => {
@@ -213,6 +219,29 @@ class BeanstalkSubgraphRepository {
       whitelisted: result.silo.whitelistedTokens,
       all: [...result.silo.whitelistedTokens, ...result.silo.dewhitelistedTokens]
     };
+  }
+
+  static async getAllDeposits(blockNumber, c = C()) {
+    const allDeposits = await SubgraphQueryUtil.allPaginatedSG(
+      c.SG.BEANSTALK,
+      gql`
+        {
+          siloDeposits {
+            ${DepositDto.subgraphFields}
+            id
+            createdBlock
+          }
+        }
+      `,
+      `block: {number: ${blockNumber}}`,
+      '',
+      {
+        field: 'createdBlock',
+        lastValue: 0,
+        direction: 'asc'
+      }
+    );
+    return allDeposits.map((d) => DepositDto.fromSubgraph(d));
   }
 }
 

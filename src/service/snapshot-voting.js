@@ -1,7 +1,7 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
 const SnapshotSubgraphRepository = require('../repository/subgraph/snapshot-subgraph');
-const PromiseUtil = require('../utils/promise');
+const PromiseUtil = require('../utils/async/promise');
 
 class SnapshotVotingService {
   // Returns a list of voting powers by requested address
@@ -60,7 +60,7 @@ class SnapshotVotingService {
     for (const account of accounts) {
       functions.push(async () => ({
         account,
-        stalk: BigInt(await beanstalk.balanceOfStalk(account, { blockTag: blockNumber }))
+        stalk: await beanstalk.balanceOfStalk(account, { blockTag: blockNumber })
       }));
     }
     const results = {};

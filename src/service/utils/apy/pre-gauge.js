@@ -3,9 +3,9 @@
  * @typedef {import('../../../types/types').DepositYieldMap} DepositYieldMap
  */
 
-const { C } = require('../../constants/runtime-constants');
-const { ApyInitType } = require('../../repository/postgres/models/types/types');
-const { fromBigInt } = require('../number');
+const { C } = require('../../../constants/runtime-constants');
+const { ApyInitType } = require('../../../repository/postgres/models/types/types');
+const { fromBigInt } = require('../../../utils/number');
 
 class PreGaugeApyUtil {
   /**
@@ -44,9 +44,8 @@ class PreGaugeApyUtil {
     let userStalk = tokens.map(
       (_, idx) =>
         options?.initUserValues?.[idx]?.stalkPerBdv ??
-        (!options?.initType || options?.initType === ApyInitType.AVERAGE
-          ? // AVERAGE is the default
-            totalStalk / totalDepositedBdv
+        (options.initType === ApyInitType.AVERAGE
+          ? totalStalk / totalDepositedBdv
           : // New deposit starts with 1 stalk
             1)
     );

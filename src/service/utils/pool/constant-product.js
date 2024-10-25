@@ -1,4 +1,4 @@
-const NumberUtil = require('../number');
+const NumberUtil = require('../../../utils/number');
 
 class ConstantProductWellUtil {
   // Retroactive replacement functionality for well function `calcRates` - did not exist in CP2 1.0

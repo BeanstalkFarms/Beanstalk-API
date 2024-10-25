@@ -1,6 +1,6 @@
 'use strict';
 
-const { timestamps } = require('../util/sequelize-util');
+const { timestamps, bigintNumericColumn } = require('../util/sequelize-util');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -32,21 +32,11 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
-      bdv: {
-        type: Sequelize.STRING
-      },
-      stalkEarnedPerSeason: {
-        type: Sequelize.STRING
-      },
-      stemTip: {
-        type: Sequelize.STRING
-      },
-      totalDeposited: {
-        type: Sequelize.STRING
-      },
-      totalDepositedBdv: {
-        type: Sequelize.STRING
-      },
+      ...bigintNumericColumn('bdv', Sequelize),
+      ...bigintNumericColumn('stalkEarnedPerSeason', Sequelize),
+      ...bigintNumericColumn('stemTip', Sequelize),
+      ...bigintNumericColumn('totalDeposited', Sequelize),
+      ...bigintNumericColumn('totalDepositedBdv', Sequelize),
       ...timestamps(Sequelize)
     });
   },

@@ -1,4 +1,4 @@
-const NumberUtil = require('../../../utils/number');
+const NumberUtil = require('../../utils/number');
 
 class WellDto {
   static subgraphFields = `

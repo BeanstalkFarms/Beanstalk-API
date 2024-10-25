@@ -1,7 +1,7 @@
-const { C } = require('../../constants/runtime-constants');
-const AlchemyUtil = require('../../datasources/alchemy');
-const Contracts = require('../../datasources/contracts/contracts');
-const { BigInt_abs } = require('../bigint');
+const { C } = require('../../../constants/runtime-constants');
+const AlchemyUtil = require('../../../datasources/alchemy');
+const Contracts = require('../../../datasources/contracts/contracts');
+const { BigInt_abs } = require('../../../utils/bigint');
 
 // This functionality may or may not be helpful within this API project - it is used in subgraphs.
 // However it was first developed here as a means of understanding the inputs/outputs.
@@ -22,8 +22,8 @@ class WellFnUtil {
     const wellFn = Contracts.get(well.wellFunction.id, c);
     const data = well.wellFunction.data;
 
-    const initialLp = BigInt(await wellFn.calcLpTokenSupply(prevReserves, data));
-    const newLp = BigInt(await wellFn.calcLpTokenSupply(newReserves, data));
+    const initialLp = await wellFn.calcLpTokenSupply(prevReserves, data);
+    const newLp = await wellFn.calcLpTokenSupply(newReserves, data);
     const deltaLp = newLp - initialLp;
 
     // Determines how much of the liquidity operation was double sided.

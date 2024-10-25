@@ -1,11 +1,13 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
-const { sequelize } = require('../repository/postgres/models');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
+const ArraysUtil = require('../utils/arrays');
 const BlockUtil = require('../utils/block');
+const Concurrent = require('../utils/async/concurrent');
 const { createNumberSpread } = require('../utils/number');
-const PromiseUtil = require('../utils/promise');
+const PromiseUtil = require('../utils/async/promise');
+const AsyncContext = require('../utils/async/context');
 
 class SiloService {
   static async getMigratedGrownStalk(accounts, options = {}) {
@@ -110,46 +112,106 @@ class SiloService {
     return retval;
   }
 
+  // Combines results from tokenSettings + stemTipForToken
+  static async getWhitelistedTokenInfo({ block, chain }) {
+    const beanstalk = Contracts.getBeanstalk();
+    const tokenModels = await TokenRepository.findWhitelistedTokens(chain);
+    const addresses = tokenModels.map((t) => t.address);
+
+    const results = await Promise.all(
+      addresses.map(async (t) => {
+        const [tokenSetting, stemTip, bdv] = await Promise.all([
+          beanstalk.tokenSettings(t, { blockTag: block }),
+          beanstalk.stemTipForToken(t, { blockTag: block }),
+          PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(t, BigInt(10 ** C().DECIMALS[t]), { blockTag: block }))
+        ]);
+        return { tokenSetting, stemTip, bdv };
+      })
+    );
+
+    return addresses.reduce((acc, next, idx) => {
+      acc[next] = {
+        ...results[idx].tokenSetting,
+        stemTip: results[idx].stemTip,
+        bdv: results[idx].bdv
+      };
+      return acc;
+    }, {});
+  }
+
+  // Retrieves all mow stems for the requested account/token pairs
+  static async getMowStems(accountTokenPairs, blockNumber) {
+    const results = {};
+    const beanstalk = Contracts.getBeanstalk();
+    const TAG = Concurrent.tag('getMowStems');
+    for (let i = 0; i < accountTokenPairs.length; ++i) {
+      const { account, token } = accountTokenPairs[i];
+      await Concurrent.run(TAG, 50, async () => {
+        results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
+      });
+    }
+    await Concurrent.allResolved(TAG);
+
+    return results;
+  }
+
+  static async batchBdvs(calldata, block, batchSize = 100) {
+    const beanstalk = Contracts.getBeanstalk();
+    const tokenBatches = ArraysUtil.toChunks(calldata.tokens, batchSize);
+    const amountBatches = ArraysUtil.toChunks(calldata.amounts, batchSize);
+
+    const results = [];
+    results.length = calldata.tokens.length;
+
+    const TAG = Concurrent.tag('batchBdvs');
+    for (let i = 0; i < tokenBatches.length; i++) {
+      const batchTokens = tokenBatches[i];
+      const batchAmounts = amountBatches[i];
+
+      // Call the bdvs function
+      await Concurrent.run(TAG, 50, async () => {
+        const bdvsResult = await beanstalk.bdvs(batchTokens, batchAmounts, { blockTag: block });
+        // Preserve result order
+        results.splice(i * batchSize, batchSize, ...bdvsResult);
+      });
+    }
+    await Concurrent.allResolved(TAG);
+    return results;
+  }
+
   // Updates all whitelisted tokens in the database
   static async updateWhitelistedTokenInfo() {
     const chain = C().CHAIN;
     const beanstalk = Contracts.getBeanstalk();
-    const tokenModels = await TokenRepository.findWhitelistedTokens({ chain });
+    const tokenModels = await TokenRepository.findWhitelistedTokens(chain);
 
     const updatedTokens = [];
-    await sequelize.transaction(async (transaction) => {
+    await AsyncContext.sequelizeTransaction(async () => {
       for (const tokenModel of tokenModels) {
         const token = tokenModel.address;
         const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
           [
-            (async () => BigInt(await Contracts.get(token).totalSupply()))(),
-            (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))))(),
+            Contracts.get(token).totalSupply(),
+            PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))),
             (async () => {
               const tokenSettings = await beanstalk.tokenSettings(token);
-              return BigInt(tokenSettings.stalkEarnedPerSeason);
+              return tokenSettings.stalkEarnedPerSeason;
             })(),
-            (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
-            (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
-            (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
-          ].map(PromiseUtil.nullOnReject)
+            beanstalk.stemTipForToken(token),
+            beanstalk.getTotalDeposited(token),
+            beanstalk.getTotalDepositedBdv(token)
+          ].map(PromiseUtil.defaultOnReject(null))
         );
 
         updatedTokens.push(
-          ...(await TokenRepository.updateToken(
-            token,
-            chain,
-            {
-              supply,
-              bdv,
-              stalkEarnedPerSeason,
-              stemTip,
-              totalDeposited,
-              totalDepositedBdv
-            },
-            {
-              transaction
-            }
-          ))
+          ...(await TokenRepository.updateToken(token, chain, {
+            supply,
+            bdv,
+            stalkEarnedPerSeason,
+            stemTip,
+            totalDeposited,
+            totalDepositedBdv
+          }))
         );
       }
     });

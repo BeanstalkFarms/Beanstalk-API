@@ -1,4 +1,4 @@
-const { C } = require('../../../constants/runtime-constants');
+const { C } = require('../../../../constants/runtime-constants');
 const DefaultGaugePointFunction = require('./default');
 const LegacyDefaultGaugePointFunction = require('./legacy');
 

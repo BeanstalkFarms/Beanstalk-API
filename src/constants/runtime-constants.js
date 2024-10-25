@@ -1,8 +1,9 @@
 const AlchemyUtil = require('../datasources/alchemy');
-const AsyncContext = require('../utils/context');
+const AsyncContext = require('../utils/async/context');
 const EnvUtil = require('../utils/env');
 const BeanstalkEth = require('./raw/beanstalk-eth');
 const BeanstalkArb = require('./raw/beanstalk-arb');
+const { isNil } = require('../utils/bigint');
 
 const C_MAPPING = {
   eth: BeanstalkEth,
@@ -13,6 +14,9 @@ const C_MAPPING = {
 // i.e. jest.spyOn(RuntimeConstants, 'proxyUnderlying').mockReturnValue(4);
 class RuntimeConstants {
   static proxyUnderlying({ chain, season }) {
+    if (isNil(chain) && isNil(season)) {
+      throw new Error(`One of chain/season must be provided.`);
+    }
     return new Proxy({}, RuntimeConstants._makeProxyHandler(chain, season));
   }
 
@@ -30,8 +34,8 @@ class RuntimeConstants {
         }
         let value = constants[property];
         if (!value) {
-          // Secondarily search for the property among the addresses
-          value = constants.ADDRESSES[property];
+          // Secondarily search for the property among the addresses/misc
+          value = constants.ADDRESSES[property] ?? constants.MISC[property];
         }
         return value;
       }
@@ -60,10 +64,8 @@ class RuntimeConstants {
 // C(chain).DECIMALS[token]
 const C = (opt) => {
   if (!opt) {
-    let defaultChain;
-    try {
-      defaultChain = AsyncContext.get('chain');
-    } catch (e) {
+    let defaultChain = AsyncContext.getOrUndef('chain');
+    if (!defaultChain) {
       // If there is no async context, this is from a system process/non rest. Use default configured chain
       defaultChain = EnvUtil.defaultChain();
     }
