@@ -8,6 +8,7 @@ servers:
   
 tags:
   - name: Basin
+  - name: Silo
   - name: Snapshot
   - name: Price
 
@@ -151,6 +152,133 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Trade'
+  /silo/yield:
+    post:
+      tags:
+        - Silo
+      summary: Calculates and retrieves silo yields at a single season. Optional inputs allows refined control over the calculation.
+      operationId: siloYield
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                season:
+                  type: integer
+                  description: Season number. Defaults to the current season.
+                tokens:
+                  type: array
+                  items:
+                    type: string
+                  description: An array of EVM token addresses. Defaults to all whitelisted tokens
+                emaWindows:
+                  type: array
+                  items:
+                    type: integer
+                  default: [24, 168, 720]
+                  description: An array of EMA window sizes. Each is the number of seasons to use in the lookback. Defaults to 24h, 7d, and 30d windows.
+                options:
+                  type: object
+                  properties:
+                    initType:
+                      type: string
+                      enum: [NEW, AVERAGE]
+                      description: Indicates whether to calculate from the basis of a new silo deposit, or the average silo deposit.
+                      default: "AVERAGE"
+                    initUserValues:
+                      type: object
+                      properties:
+                        stalkPerBdv:
+                          type: number
+                          description: "(user deposited stalk) / (user deposited bdv + user germinating bdv)"
+                        germinating:
+                          type: array
+                          items:
+                            type: number
+                          description: "[Even, Odd] germinating stalk ratio of this deposit type. Each entry should be computed as: (user germinating stalk) / (user deposited bdv + user germinating bdv)"
+                          default: [0, 0]
+                      description: Initial values of a deposit starting state. Takes precedence over initType
+                    catchUpRate:
+                      type: number
+                      description: Target number of hours for a deposit's grown stalk to catch up (for gauge only)
+                      default: 4320
+                    duration:
+                      type: number
+                      description: The duration for which to calculate the apy, in seasons
+                      default: 8760
+                    skipValidation:
+                      type: boolean
+                      description: Indicates whether any parameter validation should be skipped
+                      default: false
+                  description: Options that control the calculation itself
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  season:
+                    type: integer
+                    description: Season number
+                  yields:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      description: Yields data for a window.
+                      additionalProperties:
+                        type: object
+                        properties:
+                          bean:
+                            type: number
+                            format: float
+                            description: The annualized growth in bean count
+                          stalk:
+                            type: number
+                            format: float
+                            description: The annualized growth in stalk count
+                          ownership:
+                            type: number
+                            format: float
+                            description: The annualized growth in silo ownership percentage
+                        description: Yields for each whitelisted token
+                    description: Yields for each available ema window.
+                    example:
+                      "720":
+                        "0xbea0005b8599265d41256905a9b3073d397812e4":
+                          bean: 0
+                          stalk: 1.749468280393595
+                          ownership: 1.415032727943025
+                  initType:
+                    type: string
+                    enum: [NEW, AVERAGE]
+                    description: The initType used in the calculation
+                  ema:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        effectiveWindow:
+                          type: integer
+                          description: The effective window used for the EMA. This is relevant if fewer datapoints were available than requested.
+                        rewardBeans:
+                          type: string
+                          description: The number of seasonal reward beans as a BigInt string
+                          example: "213456789"
+                    description: EMA calculation details for each requested window.
+                    example:
+                        "720":
+                          effectiveWindow: 350
+                          rewardBeans: "213456789"
+                required:
+                  - season
+                  - yields
+                  - initType
+                  - ema
+
   /price:
     get:
       tags:
@@ -245,6 +373,9 @@ paths:
                             format: float
                             example: 500.20
                           description: Mapping of EVM addresses and their voting power contributing to the primary address' vote.
+                          example:
+                            "0xabcd": 266.32
+                            "0xcdef": 1234.28
 
 
 components:
