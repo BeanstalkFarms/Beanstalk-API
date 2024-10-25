@@ -60,7 +60,11 @@ class SiloApyService {
   static async validate({ season, emaWindows, tokens, options }) {
     emaWindows ??= this.DEFAULT_WINDOWS;
     options ??= {};
-    options.initType ??= ApyInitType.AVERAGE;
+    if (options.initUserValues) {
+      options.initType = 'CUSTOM';
+    } else {
+      options.initType ??= ApyInitType.AVERAGE;
+    }
 
     // Check whether season/tokens are valid
     const latestSeason = (await BeanstalkSubgraphRepository.getLatestSeason()).season;
@@ -97,7 +101,7 @@ class SiloApyService {
       yields: {},
       initType: options.initType
     };
-    const windowEMAs = await this.calcWindowEMA(season, windows);
+    const windowEMAs = options.ema ?? (await this.calcWindowEMA(season, windows));
     apyResults.ema = windowEMAs.reduce((acc, next, idx) => {
       acc[windows[idx]] = {
         effectiveWindow: next.window,

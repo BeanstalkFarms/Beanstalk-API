@@ -28,6 +28,11 @@ router.post('/yield', async (ctx) => {
   /** @type {GetApyRequest} */
   const body = ctx.request.body;
 
+  // Prevents user from requesting legacy chain; season number will dictate constants
+  if (ctx.query.chain) {
+    throw new InputError('Query parameter `chain` is not compatible with this request.');
+  }
+
   if (body.emaWindows && (!Array.isArray(body.emaWindows) || body.emaWindows.length === 0)) {
     throw new InputError('Invalid `emaWindows` property was provided.');
   }
@@ -36,9 +41,16 @@ router.post('/yield', async (ctx) => {
     throw new InputError('Invalid `tokens` property was provided.');
   }
 
-  // Prevents user from requesting legacy chain; season number will dictate constants
-  if (ctx.query.chain) {
-    throw new InputError('Query parameter `chain` is not compatible with this request.');
+  if (body.options?.ema) {
+    if (!body.emaWindows) {
+      throw new InputError('`emaWindows` must be provided when `options.ema` is provided.');
+    }
+    if (body.emaWindows.length !== body.options.ema.length) {
+      throw new InputError('Cardinality mismatch: `emaWindows` and `options.ema`.');
+    }
+    for (const entry of body.options.ema) {
+      entry.beansPerSeason = BigInt(entry.beansPerSeason);
+    }
   }
 
   /** @type {CalcApysResult} */

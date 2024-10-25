@@ -30,8 +30,10 @@ export type CalcApysResult = {
 };
 
 export type WindowEMAResult = {
+  // The effective window (may be less than what was requested)
   window: number;
-  beansPerSeason: number;
+  // EMA number of beans earned per season
+  beansPerSeason: BigInt;
 };
 
 export type Deposit = {
@@ -49,12 +51,15 @@ export const ApyInitType: {
 export type ApyInitType = (typeof ApyInitType)[keyof typeof ApyInitType];
 
 export type CalcApyOptions = {
-  // Target number of hours for a deposit's grown stalk to catch up (for gauge only)
-  catchUpRate?: number;
   // Whether to initialize apy calculation with a new deposit or an average deposit.
   initType?: ApyInitType;
   // Initial values of a deposit starting states. Takes precedence over initType
   initUserValues?: Deposit[];
+  // Override setting for the number of beans per season. The windows inside this object must match
+  // the windows in the outer request's emaWindows
+  ema?: WindowEMAResult[];
+  // Target number of hours for a deposit's grown stalk to catch up (for gauge only)
+  catchUpRate?: number;
   // The duration for which to calculate the apy (if other than 1 year)
   duration?: number;
   // Indicates whether any parameter validation should be skipped
