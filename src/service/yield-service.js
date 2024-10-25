@@ -5,6 +5,7 @@
 
 const { C } = require('../constants/runtime-constants');
 const YieldModelAssembler = require('../repository/postgres/models/assemblers/yield-assembler');
+const { ApyInitType } = require('../repository/postgres/models/types/types');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const YieldRepository = require('../repository/postgres/queries/yield-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
