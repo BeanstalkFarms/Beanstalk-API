@@ -11,15 +11,15 @@ class ApySeeder {
     // Currently Pre-exploit seasons are expected to fail
     const TAG = Concurrent.tag('apySeeder');
     for (const season of missingSeasons) {
-      try {
-        // TODO: This can be increased once the decentralized subgraphs are deployed + the rate limit is increased
-        await Concurrent.run(TAG, 2, async () => {
+      await Concurrent.run(TAG, 2, async () => {
+        try {
           await YieldService.saveSeasonalApys({ season });
-        });
-        Log.info(`Saved apy for season ${season}`);
-      } catch (e) {
-        Log.info(`Could not save apy for season ${season}`, e);
-      }
+          Log.info(`Saved apy for season ${season}`);
+        } catch (e) {
+          Log.info(`Could not save apy for season ${season}`, e);
+          throw e;
+        }
+      });
     }
     await Concurrent.allSettled(TAG);
   }
