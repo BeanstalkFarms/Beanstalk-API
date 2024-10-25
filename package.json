@@ -21,7 +21,10 @@
   "jest": {
     "testEnvironment": "node",
     "setupFiles": [
-      "<rootDir>/test/jest.setup.js"
+      "<rootDir>/test/setup/jest.setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setup/jest.setup-after.js"
     ]
   },
   "keywords": [],
@@ -41,7 +44,7 @@
     "node-cron": "^3.0.3",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.3",
+    "sequelize": "^6.37.4",
     "sequelize-cli": "^6.6.2"
   },
   "devDependencies": {

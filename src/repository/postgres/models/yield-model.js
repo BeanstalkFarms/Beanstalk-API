@@ -1,4 +1,4 @@
-const { bigintStringColumn } = require('../util/sequelize-util');
+const { bigintNumericColumn } = require('../util/sequelize-util');
 const { ApyInitType } = require('./types/types');
 
 module.exports = (sequelize, DataTypes) => {
@@ -18,7 +18,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false
       },
-      ...bigintStringColumn('emaBeans', DataTypes, { allowNull: false }),
+      // Actual number of datapoints (different from emaWindow if < emaWindow seasons were available)
+      emaEffectiveWindow: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      ...bigintNumericColumn('emaBeans', DataTypes, { allowNull: false }),
       initType: {
         type: DataTypes.ENUM,
         values: Object.values(ApyInitType),

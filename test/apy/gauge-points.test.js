@@ -1,5 +1,5 @@
-const DefaultGaugePointFunction = require('../../src/utils/apy/gp-functions/default');
-const LegacyDefaultGaugePointFunction = require('../../src/utils/apy/gp-functions/legacy');
+const DefaultGaugePointFunction = require('../../src/service/utils/apy/gp-functions/default');
+const LegacyDefaultGaugePointFunction = require('../../src/service/utils/apy/gp-functions/legacy');
 
 describe('Gauge Point Functions', () => {
   test('Current default implementation', () => {

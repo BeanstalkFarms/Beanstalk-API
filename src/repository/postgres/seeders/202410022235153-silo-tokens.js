@@ -4,7 +4,7 @@ const db = require('../models');
 const Contracts = require('../../../datasources/contracts/contracts');
 const { C } = require('../../../constants/runtime-constants');
 const AlchemyUtil = require('../../../datasources/alchemy');
-const PromiseUtil = require('../../../utils/promise');
+const PromiseUtil = require('../../../utils/async/promise');
 const EnvUtil = require('../../../utils/env');
 
 const c = C('eth');
@@ -40,21 +40,21 @@ module.exports = {
         const [name, symbol, supply, decimals] = await Promise.all([
           erc20.name(),
           erc20.symbol(),
-          (async () => BigInt(await erc20.totalSupply()))(),
+          erc20.totalSupply(),
           (async () => Number(await erc20.decimals()))()
         ]);
         const [bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
           [
-            (async () => BigInt(await beanstalk.bdv(token, BigInt(10 ** decimals))))(),
+            PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(token, BigInt(10 ** decimals))),
             (async () => {
               const tokenSettings = await beanstalk.tokenSettings(token);
-              return BigInt(tokenSettings.stalkEarnedPerSeason);
+              return tokenSettings.stalkEarnedPerSeason;
             })(),
-            (async () => BigInt(await beanstalk.stemTipForToken(token)))(),
-            (async () => BigInt(await beanstalk.getTotalDeposited(token)))(),
-            (async () => BigInt(await beanstalk.getTotalDepositedBdv(token)))()
+            beanstalk.stemTipForToken(token),
+            beanstalk.getTotalDeposited(token),
+            beanstalk.getTotalDepositedBdv(token)
             // If any revert, they return null instead
-          ].map(PromiseUtil.nullOnReject)
+          ].map(PromiseUtil.defaultOnReject(null))
         );
         rows.push({
           address: token,

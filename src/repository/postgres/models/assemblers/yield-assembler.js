@@ -1,19 +1,19 @@
-const { C } = require('../../../../constants/runtime-constants');
-
 class YieldModelAssembler {
   static toModels(yieldResults, apyInitType, tokenModels) {
     const yieldModels = [];
-    for (const window in yieldResults.yields) {
-      for (const tokenAddr in yieldResults.yields[window]) {
+    for (const window in yieldResults.ema) {
+      const effectiveWindow = yieldResults.ema[window].effectiveWindow;
+      for (const tokenAddr in yieldResults.yields[effectiveWindow]) {
         yieldModels.push({
           tokenId: tokenModels.find((t) => t.address.toLowerCase() === tokenAddr).id,
           season: yieldResults.season,
           emaWindow: parseInt(window),
-          emaBeans: BigInt(yieldResults.emaBeans[window]),
+          emaEffectiveWindow: effectiveWindow,
+          emaBeans: BigInt(yieldResults.ema[window].beansPerSeason),
           initType: apyInitType,
-          beanYield: yieldResults.yields[window][tokenAddr].bean,
-          stalkYield: yieldResults.yields[window][tokenAddr].stalk,
-          ownershipYield: yieldResults.yields[window][tokenAddr].ownership
+          beanYield: yieldResults.yields[effectiveWindow][tokenAddr].bean,
+          stalkYield: yieldResults.yields[effectiveWindow][tokenAddr].stalk,
+          ownershipYield: yieldResults.yields[effectiveWindow][tokenAddr].ownership
         });
       }
     }
@@ -23,15 +23,18 @@ class YieldModelAssembler {
   // The model is expected to also have Token association loaded, so the token address can be used
   static fromModels(yieldModels) {
     const yieldResult = {
-      beanstalk: C().BEANSTALK,
       season: yieldModels[0].season,
       yields: {},
-      emaBeans: {}
+      ema: {}
     };
     for (const model of yieldModels) {
       if (!yieldResult.yields[model.emaWindow]) {
         yieldResult.yields[model.emaWindow] = {};
-        yieldResult.emaBeans[model.emaWindow] = model.emaBeans;
+        yieldResult.ema[model.emaWindow] = {
+          effectiveWindow: model.emaEffectiveWindow,
+          beansPerSeason: model.emaBeans
+        };
+        yieldResult.initType = model.initType;
       }
       yieldResult.yields[model.emaWindow][model.Token.address] = {
         bean: model.beanYield,

@@ -1,9 +1,5 @@
-const { sequelize } = require('../../repository/postgres/models');
-const YieldModelAssembler = require('../../repository/postgres/models/assemblers/yield-assembler');
-const { ApyInitType } = require('../../repository/postgres/models/types/types');
-const YieldRepository = require('../../repository/postgres/queries/yield-repository');
-const SiloApyService = require('../../service/silo-apy');
 const SiloService = require('../../service/silo-service');
+const YieldService = require('../../service/yield-service');
 const Log = require('../../utils/logging');
 const OnSunriseUtil = require('../util/on-sunrise');
 
@@ -14,35 +10,9 @@ class SunriseTask {
     Log.info('Sunrise was processed by the subgraphs, proceeding.');
 
     // Update whitelisted token info
-    const tokens = await SiloService.updateWhitelistedTokenInfo();
-    const tokenAddrs = tokens.map((t) => t.address.toLowerCase());
+    const tokenModels = await SiloService.updateWhitelistedTokenInfo();
 
-    // Calculate latest yields
-    const [latestAvgApy, latestNewApy] = await Promise.all([
-      SiloApyService.getApy({
-        tokens: tokenAddrs,
-        options: {
-          initType: ApyInitType.AVERAGE
-        }
-      }),
-      SiloApyService.getApy({
-        tokens: tokenAddrs,
-        options: {
-          initType: ApyInitType.NEW
-        }
-      })
-    ]);
-
-    // Prepare rows
-    const yieldRows = [
-      ...YieldModelAssembler.toModels(latestAvgApy, ApyInitType.AVERAGE, tokens),
-      ...YieldModelAssembler.toModels(latestNewApy, ApyInitType.NEW, tokens)
-    ];
-
-    // Save new yields
-    await sequelize.transaction(async (transaction) => {
-      return await YieldRepository.addYields(yieldRows, { transaction });
-    });
+    await YieldService.saveSeasonalApys({ tokenModels });
   }
 }
 

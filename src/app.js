@@ -9,11 +9,12 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const { activateJobs } = require('./scheduled/cron-schedule.js');
 const { sequelize } = require('./repository/postgres/models/index.js');
-const { formatBigintHex } = require('./utils/bigint.js');
-const AsyncContext = require('./utils/context.js');
+const { formatBigintDecimal } = require('./utils/bigint.js');
+const AsyncContext = require('./utils/async/context.js');
 const EnvUtil = require('./utils/env.js');
 const ChainUtil = require('./utils/chain.js');
 const AlchemyUtil = require('./datasources/alchemy.js');
+const StartupSeeder = require('./repository/postgres/startup-seeders/startup-seeder.js');
 
 async function appStartup() {
   // Activate whichever cron jobs are configured, if any
@@ -26,10 +27,13 @@ async function appStartup() {
     await AlchemyUtil.ready(chain);
   }
 
-  const app = new Koa();
-
   // This can be useful for local development, though migrations should be used instead
   // sequelize.sync();
+
+  // Long-running async seeder process, the api will come online before this is complete.
+  StartupSeeder.seedDatabase();
+
+  const app = new Koa();
 
   app.use(
     cors({
@@ -60,7 +64,7 @@ async function appStartup() {
     }
     try {
       await next(); // pass control to the next function specified in .use()
-      ctx.body = JSON.stringify(ctx.body, formatBigintHex);
+      ctx.body = JSON.stringify(ctx.body, formatBigintDecimal);
       if (!ctx.originalUrl.includes('healthcheck')) {
         console.log(
           `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`

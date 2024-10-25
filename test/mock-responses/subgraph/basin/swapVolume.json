@@ -1,6 +1,7 @@
 {
   "swaps": [
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -18,6 +19,7 @@
       "timestamp": "1714937735"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -35,6 +37,7 @@
       "timestamp": "1714973123"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -52,6 +55,7 @@
       "timestamp": "1714975211"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -69,6 +73,7 @@
       "timestamp": "1714976867"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -86,6 +91,7 @@
       "timestamp": "1714983803"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -103,6 +109,7 @@
       "timestamp": "1714984139"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -120,6 +127,7 @@
       "timestamp": "1714984211"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -137,6 +145,7 @@
       "timestamp": "1714984235"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -154,6 +163,7 @@
       "timestamp": "1714999859"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },
@@ -171,6 +181,7 @@
       "timestamp": "1715000567"
     },
     {
+      "id": "1",
       "well": {
         "id": "0xbea0e11282e2bb5893bece110cf199501e872bad"
       },

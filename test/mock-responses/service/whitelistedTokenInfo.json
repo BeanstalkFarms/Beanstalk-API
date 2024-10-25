@@ -1,0 +1,227 @@
+{
+  "0xbea00aa8130acad047e137ec68693c005f8736ce": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "134912",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "37701578769",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": "-1667",
+    "gaugePoints": "580000000000000000000",
+    "optimalPercentDepositedBdv": "16000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "37701578769",
+    "bdv": "1000000"
+  },
+  "0xbea00bbe8b5da39a3f57824a1a13ec2a8848d74f": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "6250301",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "11079628426",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": "306",
+    "gaugePoints": "700000000000000000000",
+    "optimalPercentDepositedBdv": "26000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "11079628426",
+    "bdv": "2000000"
+  },
+  "0xbea00cc9f93e9a8ac0dfdff2d64ba38eb9c2e48c": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "1",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "210",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": 0,
+    "gaugePoints": "1000000000000000000000",
+    "optimalPercentDepositedBdv": "14000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "210",
+    "bdv": "3000000"
+  },
+  "0xbea00dde4b34acdcb1a30442bd2b39ca8be1b09c": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "1",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "210",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": 0,
+    "gaugePoints": "1000000000000000000000",
+    "optimalPercentDepositedBdv": "20000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "210",
+    "bdv": "3000000"
+  },
+  "0xbea00ee04d8289aed04f92ea122a96dc76a91bd7": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "176510",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "26086731774",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": "-2181",
+    "gaugePoints": "580000000000000000000",
+    "optimalPercentDepositedBdv": "12000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "26086731774",
+    "bdv": "4000000"
+  },
+  "0xbea00ff437ca7e8354b174339643b4d1814bed33": {
+    "selector": "3360454439",
+    "stalkEarnedPerSeason": "1",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "210",
+    "encodeType": "1",
+    "deltaStalkEarnedPerSeason": 0,
+    "gaugePoints": "1000000000000000000000",
+    "optimalPercentDepositedBdv": "12000000",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "210",
+    "bdv": "5000000"
+  },
+  "0x1bea054dddbca12889e07b3e076f511bf1d27543": {
+    "selector": "3368919712",
+    "stalkEarnedPerSeason": "1",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "21797",
+    "milestoneStem": "0",
+    "encodeType": "0",
+    "deltaStalkEarnedPerSeason": "1",
+    "gaugePoints": "0",
+    "optimalPercentDepositedBdv": "0",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "3542",
+    "bdv": "6000000"
+  },
+  "0x1bea059c3ea15f6c10be1c53d70c75fd1266d788": {
+    "selector": "2965515185",
+    "stalkEarnedPerSeason": "1",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "21797",
+    "milestoneStem": "0",
+    "encodeType": "0",
+    "deltaStalkEarnedPerSeason": "1",
+    "gaugePoints": "0",
+    "optimalPercentDepositedBdv": "0",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "3542",
+    "bdv": "7000000"
+  },
+  "0xbea0005b8599265d41256905a9b3073d397812e4": {
+    "selector": "1510251079",
+    "stalkEarnedPerSeason": "6250301",
+    "stalkIssuedPerBdv": "10000000000",
+    "milestoneSeason": "25339",
+    "milestoneStem": "41223652137",
+    "encodeType": "0",
+    "deltaStalkEarnedPerSeason": "306",
+    "gaugePoints": "0",
+    "optimalPercentDepositedBdv": "0",
+    "gaugePointImplementation": [
+      "0",
+      "3837319202",
+      "0",
+      "0"
+    ],
+    "liquidityWeightImplementation": [
+      "0",
+      "744464920",
+      "0",
+      "0"
+    ],
+    "stemTip": "41223652137",
+    "bdv": "1000000"
+  }
+}

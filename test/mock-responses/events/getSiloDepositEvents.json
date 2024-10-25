@@ -1,0 +1,42 @@
+[
+  {
+    "type": 1,
+    "account": "abc",
+    "token": "beantoken",
+    "stem": "-123456",
+    "amount": "5000000",
+    "bdv": "5000000"
+  },
+  {
+    "type": -1,
+    "account": "abc",
+    "token": "beantoken",
+    "stem": "-123456",
+    "amount": "500000",
+    "bdv": "5000000"
+  },
+  {
+    "type": -1,
+    "account": "def",
+    "token": "beantoken",
+    "stem": "10",
+    "amount": "1600000",
+    "bdv": "1600000"
+  },
+  {
+    "type": 1,
+    "account": "ghi",
+    "token": "urbean",
+    "stem": "-123456",
+    "amount": "5000000",
+    "bdv": "5000000"
+  },
+  {
+    "type": -1,
+    "account": "ghi",
+    "token": "urbean",
+    "stem": "-123456",
+    "amount": "5000000",
+    "bdv": "5000000"
+  }
+]
