@@ -41,6 +41,15 @@ router.post('/yield', async (ctx) => {
     throw new InputError('Invalid `tokens` property was provided.');
   }
 
+  if (body.options?.initUserValues) {
+    if (!body.tokens) {
+      throw new InputError('`tokens` must be provided when `options.initUserValues` is provided.');
+    }
+    if (body.tokens.length !== body.options.initUserValues.length) {
+      throw new InputError('Cardinality mismatch: `tokens` and `options.initUserValues`.');
+    }
+  }
+
   if (body.options?.ema) {
     if (!body.emaWindows) {
       throw new InputError('`emaWindows` must be provided when `options.ema` is provided.');
