@@ -45,7 +45,7 @@ class DepositRepository {
 
   // Inserts/Updates the given deposit rows
   static async upsertDeposits(deposits) {
-    const TAG = 'upsertDeposits';
+    const TAG = Concurrent.tag('upsertDeposits');
     for (const row of deposits) {
       await Concurrent.run(TAG, 50, async () => {
         await sequelize.models.Deposit.upsert(row, {

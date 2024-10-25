@@ -143,7 +143,7 @@ class SiloService {
   static async getMowStems(accountTokenPairs, blockNumber) {
     const results = {};
     const beanstalk = Contracts.getBeanstalk();
-    const TAG = 'getMowStems';
+    const TAG = Concurrent.tag('getMowStems');
     for (let i = 0; i < accountTokenPairs.length; ++i) {
       const { account, token } = accountTokenPairs[i];
       await Concurrent.run(TAG, 50, async () => {
@@ -163,7 +163,7 @@ class SiloService {
     const results = [];
     results.length = calldata.tokens.length;
 
-    const TAG = 'batchBdvs';
+    const TAG = Concurrent.tag('batchBdvs');
     for (let i = 0; i < tokenBatches.length; i++) {
       const batchTokens = tokenBatches[i];
       const batchAmounts = amountBatches[i];

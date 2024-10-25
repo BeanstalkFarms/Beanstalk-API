@@ -1,6 +1,6 @@
 // Allows high levels of concurrency by continually running up to a maximum number of requests,
 // as opposed to waiting for the existing batch to complete before continuing.
-// Usage: likely in a loop: await Concurrent.run('uniqueId', 50, async () => {});
+// Usage: likely in a loop: await Concurrent.run('uniqueId-timestamp', 50, async () => {});
 // When all have been started, need to await the completion with: await Concurrent.allResolved('uniqueId');
 class Concurrent {
   static running = {};
@@ -40,6 +40,10 @@ class Concurrent {
     });
   }
 
+  static tag(name) {
+    return `${name}-${Date.now()}`;
+  }
+
   static allResolved(id) {
     if (this.running[id] === undefined) {
       // Nothing with this id ever got ran
@@ -48,13 +52,14 @@ class Concurrent {
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         if (this.running[id] === 0 && this.queue[id].length === 0) {
+          const errors = this.errors[id];
+          this._clearState(id);
           clearInterval(interval);
-          if (this.errors[id].length === 0) {
+          if (errors.length === 0) {
             resolve();
           } else {
             reject(`Failed with errors: ${this.errors[id]}`);
           }
-          this.errors[id].length = 0;
         }
       }, 50);
     });
@@ -68,9 +73,9 @@ class Concurrent {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         if (this.running[id] === 0 && this.queue[id].length === 0) {
+          this._clearState(id);
           clearInterval(interval);
           resolve();
-          this.errors[id].length = 0;
         }
       }, 50);
     });
@@ -80,6 +85,13 @@ class Concurrent {
     if (this.queue[id].length > 0) {
       this.queue[id].shift()();
     }
+  }
+
+  static _clearState(id) {
+    delete this.running[id];
+    delete this.queue[id];
+    delete this.runCount[id];
+    delete this.errors[id];
   }
 }
 module.exports = Concurrent;

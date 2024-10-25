@@ -9,7 +9,7 @@ class ApySeeder {
 
     // Calculate and save all vapys for each season (this will take a long time)
     // Currently Pre-exploit seasons are expected to fail
-    const TAG = 'apySeeder';
+    const TAG = Concurrent.tag('apySeeder');
     for (const season of missingSeasons) {
       try {
         // TODO: This can be increased once the decentralized subgraphs are deployed + the rate limit is increased
