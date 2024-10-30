@@ -23,3 +23,7 @@ To run the databse inside Docker and the API on the host machine (faster for tes
 3. Start the postgres container with `npm run docker:postgres`.
 4. To run the application, `npm start`
 5. The database can be stopped with `npm run docker:stop`.
+
+## License
+
+[MIT](https://github.com/BeanstalkFarms/Beanstalk/blob/master/LICENSE.txt)
