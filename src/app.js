@@ -68,11 +68,11 @@ async function appStartup() {
       // GraphQL handles its own JSON serialization
       if (!ctx.originalUrl.includes('/graphql')) {
         ctx.body = JSON.stringify(ctx.body, formatBigintDecimal);
-      }
-      if (!ctx.originalUrl.includes('healthcheck')) {
-        console.log(
-          `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`
-        );
+        if (!ctx.originalUrl.includes('healthcheck')) {
+          console.log(
+            `${new Date().toISOString()} [success] ${ctx.method} ${ctx.originalUrl} - ${ctx.status} - Response Body: ${ctx.body}`
+          );
+        }
       }
     } catch (err) {
       if (!(err instanceof Error)) {
