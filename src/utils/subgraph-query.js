@@ -23,8 +23,11 @@ class SubgraphQueryUtil {
     const retval = [];
     while (pagination.lastValue !== undefined) {
       // Construct arguments for pagination
-      const whereClause = `{${pagination.field}${whereSuffix}: ${formatType(pagination.lastValue)}, ${where}}`;
-      const paginateArguments = `(${block} where: ${whereClause} first: ${PAGE_SIZE} orderBy: ${pagination.field} orderDirection: ${pagination.direction})`;
+      // For nested field pagination, pagination.field could be something like "season_: {season" (see basin subgraph)
+      const numOpenBraces = (pagination.field.match(new RegExp(`\\{`, 'g')) || []).length;
+      const whereClause = `{${pagination.field}${whereSuffix}: ${formatType(pagination.lastValue)}${'}'.repeat(numOpenBraces)}, ${where}}`;
+
+      const paginateArguments = `(${block} where: ${whereClause} first: ${PAGE_SIZE} orderBy: ${pagination.orderBy ?? pagination.field} orderDirection: ${pagination.direction})`;
       let entityName = '';
       // Add the generated arguments to the query
       const paginatedQuery = query.replace(/(\w+)\s{/, (match, p1) => {
@@ -50,7 +53,13 @@ class SubgraphQueryUtil {
         }
       }
       prevPageIds = pageIds;
-      pagination.lastValue = result[entityName][PAGE_SIZE - 1]?.[pagination.field];
+      if (!result[entityName][PAGE_SIZE - 1]) {
+        break;
+      } else {
+        pagination.lastValue =
+          pagination.objectAccessor?.(result[entityName][PAGE_SIZE - 1]) ??
+          result[entityName][PAGE_SIZE - 1][pagination.field];
+      }
     }
     return retval;
   }

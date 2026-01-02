@@ -8,7 +8,7 @@ services:
       - "${KOAJS_PORT}:3000"
     env_file:
       - .env
-    entrypoint: ["./entrypoint-proxy.sh", "postgres", "5432", "npm", "start"]
+    entrypoint: ["./entrypoint-proxy.sh", "postgres", "5432", "redis", "6379", "npm", "start"]
     restart: no
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
@@ -25,3 +25,11 @@ services:
       POSTGRES_PASSWORD: beanstalk
     volumes:
       - ./.data/${DOCKER_ENV}/postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./.data/${DOCKER_ENV}/redis:/data
+    restart: unless-stopped
