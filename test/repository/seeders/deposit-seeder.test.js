@@ -7,7 +7,7 @@ const SiloService = require('../../../src/service/silo-service');
 const AsyncContext = require('../../../src/utils/async/context');
 const Log = require('../../../src/utils/logging');
 const { allToBigInt } = require('../../../src/utils/number');
-const { mockBeanstalkSG } = require('../../util/mock-sg');
+const { mockBeanstalkSG, mockWrappedSgReturnData } = require('../../util/mock-sg');
 
 describe('Deposit Seeder', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('Deposit Seeder', () => {
   });
   test('Seeds all deposits', async () => {
     const depositsResponse = require('../../mock-responses/subgraph/silo-service/allDeposits.json');
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(depositsResponse);
+    jest.spyOn(mockBeanstalkSG, 'rawRequest').mockResolvedValueOnce(mockWrappedSgReturnData(depositsResponse));
 
     const whitelistInfoResponse = allToBigInt(require('../../mock-responses/service/whitelistedTokenInfo.json'));
     jest.spyOn(SiloService, 'getWhitelistedTokenInfo').mockResolvedValue(whitelistInfoResponse);

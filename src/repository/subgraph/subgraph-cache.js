@@ -1,5 +1,6 @@
 const { C } = require('../../constants/runtime-constants');
 const redisClient = require('../../datasources/redis-client');
+const { sendWebhookMessage } = require('../../utils/discord');
 const Log = require('../../utils/logging');
 const SubgraphQueryUtil = require('../../utils/subgraph-query');
 const { SG_CACHE_CONFIG } = require('./cache-config');
@@ -7,10 +8,16 @@ const CommonSubgraphRepository = require('./common-subgraph');
 
 // Caches past season results for configured queries, enabling retrieval of the full history to be fast
 class SubgraphCache {
+  // Introspection is required at runtime to build the schema.
+  // If the schema of an underlying subgraph changes, the API must be redeployed (or apollo restarted).
+  // Therefore the schema can be cached here rather than retrieved at runtime on each request.
+  static initialIntrospection = {};
+  static introspectionDeployment = {};
+
   static async get(cacheQueryName, where) {
     const sgName = SG_CACHE_CONFIG[cacheQueryName].subgraph;
 
-    const introspection = await this.introspect(sgName);
+    const introspection = this.initialIntrospection[sgName];
 
     const { latest, cache } = await this._getCachedResults(cacheQueryName, where);
     const freshResults = await this._queryFreshResults(cacheQueryName, where, latest, introspection);
@@ -64,14 +71,17 @@ class SubgraphCache {
     }
 
     if (!fromCache) {
-      Log.info(`New deployment detected; clearing subgraph cache for ${sgName}`);
-      await this.clear(sgName);
-
-      await redisClient.set(`sg-deployment:${sgName}`, deployment);
-      await redisClient.set(`sg-introspection:${sgName}`, JSON.stringify(queryInfo));
+      await this._newDeploymentDetected(sgName, deployment);
     }
 
-    return queryInfo;
+    this.introspectionDeployment[sgName] = deployment;
+    return (this.initialIntrospection[sgName] = queryInfo);
+  }
+
+  static async _newDeploymentDetected(sgName, deployment) {
+    Log.info(`New deployment detected; clearing subgraph cache for ${sgName}`);
+    await this.clear(sgName);
+    await redisClient.set(`sg-deployment:${sgName}`, deployment);
   }
 
   // Recursively build a type string to use in the re-exported schema
@@ -88,7 +98,8 @@ class SubgraphCache {
 
   static async _getCachedResults(cacheQueryName, where) {
     const cfg = SG_CACHE_CONFIG[cacheQueryName];
-    const cachedResults = JSON.parse(await redisClient.get(`sg:${cfg.subgraph}:${cacheQueryName}:${where}`)) ?? [];
+    const redisResult = await redisClient.get(`sg:${cfg.subgraph}:${cacheQueryName}:${where}`);
+    const cachedResults = JSON.parse(redisResult) ?? [];
 
     return {
       latest:
@@ -101,8 +112,9 @@ class SubgraphCache {
 
   static async _queryFreshResults(cacheQueryName, where, latestValue, introspection, c = C()) {
     const cfg = SG_CACHE_CONFIG[cacheQueryName];
+    const sgClient = cfg.client(c);
     const results = await SubgraphQueryUtil.allPaginatedSG(
-      cfg.client(c),
+      sgClient,
       `{ ${cfg.queryName} { ${introspection[cacheQueryName].fields
         .filter((f) => !cfg.omitFields?.includes(f.name))
         .concat(cfg.syntheticFields?.map((f) => ({ name: f.queryAccessor })) ?? [])
@@ -112,6 +124,14 @@ class SubgraphCache {
       where,
       { ...cfg.paginationSettings, lastValue: latestValue }
     );
+
+    // If new deployment detected, clear the cache and send an alert that API might need restarting
+    if (sgClient.meta.deployment !== this.introspectionDeployment[cfg.subgraph]) {
+      sendWebhookMessage(
+        `New deployment detected for ${cfg.subgraph}, the API might need to be restarted (if the schema changed).`
+      );
+      await this._newDeploymentDetected(cfg.subgraph, sgClient.meta.deployment);
+    }
 
     for (const result of results) {
       for (const syntheticField of cfg.syntheticFields ?? []) {

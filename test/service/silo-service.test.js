@@ -6,7 +6,7 @@ const {
 } = require('../../src/constants/raw/beanstalk-eth');
 const Contracts = require('../../src/datasources/contracts/contracts');
 const whitelistedSGResponse = require('../mock-responses/subgraph/silo-service/whitelistedTokens.json');
-const { mockBeanstalkSG } = require('../util/mock-sg');
+const { mockBeanstalkSG, mockWrappedSgReturnData } = require('../util/mock-sg');
 
 const defaultOptions = { blockNumber: 19000000 };
 
@@ -31,7 +31,7 @@ describe('SiloService', () => {
       })
     };
 
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'rawRequest').mockResolvedValueOnce(mockWrappedSgReturnData(whitelistedSGResponse));
     jest.spyOn(Contracts, 'getBeanstalk').mockReturnValue(mockBeanstalk);
 
     const grownStalk = await getMigratedGrownStalk(accounts, defaultOptions);
@@ -45,8 +45,8 @@ describe('SiloService', () => {
     const accounts = ['0xabcd', '0x1234'];
 
     const siloSGResponse = require('../mock-responses/subgraph/silo-service/depositedBdvs.json');
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(siloSGResponse);
-    jest.spyOn(mockBeanstalkSG, 'request').mockResolvedValueOnce(whitelistedSGResponse);
+    jest.spyOn(mockBeanstalkSG, 'rawRequest').mockResolvedValueOnce(mockWrappedSgReturnData(siloSGResponse));
+    jest.spyOn(mockBeanstalkSG, 'rawRequest').mockResolvedValueOnce(mockWrappedSgReturnData(whitelistedSGResponse));
 
     const mockBeanstalk = {
       stemTipForToken: jest.fn().mockImplementation((token, options) => {
