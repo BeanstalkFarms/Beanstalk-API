@@ -1,4 +1,3 @@
-const { C } = require('../../constants/runtime-constants');
 const redisClient = require('../../datasources/redis-client');
 const { sendWebhookMessage } = require('../../utils/discord');
 const Log = require('../../utils/logging');
@@ -110,8 +109,9 @@ class SubgraphCache {
     };
   }
 
-  static async _queryFreshResults(cacheQueryName, where, latestValue, introspection, c = C()) {
+  static async _queryFreshResults(cacheQueryName, where, latestValue, introspection) {
     const cfg = SG_CACHE_CONFIG[cacheQueryName];
+    const c = cfg.selectC(latestValue);
     const sgClient = cfg.client(c);
     const results = await SubgraphQueryUtil.allPaginatedSG(
       sgClient,
@@ -137,6 +137,18 @@ class SubgraphCache {
       for (const syntheticField of cfg.syntheticFields ?? []) {
         result[syntheticField.objectRewritePath] = syntheticField.objectAccessor(result);
       }
+    }
+
+    if (c.CHAIN === 'eth') {
+      // Continue to query the arbitrum subgraph
+      results.push(
+        ...(await this._queryFreshResults(
+          cacheQueryName,
+          where,
+          results[results.length - 1][cfg.paginationSettings.objectField ?? cfg.paginationSettings.field],
+          introspection
+        ))
+      );
     }
     return results;
   }
