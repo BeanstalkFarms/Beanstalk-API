@@ -141,17 +141,15 @@ class SubgraphCache {
     }
 
     if (c.CHAIN === 'eth') {
-      // Continue to query the arbitrum subgraph
-      results.push(
-        ...(await this._queryFreshResults(
-          cacheQueryName,
-          where,
-          // Result for eth subgraph could be empty if none matched the where clause
-          results[results.length - 1]?.[cfg.paginationSettings.objectField ?? cfg.paginationSettings.field] ??
-            cfg.paginationSettings.arbStart,
-          introspection
-        ))
-      );
+      // Continue to query the next subgraph if there are more results
+      // Result for either subgraph could be empty if none matched the where clause
+      const nextLastValue =
+        results[results.length - 1]?.[cfg.paginationSettings.objectField ?? cfg.paginationSettings.field] ??
+        cfg.paginationSettings.arbStart;
+      const nextC = cfg.selectC(nextLastValue);
+      if (nextC.CHAIN !== c.CHAIN) {
+        results.push(...(await this._queryFreshResults(cacheQueryName, where, nextLastValue, introspection)));
+      }
     }
     return results;
   }
