@@ -113,6 +113,7 @@ class SubgraphCache {
     const cfg = SG_CACHE_CONFIG[cacheQueryName];
     const c = cfg.selectC(latestValue);
     const sgClient = cfg.client(c);
+    const prevDeployment = sgClient.meta?.deployment;
     const results = await SubgraphQueryUtil.allPaginatedSG(
       sgClient,
       `{ ${cfg.queryName} { ${introspection[cacheQueryName].fields
@@ -126,7 +127,7 @@ class SubgraphCache {
     );
 
     // If new deployment detected, clear the cache and send an alert that API might need restarting
-    if (sgClient.meta.deployment !== this.introspectionDeployment[cfg.subgraph]) {
+    if (!!prevDeployment && prevDeployment !== sgClient.meta.deployment) {
       sendWebhookMessage(
         `New deployment detected for ${cfg.subgraph}, the API might need to be restarted (if the schema changed).`
       );
