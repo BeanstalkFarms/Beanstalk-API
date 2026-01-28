@@ -26,73 +26,78 @@ const selectC = (latestValue) => {
   }
 };
 
-// TODO: Need to add something to accommodate different protocol address changing between L1->L2.
-// Relevant to several of the queries.
-
 // Must be List queries that dont require explicitly provided id (in subgraph framework, usually ending in 's')
 const SG_CACHE_CONFIG = {
   //////// BEANSTALK SUBGRAPH /////////
   cache_siloHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'siloHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['silo']
+    omitFields: ['silo'],
+    selectC,
+    rewriteWhere: (where, c) => {
+      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
+    }
   },
   cache_fieldHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'fieldHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['field']
+    omitFields: ['field'],
+    selectC,
+    rewriteWhere: (where, c) => {
+      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
+    }
   },
   cache_podMarketplaceHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'podMarketplaceHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['podMarketplace']
+    omitFields: ['podMarketplace'],
+    selectC
   },
   cache_seasons: {
     subgraph: 'beanstalk',
     queryName: 'seasons',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['beanstalk']
+    omitFields: ['beanstalk'],
+    selectC
   },
   cache_siloAssetHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'siloAssetHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['siloAsset']
+    omitFields: ['siloAsset'],
+    selectC,
+    rewriteWhere: (where, c) => {
+      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
+    }
   },
   cache_unripeTokenHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'unripeTokenHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['underlyingToken', 'unripeToken']
+    omitFields: ['underlyingToken', 'unripeToken'],
+    selectC
   },
   cache_whitelistTokenHourlySnapshots: {
     subgraph: 'beanstalk',
     queryName: 'whitelistTokenHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
-    omitFields: ['token']
+    omitFields: ['token'],
+    selectC
   },
   //////// BEAN SUBGRAPH /////////
   cache_beanHourlySnapshots: {
     subgraph: 'bean',
     queryName: 'beanHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEAN,
     paginationSettings: paginationSettings('season_: {season', {
       objectField: 'season',
@@ -107,12 +112,12 @@ const SG_CACHE_CONFIG = {
         objectRewritePath: 'season',
         typeName: 'Int!'
       }
-    ]
+    ],
+    selectC
   },
   cache_poolHourlySnapshots: {
     subgraph: 'bean',
     queryName: 'poolHourlySnapshots',
-    selectC,
     client: (c) => c.SG.BEAN,
     paginationSettings: paginationSettings('season_: {season', {
       objectField: 'season',
@@ -127,7 +132,8 @@ const SG_CACHE_CONFIG = {
         objectRewritePath: 'season',
         typeName: 'Int!'
       }
-    ]
+    ],
+    selectC
   }
 };
 

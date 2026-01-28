@@ -121,7 +121,7 @@ class SubgraphCache {
         .map((f) => f.name)
         .join(' ')} } }`,
       '',
-      where,
+      cfg.rewriteWhere?.(where, c) ?? where,
       { ...cfg.paginationSettings, lastValue: latestValue }
     );
 
