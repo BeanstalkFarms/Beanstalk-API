@@ -146,7 +146,9 @@ class SubgraphCache {
         ...(await this._queryFreshResults(
           cacheQueryName,
           where,
-          results[results.length - 1][cfg.paginationSettings.objectField ?? cfg.paginationSettings.field],
+          // Result for eth subgraph could be empty if none matched the where clause
+          results[results.length - 1]?.[cfg.paginationSettings.objectField ?? cfg.paginationSettings.field] ??
+            cfg.paginationSettings.arbStart,
           introspection
         ))
       );
@@ -158,7 +160,11 @@ class SubgraphCache {
     const cfg = SG_CACHE_CONFIG[cacheQueryName];
     // The final element was re-retrieved and included in the fresh results.
     const aggregated = [...cachedResults.slice(0, -1), ...freshResults];
-    await redisClient.set(`sg:${cfg.subgraph}:${cacheQueryName}:${where}`, JSON.stringify(aggregated));
+    await redisClient.set(
+      `sg:${cfg.subgraph}:${cacheQueryName}:${where}`,
+      JSON.stringify(aggregated),
+      { EX: 60 * 60 * 24 * 30 } // ~30 days
+    );
     return aggregated;
   }
 }

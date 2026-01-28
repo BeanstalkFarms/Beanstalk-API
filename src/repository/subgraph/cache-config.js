@@ -7,7 +7,9 @@ const paginationSettings = (fieldName, { objectField, objectAccessor, orderBy } 
   // For synthetic fields
   objectField,
   objectAccessor,
-  orderBy: orderBy ?? fieldName
+  orderBy: orderBy ?? fieldName,
+  // For multiple subgraphs
+  arbStart: C('arb').MILESTONE.startSeason
 });
 
 // For multi subgraphs:
