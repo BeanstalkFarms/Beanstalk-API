@@ -32,4 +32,3 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - ./.data/${DOCKER_ENV}/redis:/data
-    restart: unless-stopped

@@ -16,9 +16,16 @@ class SubgraphClients {
 
   // let callNumber = 1;
   static fromUrl(url) {
-    return async (query) => {
+    const requestFunction = async (query) => {
       const client = this._getClient(url);
-      const response = await client.request(query);
+      const res = await client.rawRequest(query);
+
+      // Attach response metadata to the client function
+      requestFunction.meta = {
+        version: res.headers.get('x-version'),
+        deployment: res.headers.get('x-deployment'),
+        indexedBlock: res.headers.get('x-indexed-block')
+      };
 
       // if (EnvUtil.getDeploymentEnv() === 'local') {
       //   // Use this to assist in mocking. Should be commented in/out as needed.
@@ -28,8 +35,9 @@ class SubgraphClients {
       //   );
       //   console.log('wrote subgraph output to test directory');
       // }
-      return response;
+      return res.data;
     };
+    return requestFunction;
   }
 
   static _getClient(url) {

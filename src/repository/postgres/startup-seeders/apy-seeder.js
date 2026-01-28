@@ -4,6 +4,10 @@ const Log = require('../../../utils/logging');
 
 class ApySeeder {
   static async run() {
+    if (process.env.DISABLE_APY_SEEDER) {
+      Log.info('Apy seeder is disabled. Skipping...');
+      return;
+    }
     // Find all missing seasons
     let missingSeasons = await YieldService.findMissingSeasons();
 
