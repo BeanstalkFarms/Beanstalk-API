@@ -35,7 +35,7 @@ class GraphQLSchema {
         ${Object.keys(introspection)
           .map(
             (query) =>
-              `${query}(where: String, orderBy: String, orderDirection: String, skip: Int, first: Int): [${introspection[query].type}!]!`
+              `${query}(where: String, orderBy: String, orderDirection: String, skip: Int, first: Int): [Cached${introspection[query].type}!]!`
           )
           .join('\n')}
       }
