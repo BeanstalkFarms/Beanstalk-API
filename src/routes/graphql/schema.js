@@ -18,7 +18,7 @@ class GraphQLSchema {
       scalar Bytes
       ${Object.keys(introspection).map(
         (query) =>
-          `type ${introspection[query].type} {
+          `type Cached${introspection[query].type} {
             ${introspection[query].fields
               .filter((f) => !SG_CACHE_CONFIG[query].omitFields?.includes(f.name))
               .concat(
