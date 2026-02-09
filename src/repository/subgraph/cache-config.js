@@ -32,6 +32,8 @@ const rewriteWhere = (where, c) => {
   return where
     .replace('__protocol__', `${c.BEANSTALK}`)
     .replace('__bean__', `${c.BEAN}`)
+    .replace('__beanweth__', `${c.BEANWETH}`)
+    .replace('__beanwsteth__', `${c.BEANWSTETH}`)
     .replace('__urbean__', `${c.UNRIPE_BEAN}`)
     .replace('__urlp__', `${c.UNRIPE_LP}`);
 };
