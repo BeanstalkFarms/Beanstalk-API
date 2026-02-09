@@ -28,6 +28,14 @@ const selectC = (latestValue) => {
   }
 };
 
+const rewriteWhere = (where, c) => {
+  return where
+    .replace('__protocol__', `"${c.BEANSTALK}"`)
+    .replace('__bean__', `"${c.BEAN}"`)
+    .replace('__urbean__', `"${c.UNRIPE_BEAN}"`)
+    .replace('__urlp__', `"${c.UNRIPE_LP}"`);
+};
+
 // Must be List queries that dont require explicitly provided id (in subgraph framework, usually ending in 's')
 const SG_CACHE_CONFIG = {
   //////// BEANSTALK SUBGRAPH /////////
@@ -38,9 +46,7 @@ const SG_CACHE_CONFIG = {
     paginationSettings: paginationSettings('season'),
     omitFields: ['silo'],
     selectC,
-    rewriteWhere: (where, c) => {
-      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
-    }
+    rewriteWhere
   },
   cache_fieldHourlySnapshots: {
     subgraph: 'beanstalk',
@@ -49,9 +55,7 @@ const SG_CACHE_CONFIG = {
     paginationSettings: paginationSettings('season'),
     omitFields: ['field'],
     selectC,
-    rewriteWhere: (where, c) => {
-      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
-    }
+    rewriteWhere
   },
   cache_podMarketplaceHourlySnapshots: {
     subgraph: 'beanstalk',
@@ -59,7 +63,8 @@ const SG_CACHE_CONFIG = {
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
     omitFields: ['podMarketplace'],
-    selectC
+    selectC,
+    rewriteWhere
   },
   cache_seasons: {
     subgraph: 'beanstalk',
@@ -67,7 +72,8 @@ const SG_CACHE_CONFIG = {
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
     omitFields: ['beanstalk'],
-    selectC
+    selectC,
+    rewriteWhere
   },
   cache_siloAssetHourlySnapshots: {
     subgraph: 'beanstalk',
@@ -76,9 +82,7 @@ const SG_CACHE_CONFIG = {
     paginationSettings: paginationSettings('season'),
     omitFields: ['siloAsset'],
     selectC,
-    rewriteWhere: (where, c) => {
-      return where.replace('__protocol__', `"${c.BEANSTALK}"`);
-    }
+    rewriteWhere
   },
   cache_unripeTokenHourlySnapshots: {
     subgraph: 'beanstalk',
@@ -86,7 +90,8 @@ const SG_CACHE_CONFIG = {
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
     omitFields: ['underlyingToken', 'unripeToken'],
-    selectC
+    selectC,
+    rewriteWhere
   },
   cache_whitelistTokenHourlySnapshots: {
     subgraph: 'beanstalk',
@@ -94,7 +99,17 @@ const SG_CACHE_CONFIG = {
     client: (c) => c.SG.BEANSTALK,
     paginationSettings: paginationSettings('season'),
     omitFields: ['token'],
-    selectC
+    selectC,
+    rewriteWhere
+  },
+  cache_tokenYields: {
+    subgraph: 'beanstalk',
+    queryName: 'tokenYields',
+    client: (c) => c.SG.BEANSTALK,
+    paginationSettings: paginationSettings('season'),
+    omitFields: ['siloYield'],
+    selectC,
+    rewriteWhere
   },
   //////// BEAN SUBGRAPH /////////
   cache_beanHourlySnapshots: {
@@ -115,7 +130,8 @@ const SG_CACHE_CONFIG = {
         typeName: 'Int!'
       }
     ],
-    selectC
+    selectC,
+    rewriteWhere
   },
   cache_poolHourlySnapshots: {
     subgraph: 'bean',
@@ -135,7 +151,8 @@ const SG_CACHE_CONFIG = {
         typeName: 'Int!'
       }
     ],
-    selectC
+    selectC,
+    rewriteWhere
   }
 };
 
