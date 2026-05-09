@@ -1,6 +1,7 @@
 require('dotenv').config();
 const ChainUtil = require('./chain');
 
+const CUSTOM_RPC = process.env.CUSTOM_RPC;
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 const GRAPH_API_KEY = process.env.GRAPH_API_KEY;
 
@@ -50,6 +51,10 @@ class EnvUtil {
 
   static defaultChain() {
     return ENABLED_CHAINS[0];
+  }
+
+  static getCustomRpcUrl(chain) {
+    return CUSTOM_RPC?.split(',')[EnvUtil.getEnabledChains().indexOf(chain)];
   }
 
   static getAlchemyKey() {

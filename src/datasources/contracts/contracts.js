@@ -1,5 +1,6 @@
 const { Contract: AlchemyContract } = require('alchemy-sdk');
 const { C } = require('../../constants/runtime-constants');
+const RpcCache = require('../rpc-cache');
 const SuperContract = require('./super-contract');
 const wellFunctionAbi = require('../../datasources/abi/basin/WellFunction.json');
 
@@ -20,10 +21,11 @@ class Contracts {
 
   static makeContract(address, abi, provider) {
     const underlyingContract = new AlchemyContract(address, abi, provider);
-    return new SuperContract(underlyingContract);
+    return RpcCache.wrapContract(new SuperContract(underlyingContract), address);
   }
 
   static _getDefaultContract(address, c = C()) {
+    address = address.toLowerCase();
     const network = c.CHAIN;
     const key = JSON.stringify({ address, network });
     if (!Contracts._contracts[key]) {
