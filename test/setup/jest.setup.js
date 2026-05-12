@@ -3,12 +3,14 @@ jest.mock('../../src/utils/env', () => {
   return {
     isChainEnabled: jest.fn(),
     defaultChain: jest.fn().mockReturnValue('eth'),
+    getCustomRpcUrl: jest.fn(),
     getAlchemyKey: jest.fn(),
     getEnabledChains: jest.fn(),
     getEnabledCronJobs: jest.fn(),
     getDeploymentEnv: jest.fn(),
     getDiscordWebhooks: jest.fn(),
     getDiscordPrefix: jest.fn(),
+    getRedisUrl: jest.fn().mockReturnValue('redis://localhost:6379'),
     getSG: jest.fn().mockImplementation(() => ({
       BEANSTALK: 'a',
       BEAN: 'b',

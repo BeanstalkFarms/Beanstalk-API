@@ -1,12 +1,12 @@
 const { C } = require('../constants/runtime-constants');
 const Contracts = require('../datasources/contracts/contracts');
+const Multicall = require('../datasources/contracts/multicall');
 const TokenRepository = require('../repository/postgres/queries/token-repository');
 const BeanstalkSubgraphRepository = require('../repository/subgraph/beanstalk-subgraph');
 const ArraysUtil = require('../utils/arrays');
 const BlockUtil = require('../utils/block');
 const Concurrent = require('../utils/async/concurrent');
 const { createNumberSpread } = require('../utils/number');
-const PromiseUtil = require('../utils/async/promise');
 const AsyncContext = require('../utils/async/context');
 
 class SiloService {
@@ -118,22 +118,26 @@ class SiloService {
     const tokenModels = await TokenRepository.findWhitelistedTokens(chain);
     const addresses = tokenModels.map((t) => t.address);
 
-    const results = await Promise.all(
-      addresses.map(async (t) => {
-        const [tokenSetting, stemTip, bdv] = await Promise.all([
-          beanstalk.tokenSettings(t, { blockTag: block }),
-          beanstalk.stemTipForToken(t, { blockTag: block }),
-          PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(t, BigInt(10 ** C().DECIMALS[t]), { blockTag: block }))
-        ]);
-        return { tokenSetting, stemTip, bdv };
-      })
+    const multicallResults = await Multicall.aggregate(
+      addresses.flatMap((t) => [
+        { contract: beanstalk, method: 'tokenSettings', args: [t], blockTag: block },
+        { contract: beanstalk, method: 'stemTipForToken', args: [t], blockTag: block },
+        {
+          contract: beanstalk,
+          method: 'bdv',
+          args: [t, BigInt(10 ** C().DECIMALS[t])],
+          blockTag: block,
+          allowFailure: true
+        }
+      ])
     );
 
     return addresses.reduce((acc, next, idx) => {
+      const resultIndex = idx * 3;
       acc[next] = {
-        ...results[idx].tokenSetting,
-        stemTip: results[idx].stemTip,
-        bdv: results[idx].bdv
+        ...multicallResults[resultIndex],
+        stemTip: multicallResults[resultIndex + 1],
+        bdv: multicallResults[resultIndex + 2] ?? 1n
       };
       return acc;
     }, {});
@@ -143,14 +147,23 @@ class SiloService {
   static async getMowStems(accountTokenPairs, blockNumber) {
     const results = {};
     const beanstalk = Contracts.getBeanstalk();
-    const TAG = Concurrent.tag('getMowStems');
-    for (let i = 0; i < accountTokenPairs.length; ++i) {
-      const { account, token } = accountTokenPairs[i];
-      await Concurrent.run(TAG, 50, async () => {
-        results[`${account}|${token}`] = await beanstalk.getLastMowedStem(account, token, { blockTag: blockNumber });
-      });
+    const pairChunks = ArraysUtil.toChunks(accountTokenPairs, 500);
+
+    for (const pairChunk of pairChunks) {
+      const chunkResults = await Multicall.aggregate(
+        pairChunk.map(({ account, token }) => ({
+          contract: beanstalk,
+          method: 'getLastMowedStem',
+          args: [account, token],
+          blockTag: blockNumber
+        }))
+      );
+
+      for (let i = 0; i < pairChunk.length; ++i) {
+        const { account, token } = pairChunk[i];
+        results[`${account}|${token}`] = chunkResults[i];
+      }
     }
-    await Concurrent.allResolved(TAG);
 
     return results;
   }
@@ -187,21 +200,35 @@ class SiloService {
 
     const updatedTokens = [];
     await AsyncContext.sequelizeTransaction(async () => {
-      for (const tokenModel of tokenModels) {
+      const multicallResults = await Multicall.aggregate(
+        tokenModels.flatMap((tokenModel) => {
+          const token = tokenModel.address;
+          return [
+            { contract: Contracts.get(token), method: 'totalSupply', allowFailure: true },
+            {
+              contract: beanstalk,
+              method: 'bdv',
+              args: [token, BigInt(10 ** tokenModel.decimals)],
+              allowFailure: true
+            },
+            { contract: beanstalk, method: 'tokenSettings', args: [token], allowFailure: true },
+            { contract: beanstalk, method: 'stemTipForToken', args: [token], allowFailure: true },
+            { contract: beanstalk, method: 'getTotalDeposited', args: [token], allowFailure: true },
+            { contract: beanstalk, method: 'getTotalDepositedBdv', args: [token], allowFailure: true }
+          ];
+        })
+      );
+
+      for (let i = 0; i < tokenModels.length; ++i) {
+        const tokenModel = tokenModels[i];
         const token = tokenModel.address;
-        const [supply, bdv, stalkEarnedPerSeason, stemTip, totalDeposited, totalDepositedBdv] = await Promise.all(
-          [
-            Contracts.get(token).totalSupply(),
-            PromiseUtil.defaultOnReject(1n)(beanstalk.bdv(token, BigInt(10 ** tokenModel.decimals))),
-            (async () => {
-              const tokenSettings = await beanstalk.tokenSettings(token);
-              return tokenSettings.stalkEarnedPerSeason;
-            })(),
-            beanstalk.stemTipForToken(token),
-            beanstalk.getTotalDeposited(token),
-            beanstalk.getTotalDepositedBdv(token)
-          ].map(PromiseUtil.defaultOnReject(null))
-        );
+        const resultIndex = i * 6;
+        const supply = multicallResults[resultIndex] ?? null;
+        const bdv = multicallResults[resultIndex + 1] ?? 1n;
+        const stalkEarnedPerSeason = multicallResults[resultIndex + 2]?.stalkEarnedPerSeason ?? null;
+        const stemTip = multicallResults[resultIndex + 3] ?? null;
+        const totalDeposited = multicallResults[resultIndex + 4] ?? null;
+        const totalDepositedBdv = multicallResults[resultIndex + 5] ?? null;
 
         updatedTokens.push(
           ...(await TokenRepository.updateToken(token, chain, {
